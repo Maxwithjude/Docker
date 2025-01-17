@@ -29,7 +29,23 @@
 
 <br>
 
+## 💡 산출물
 
+### ERD
+![ERD](image/ERD.png)
+
+### User Flow & Wire Frame
+[🔗 User Flow](https://www.figma.com/board/Ce1fyDbZh7lUdKMhZG1E4r/A208---FlowChart?node-id=0-1&p=f&t=gaoDUj24KI55Ow2o-0)
+<br>
+[🔗 Wire Frame](https://www.figma.com/design/uAl2EqrRoCL7BtRWtmnprv/A208---WireFrame?node-id=0-1&t=VfCv9iurRQE2e5lK-1)
+
+### API 명세서
+[🔗 API Docs](https://eenzzi.notion.site/API-17a45cc04c9d80e4accef604699f301b?pvs=4)
+
+### 팀 노션
+<a href="https://eenzzi.notion.site/PJT-17445cc04c9d80e48ec5feefdaf49286?pvs=4"><img alt="notion" src ="https://img.shields.io/badge/notion-skyblue.svg?&style=for-the-badge&logo=notion&logoColor=black"/></a>
+
+<br>
 
 ## 🛠️ **기술 스택**
 - **Frontend**: React  
@@ -43,8 +59,3 @@
 
 
 
-# ERD
-![ERD](image/ERD.png)
-
-# User Flow
-[💭 User Flow](https://www.figma.com/board/Ce1fyDbZh7lUdKMhZG1E4r/A208---FlowChart?node-id=0-1&p=f&t=gaoDUj24KI55Ow2o-0)

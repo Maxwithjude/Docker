@@ -1,4 +1,4 @@
-# **북마크 기반 큐레이션 서비스** 
+# **북마크 기반 큐레이션 서비스**   
 
 <br>
 
@@ -57,7 +57,6 @@
 - **Infra**: Docker, AWS EKS, Prometheus, Grafana
 - **External Integration**: RSS Feed, Chrome Extension  
 
-<br>
 
 
 

@@ -57,7 +57,6 @@
 - **Infra**: Docker, AWS EKS, Prometheus, Grafana
 - **External Integration**: RSS Feed, Chrome Extension  
 
-<br>
 
 
 

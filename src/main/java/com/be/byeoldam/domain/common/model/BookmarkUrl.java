@@ -1,17 +1,12 @@
-package com.be.byeoldam.domain.bookmark.model;
+package com.be.byeoldam.domain.common.model;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 @Entity
 @Table(name="bookmark_url")
 @Getter
-@NoArgsConstructor
-@AllArgsConstructor
-@Builder
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class BookmarkUrl {
 
     @Id
@@ -24,7 +19,6 @@ public class BookmarkUrl {
     @Column(name = "reference_count", nullable = false)
     private Long referenceCount;
 
-    // 타입 고민 필요
     @Column(name = "reading_time")
     private int readingTime;
 }

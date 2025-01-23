@@ -1,29 +1,21 @@
 package com.be.byeoldam.domain.user.model;
 
 import com.be.byeoldam.common.entity.BaseTimeEntity;
-import com.be.byeoldam.domain.user.dto.UserRegisterDto;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+import lombok.*;
 
 import java.time.LocalDateTime;
 
 @Getter
-@NoArgsConstructor
-@AllArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
-@Builder
 @Table(name = "user")
-@EntityListeners(AuditingEntityListener.class)
 public class User extends BaseTimeEntity{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(length = 100, nullable = false)
+    @Column(length = 100, nullable = false, unique = true)
     private String email;
 
     @Enumerated(EnumType.STRING)
@@ -79,12 +71,6 @@ public class User extends BaseTimeEntity{
         this.providerId = providerId;
     }
 
-    public static User.UserBuilder fromDto(UserRegisterDto dto) {
-        return User.builder()
-                .email(dto.getEmail())
-                .password(dto.getPassword())
-                .nickname(dto.getNickname());
-    }
 
     @PrePersist
     private void prePersist() {
@@ -100,8 +86,9 @@ public class User extends BaseTimeEntity{
         if (this.isActive == null) {
             this.isActive = AccountStatus.ACTIVE;
         }
-
-        // 프로필 이미지를 랜덤하게 배정하는 코드 추후에 넣기.
+        if(this.profileUrl == null) {
+            profileUrl ="*";
+        }
     }
 
     public enum AccountStatus {

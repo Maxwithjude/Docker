@@ -4,15 +4,14 @@ import com.be.byeoldam.common.entity.BaseTimeEntity;
 import com.be.byeoldam.domain.user.model.User;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Getter
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Inheritance(strategy = InheritanceType.JOINED)
-@DiscriminatorColumn(name = "notification_type")
+@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
+@DiscriminatorColumn(name = "type")
 public abstract class Notification extends BaseTimeEntity {
 
     @Id
@@ -26,14 +25,9 @@ public abstract class Notification extends BaseTimeEntity {
     @Column(nullable = false, length = 100)
     private String message;
 
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    private NotificationType type;
-
-    @Builder
-    protected Notification(User user, String message, NotificationType type) {
+    protected Notification(User user, String message) {
         this.user = user;
         this.message = message;
-        this.type = type;
     }
+
 }

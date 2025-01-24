@@ -1,7 +1,7 @@
 <template>
-  <div>
-    <RouterView />
-  </div>
+    <div>
+        중요페이지
+    </div>
 </template>
 
 <script setup>

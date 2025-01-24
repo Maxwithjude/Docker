@@ -3,6 +3,7 @@ package com.be.byeoldam.domain.notification.model;
 import com.be.byeoldam.domain.sharedcollection.model.SharedCollection;
 import com.be.byeoldam.domain.user.model.User;
 import jakarta.persistence.*;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -18,13 +19,10 @@ public class InviteNotification extends Notification {
 
     private String nickname; // 알림 보낸 사람의 닉네임
 
-    private InviteNotification(User user, String message, SharedCollection collection, String nickname) {
-        super(user, message);
+    @Builder
+    public InviteNotification(User user, String message, String title ,SharedCollection collection, String nickname) {
+        super(user, message, title);
         this.collection = collection;
         this.nickname = nickname;
-    }
-
-    public static InviteNotification createNotification(User user, String message, SharedCollection collection, String nickname) {
-        return new InviteNotification(user, message, collection, nickname);
     }
 }

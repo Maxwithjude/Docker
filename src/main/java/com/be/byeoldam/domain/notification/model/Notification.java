@@ -23,11 +23,15 @@ public abstract class Notification extends BaseTimeEntity {
     private User user; // 알림을 받을 유저
 
     @Column(nullable = false)
+    private String title;
+
+    @Column(nullable = false)
     private String message;
 
-    protected Notification(User user, String message) {
+    protected Notification(User user, String message, String title) {
         this.user = user;
         this.message = message;
+        this.title = title;
     }
 
 }

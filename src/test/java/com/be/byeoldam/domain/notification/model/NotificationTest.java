@@ -28,13 +28,21 @@ class NotificationTest {
     void createBookmarkNotification() {
 
         String message = "북마크 알림 테스트";
+        String title = "북마크 알림 테스트";
 
-        BookmarkNotification bookmarkNotification = BookmarkNotification.createNotification(user, message, bookmark);
+        BookmarkNotification bookmarkNotification = BookmarkNotification.builder()
+                .title(title)
+                .user(user)
+                .message(message)
+                .title("북마크 알림 테스트")
+                .bookmark(bookmark)
+                .build();
 
         assertThat(bookmarkNotification).isNotNull();
         assertThat(bookmarkNotification.getUser()).isEqualTo(user);
         assertThat(bookmarkNotification.getMessage()).isEqualTo(message);
         assertThat(bookmarkNotification.getBookmark()).isEqualTo(bookmark);
+        assertThat(bookmarkNotification.getTitle()).isEqualTo(title);
 
     }
 
@@ -44,13 +52,21 @@ class NotificationTest {
 
         String message = "초대 알림 테스트";
         String nickname = "초대자 닉네임";
+        String title = "북마크 알림 테스트";
 
-        InviteNotification inviteNotification = InviteNotification.createNotification(user, message, sharedCollection, nickname);
+        InviteNotification inviteNotification = InviteNotification.builder()
+                .user(user)
+                .message(message)
+                .title("북마크 알림 테스트")
+                .collection(sharedCollection)
+                .nickname(nickname)
+                .build();
 
         assertThat(inviteNotification).isNotNull();
         assertThat(inviteNotification.getUser()).isEqualTo(user);
         assertThat(inviteNotification.getMessage()).isEqualTo(message);
         assertThat(inviteNotification.getCollection()).isEqualTo(sharedCollection);
         assertThat(inviteNotification.getNickname()).isEqualTo(nickname);
+        assertThat(inviteNotification.getTitle()).isEqualTo(title);
     }
 }

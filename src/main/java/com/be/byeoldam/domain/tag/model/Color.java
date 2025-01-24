@@ -1,4 +1,4 @@
-package com.be.byeoldam.domain.common.model;
+package com.be.byeoldam.domain.tag.model;
 
 public enum Color {
     PASTEL_PINK("#FFB6C1"), // 파스텔 핑크

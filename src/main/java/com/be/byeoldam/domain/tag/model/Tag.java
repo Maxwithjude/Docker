@@ -1,8 +1,7 @@
-package com.be.byeoldam.domain.common.model;
+package com.be.byeoldam.domain.tag.model;
 
 import jakarta.persistence.*;
 import lombok.AccessLevel;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import java.util.Random;
@@ -29,13 +28,17 @@ public class Tag {
 
     @PrePersist
     private void prePersist() {
-        this.referenceCount = 1;
+        this.referenceCount = 0;
         this.color = Color.values()[new Random().nextInt(Color.values().length)];
     }
 
-    @Builder
-    public Tag(String name) {
+    public static Tag createTag(String name){
+        return new Tag(name);
+    }
+
+    private Tag(String name){
         this.name = name;
     }
+
 
 }

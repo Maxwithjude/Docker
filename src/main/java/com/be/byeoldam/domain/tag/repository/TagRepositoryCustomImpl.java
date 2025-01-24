@@ -1,15 +1,15 @@
-package com.be.byeoldam.domain.common.repository.tag;
+package com.be.byeoldam.domain.tag.repository;
 
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
-import static com.be.byeoldam.domain.common.model.QTag.tag;
+import static com.be.byeoldam.domain.tag.model.QTag.tag;
 
 
 @Repository
-public class TagRepositoryCustomImpl implements TagRepositoryCustom{
+public class TagRepositoryCustomImpl implements TagRepositoryCustom {
 
     @Autowired
     private JPAQueryFactory queryFactory;

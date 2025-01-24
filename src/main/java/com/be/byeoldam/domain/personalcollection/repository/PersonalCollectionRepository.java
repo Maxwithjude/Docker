@@ -6,5 +6,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
 
 public interface PersonalCollectionRepository extends JpaRepository<PersonalCollection, Long> {
-    
+    List<PersonalCollection> findByUserId(Long userId);
 }

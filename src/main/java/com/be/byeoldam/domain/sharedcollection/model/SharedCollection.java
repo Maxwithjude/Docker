@@ -1,6 +1,7 @@
 package com.be.byeoldam.domain.sharedcollection.model;
 
 import com.be.byeoldam.common.entity.BaseTimeEntity;
+import com.be.byeoldam.domain.user.model.User;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -21,4 +22,11 @@ public class SharedCollection extends BaseTimeEntity {
     @Column(nullable = false, length = 10)
     private String name;
 
+    @OneToMany
+
+    @Builder
+    public SharedCollection(User user, String name) {
+        this.user = user;
+        this.name = name;
+    }
 }

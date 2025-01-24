@@ -27,7 +27,12 @@ public class PersonalCollection extends BaseTimeEntity {
     private User user;
 
     //not null, varchar(10)
-    @Column(name="name", nullable=false, length=10)
+    @Column(name="name", nullable=false, length=20)
     private String name;
 
+    @Builder
+    public PersonalCollection(User user, String name) {
+        this.user = user;
+        this.name = name;
+    }
 }

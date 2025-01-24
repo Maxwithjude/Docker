@@ -14,7 +14,7 @@ import lombok.NoArgsConstructor;
 public class BookmarkNotification extends Notification {
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "bookmark_id", nullable = false)
+    @JoinColumn(name = "bookmark_id")
     private Bookmark bookmark;
 
     private BookmarkNotification(User user, String message, Bookmark bookmark) {

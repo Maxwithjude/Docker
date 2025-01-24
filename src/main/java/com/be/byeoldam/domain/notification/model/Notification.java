@@ -22,7 +22,7 @@ public abstract class Notification extends BaseTimeEntity {
     @JoinColumn(name = "user_id")
     private User user; // 알림을 받을 유저
 
-    @Column(nullable = false, length = 100)
+    @Column(nullable = false)
     private String message;
 
     protected Notification(User user, String message) {

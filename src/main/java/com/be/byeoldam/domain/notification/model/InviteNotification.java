@@ -13,7 +13,7 @@ import lombok.NoArgsConstructor;
 public class InviteNotification extends Notification {
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "shared_collection_id", nullable = false)
+    @JoinColumn(name = "shared_collection_id")
     private SharedCollection collection;
 
     private String nickname; // 알림 보낸 사람의 닉네임

@@ -20,8 +20,8 @@ public class InviteNotification extends Notification {
     private String nickname; // 알림 보낸 사람의 닉네임
 
     @Builder
-    public InviteNotification(User user, String message, String title ,SharedCollection collection, String nickname) {
-        super(user, message, title);
+    public InviteNotification(User user, String message, SharedCollection collection, String nickname) {
+        super(user, message);
         this.collection = collection;
         this.nickname = nickname;
     }

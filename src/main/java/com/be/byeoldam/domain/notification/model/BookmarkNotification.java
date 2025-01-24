@@ -19,8 +19,8 @@ public class BookmarkNotification extends Notification {
     private Bookmark bookmark;
 
     @Builder
-    public BookmarkNotification(User user, String message, String title, Bookmark bookmark) {
-        super(user, message, title);
+    public BookmarkNotification(User user, String message, Bookmark bookmark) {
+        super(user, message);
         this.bookmark = bookmark;
     }
 }

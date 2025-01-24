@@ -29,14 +29,13 @@ public class Tag {
 
     @PrePersist
     private void prePersist() {
-        this.referenceCount = 0;
+        this.referenceCount = 1;
         this.color = Color.values()[new Random().nextInt(Color.values().length)];
     }
 
     @Builder
     public Tag(String name) {
         this.name = name;
-        this.referenceCount = 0;
     }
 
 }

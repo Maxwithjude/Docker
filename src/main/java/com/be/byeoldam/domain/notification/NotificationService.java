@@ -37,6 +37,7 @@ public class NotificationService {
         } else if (notification instanceof BookmarkNotification) { // 북마크 알림일 경우
             BookmarkNotification bookmarkNotification = (BookmarkNotification) notification;
             title = bookmarkNotification.getBookmark().getBookmarkUrl().getUrl();
+            message = bookmarkNotification.getMessage();
             url = getTitleFromUrl(title);
         }
 

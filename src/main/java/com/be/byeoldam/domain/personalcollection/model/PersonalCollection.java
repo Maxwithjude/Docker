@@ -30,4 +30,13 @@ public class PersonalCollection extends BaseTimeEntity {
     @Column(name="name", nullable=false, length=10)
     private String name;
 
+    private PersonalCollection(String name, User user) {
+        this.name = name;
+        this.user = user;
+    }
+
+    public static PersonalCollection createPersonalCollection(String name, User user) {
+        return new PersonalCollection(name, user);
+    }
+
 }

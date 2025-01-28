@@ -1,7 +1,7 @@
 <template>
-  <div>
-    <RouterView />
-  </div>
+    <div>
+        추천페이지
+    </div>
 </template>
 
 <script setup>

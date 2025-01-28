@@ -1,7 +1,7 @@
 <template>
-  <div>
-    <RouterView />
-  </div>
+    <div>
+        헤더
+    </div>
 </template>
 
 <script setup>

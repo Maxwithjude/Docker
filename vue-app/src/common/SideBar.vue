@@ -43,11 +43,12 @@
 
 <style scoped>
 .sidebar {
-    width: 250px;
-    height: 100vh;
+    width: 240px;
     background-color: #f8f9fa;
+    height: 100%;
     padding: 20px;
-    border-right: 1px solid #dee2e6;
+    border-right: 1px solid #e9ecef;
+    flex-shrink: 0;
 }
 
 .nav-item {

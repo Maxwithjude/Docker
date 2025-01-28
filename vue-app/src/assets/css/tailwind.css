@@ -1,0 +1,6 @@
+/* src/assets/css/tailwind.css */
+
+/* Tailwind의 기본 스타일 로드 */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;

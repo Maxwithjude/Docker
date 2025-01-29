@@ -5,6 +5,7 @@ import com.be.byeoldam.config.QuerydslConfig;
 import com.be.byeoldam.domain.tag.model.Tag;
 import com.be.byeoldam.domain.tag.repository.TagRepository;
 import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
@@ -19,10 +20,10 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 @DataJpaTest
 @Import({AuditingConfig.class, QuerydslConfig.class})
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
-public class TagTest {
+public class TagRepositoryTest {
     @Autowired
-    TagRepository tagRepository;
-    @Autowired
+    com.be.byeoldam.domain.tag.repository.TagRepository tagRepository;
+    @PersistenceContext
     EntityManager entityManager; // EntityManager 주입
 
     @Test

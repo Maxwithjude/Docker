@@ -21,4 +21,11 @@ public class BookmarkUrl {
 
     @Column(name = "reading_time")
     private int readingTime;
+
+    @Builder
+    public BookmarkUrl(String url, Long referenceCount, int readingTime) {
+        this.url = url;
+        this.referenceCount = referenceCount;
+        this.readingTime = readingTime;
+    }
 }

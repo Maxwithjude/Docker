@@ -31,4 +31,8 @@ public abstract class Notification extends BaseTimeEntity {
         this.message = message;
     }
 
+    public String getType() {
+        return this.getClass().getAnnotation(DiscriminatorValue.class).value();
+    }
+
 }

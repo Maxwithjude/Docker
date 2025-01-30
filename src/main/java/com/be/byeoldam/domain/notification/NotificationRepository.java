@@ -13,4 +13,12 @@ public interface NotificationRepository extends JpaRepository<Notification, Long
      * WHERE n.user.id = :userId
      */
     List<Notification> findByUserId(Long userId);
+
+    /**
+     * 유저의 알림 전체 삭제
+     * DELETE
+     * FROM Notification n
+     * WHERE n.user.id = :userId
+     */
+    void deleteByUser_Id(Long userId);
 }

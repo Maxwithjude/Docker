@@ -4,8 +4,10 @@ import com.be.byeoldam.domain.notification.dto.NotificationResponse;
 import com.be.byeoldam.domain.notification.model.BookmarkNotification;
 import com.be.byeoldam.domain.notification.model.InviteNotification;
 import com.be.byeoldam.domain.notification.model.Notification;
+import com.be.byeoldam.exception.CustomException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -15,6 +17,12 @@ public class NotificationService {
 
     private final NotificationRepository notificationRepository;
 
+    /**
+     * 사용자의 알림 목록을 조회하는 메서드
+     * @param userId
+     * @return
+     */
+    @Transactional(readOnly = true)
     public List<NotificationResponse> getNotifications(Long userId) {
         List<Notification> notifications = notificationRepository.findByUserId(userId);
 
@@ -23,6 +31,37 @@ public class NotificationService {
                 .toList();
     }
 
+    /**
+     * 사용자의 알림을 삭제하는 메서드
+     * @param notificationId
+     * @param userId
+     */
+    @Transactional
+    public void deleteNotification(Long notificationId, Long userId) {
+        Notification notification = notificationRepository.findById(notificationId)
+                .orElseThrow(() -> new CustomException("해당 알림이 존재하지 않습니다."));
+
+        if (!notification.getUser().getId().equals(userId)) {
+            throw new IllegalArgumentException("해당 알림에 대한 권한이 없습니다.");
+        }
+
+        notificationRepository.delete(notification);
+    }
+
+    /**
+     * 사용자의 모든 알림을 삭제하는 메서드
+     * @param userId
+     */
+    @Transactional
+    public void deleteAllNotifications(Long userId) {
+        notificationRepository.deleteByUser_Id(userId);
+    }
+
+    /**
+     * Notification 객체를 NotificationResponse로 변환하는 메서드
+     * @param notification
+     * @return
+     */
     private NotificationResponse toResponse(Notification notification) {
 
         String title = "";
@@ -56,4 +95,5 @@ public class NotificationService {
     private String getTitleFromUrl(String url) {
         return url;
     }
+
 }

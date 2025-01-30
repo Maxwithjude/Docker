@@ -35,7 +35,7 @@ public class PersonalCollection extends BaseTimeEntity {
         this.user = user;
     }
 
-    public static PersonalCollection createPersonalCollection(String name, User user) {
+    public static PersonalCollection create(String name, User user) {
         return new PersonalCollection(name, user);
     }
 

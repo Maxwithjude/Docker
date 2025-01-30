@@ -26,8 +26,8 @@ public class PersonalCollection extends BaseTimeEntity {
     @JoinColumn(name="user_id", nullable=false)
     private User user;
 
-    //not null, varchar(10)
-    @Column(name="name", nullable=false, length=10)
+    //not null, varchar(20)
+    @Column(name="name", nullable=false, length=20)
     private String name;
 
     private PersonalCollection(String name, User user) {
@@ -39,4 +39,8 @@ public class PersonalCollection extends BaseTimeEntity {
         return new PersonalCollection(name, user);
     }
 
+    public void updateName(String updatedName) {
+        // TODO : 이름 빈 값 예외
+        this.name = updatedName;
+    }
 }

@@ -58,6 +58,7 @@ public class PersonalCollectionRepositoryTest {
         assertThat(savedCollection.getUser()).isEqualTo(user);
     }
 
+    // TODO : 테스트 보완 필요..?
     @Test
     @DisplayName("유저의 collection 목록 조회")
     void findPersonalCollectionTest() {

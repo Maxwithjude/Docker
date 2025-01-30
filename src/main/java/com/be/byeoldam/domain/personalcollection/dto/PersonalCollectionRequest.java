@@ -15,6 +15,6 @@ public class PersonalCollectionRequest {
     private String name;
 
     public PersonalCollection toEntity(User user) {
-        return PersonalCollection.createPersonalCollection(name, user);
+        return PersonalCollection.create(name, user);
     }
 }

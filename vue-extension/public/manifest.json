@@ -1,9 +1,14 @@
 {
   "name": "별담",
-  "description": "별을담다",
-  "version": "0.0.1",
+  "description": "북마크와 RSS 피드를 관리하는 크롬 익스텐션",
+  "version": "1.0.0",
   "manifest_version": 3,
   "action": {
     "default_popup": "index.html"
+  },
+  "permissions": ["activeTab", "tabs", "contextMenus", "storage"],
+  "host_permissions": ["<all_urls>"],
+  "background": {
+    "service_worker": "background.js"
   }
 }

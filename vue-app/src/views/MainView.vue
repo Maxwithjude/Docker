@@ -57,31 +57,31 @@ import CreateCollection from '@/modal/CreateCollection.vue';
 
 const isDeleteMode = ref(false);
 const collections = ref([
-    // {
-    //     id: 1,
-    //     title: "영어 단어장",
-    //     type: 'personal'
-    // },
-    // {
-    //     id: 2,
-    //     title: "프로그래밍 용어",
-    //     type: 'shared'
-    // },
-    // {
-    //     id: 3,
-    //     title: "일본어 문법",
-    //     type: 'personal'
-    // },
-    // {
-    //     id: 4,
-    //     title: "수학 공식",
-    //     type: 'shared'
-    // },
-    // {
-    //     id: 5,
-    //     title: "한국사 연대표",
-    //     type: 'personal'
-    // }
+    {
+        id: 1,
+        title: "영어 단어장",
+        type: 'personal'
+    },
+    {
+        id: 2,
+        title: "프로그래밍 용어",
+        type: 'shared'
+    },
+    {
+        id: 3,
+        title: "일본어 문법",
+        type: 'personal'
+    },
+    {
+        id: 4,
+        title: "수학 공식",
+        type: 'shared'
+    },
+    {
+        id: 5,
+        title: "한국사 연대표",
+        type: 'personal'
+    }
 ]);
 const showCreateModal = ref(false);
 

@@ -1,111 +1,118 @@
 <template>
-    <div class="bookmark-settings" :style="positionStyle">
-        <div class="settings-menu">
-            <button class="menu-item" @click="handleDelete">
-                <i class="fas fa-trash"></i>
-                북마크 삭제
-            </button>
-            
-            <button class="menu-item" @click="handleTags">
-                <i class="fas fa-tags"></i>
-                북마크 태그 관리
-            </button>
-            
-            <button class="menu-item" @click="handleImportant">
-                <i :class="isImportant ? 'fas fa-star' : 'far fa-star'"></i>
-                {{ isImportant ? '중요 북마크 해제' : '중요 북마크 설정' }}
-            </button>
-            
-            <button class="menu-item" @click="handleCopyToShared">
-                <i class="fas fa-share-alt"></i>
-                공유 컬렉션으로 복사
-            </button>
-            
-            <button class="menu-item" @click="handleMove">
-                <i class="fas fa-folder-open"></i>
-                다른 개인 컬렉션으로 이동
-            </button>
-        </div>
+  <el-popover
+    placement="bottom-end"
+    :width="200"
+    trigger="click"
+    popper-class="bookmark-settings-popover"
+    v-model:visible="isVisible"
+  >
+    <template #reference>
+      <slot name="reference"></slot>
+    </template>
+    
+    <div class="popover-content">
+      <el-button-group vertical class="settings-menu">
+        <el-button type="text" @click="toggleImportant">
+          {{ isImportant ? '중요 북마크 해제' : '중요 북마크로 설정' }}
+        </el-button>
+        
+        <el-button type="text" @click="copyToSharedCollection">
+          공유 컬렉션으로 복사
+        </el-button>
+        
+        <el-button type="text" @click="showMoveDialog">
+          다른 컬렉션으로 이동
+        </el-button>
+        
+        <el-button type="text" @click="showTagManagement">
+          태그 관리
+        </el-button>
+        
+        <el-button type="text" class="delete-button" @click="confirmDelete">
+          북마크 삭제
+        </el-button>
+      </el-button-group>
     </div>
+  </el-popover>
 </template>
 
 <script setup>
-import { computed } from 'vue';
+import { ref } from 'vue';
 
-const props = defineProps({
-    position: {
-        type: Object,
-        required: true,
-        // { x: number, y: number }
-    },
-    isImportant: {
-        type: Boolean,
-        default: false
+const isVisible = ref(false);
+const isImportant = ref(false);
+
+const toggleImportant = () => {
+  isImportant.value = !isImportant.value;
+  // TODO: API 호출하여 중요 상태 업데이트
+};
+
+const copyToSharedCollection = () => {
+  // TODO: 공유 컬렉션 선택 다이얼로그 표시
+};
+
+const showMoveDialog = () => {
+  // TODO: 이동할 컬렉션 선택 다이얼로그 표시
+};
+
+const showTagManagement = () => {
+  // TODO: 태그 관리 다이얼로그 표시
+};
+
+const confirmDelete = () => {
+  ElMessageBox.confirm(
+    '이 북마크를 삭제하시겠습니까?',
+    '경고',
+    {
+      confirmButtonText: '삭제',
+      cancelButtonText: '취소',
+      type: 'warning',
     }
-});
-
-const emit = defineEmits([
-    'delete',
-    'manageTags',
-    'toggleImportant',
-    'copyToShared',
-    'move',
-    'close'
-]);
-
-const positionStyle = computed(() => ({
-    left: `${props.position.x}px`,
-    top: `${props.position.y}px`
-}));
-
-const handleDelete = () => emit('delete');
-const handleTags = () => emit('manageTags');
-const handleImportant = () => emit('toggleImportant');
-const handleCopyToShared = () => emit('copyToShared');
-const handleMove = () => emit('move');
+  ).then(() => {
+    // TODO: 북마크 삭제 API 호출
+    ElMessage({
+      type: 'success',
+      message: '북마크가 삭제되었습니다.',
+    });
+  }).catch(() => {});
+};
 </script>
 
 <style scoped>
-.bookmark-settings {
-    position: absolute;
-    background: white;
-    border-radius: 8px;
-    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.15);
-    width: 240px;
-    z-index: 1000;
-    overflow: hidden;
+.bookmark-actions {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+}
+
+.settings-button {
+  padding: 4px;
+  color: #909399;
+}
+
+.settings-button:hover {
+  color: #409EFF;
 }
 
 .settings-menu {
-    display: flex;
-    flex-direction: column;
+  width: 100%;
 }
 
-.menu-item {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: 12px 16px;
-    border: none;
-    background: none;
-    width: 100%;
-    text-align: left;
-    cursor: pointer;
-    color: #333;
-    font-size: 0.9rem;
-    transition: background-color 0.2s;
+.settings-menu .el-button {
+  justify-content: flex-start;
+  padding: 8px 16px;
+  width: 100%;
 }
 
-.menu-item:hover {
-    background-color: #f5f5f5;
+.settings-menu .el-button:hover {
+  background-color: #f5f7fa;
 }
 
-.menu-item i {
-    width: 16px;
-    color: #666;
+.settings-menu .delete-button {
+  color: #f56c6c;
 }
 
-.menu-item:hover i {
-    color: #333;
+:deep(.bookmark-settings-popover) {
+  padding: 0;
 }
 </style>

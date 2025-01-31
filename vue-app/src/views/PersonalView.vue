@@ -6,18 +6,23 @@
             <div class="body">
                 <h1 class="page-title">개인 컬렉션</h1>
 
-                <div v-if="collections.length === 0" class="empty-state">
+                <div v-if="bookmarks.length === 0" class="empty-state">
                     <i class="fas fa-folder-open empty-icon"></i>
-                    <p class="empty-text">컬렉션이 존재하지 않습니다.</p>
-                    <p class="empty-description">새로운 컬렉션을 만들어 북마크를 정리해보세요!</p>
-                    <button class="create-collection-button" @click="showCreateModal = true">
-                        <i class="fas fa-plus"></i>
-                        컬렉션 만들기
-                    </button>
+                    <p class="empty-text">북마크가 존재하지 않습니다.</p>
+                    <p class="empty-description">새로운 북마크를 추가해보세요!</p>
                 </div>
 
-                <div v-else class="collections-grid">
-                    <!-- 컬렉션이 있을 때의 UI -->
+                <div v-else class="cards-grid">
+                    <Card
+                        v-for="bookmark in bookmarks"
+                        :key="bookmark.id"
+                        v-bind="bookmark"
+                        @delete="handleDelete"
+                        @manageTags="handleManageTags"
+                        @toggleImportant="handleToggleImportant"
+                        @copyToShared="handleCopyToShared"
+                        @move="handleMove"
+                    />
                 </div>
             </div>
         </div>
@@ -36,9 +41,66 @@ import { ref } from 'vue';
 import Header from '@/common/Header.vue';
 import SideBar from '@/common/SideBar.vue';
 import CreateCollection from '@/modal/CreateCollection.vue';
+import Card from '@/common/Card.vue';
 
-const collections = ref([]);
+const bookmarks = ref([
+    {
+        id: 1,
+        image: 'https://images.unsplash.com/photo-1481627834876-b7833e8f5570?q=80&w=2128&auto=format&fit=crop',
+        title: '프로그래밍 입문자를 위한 자바스크립트 기초 가이드',
+        description: '자바스크립트를 처음 시작하는 분들을 위한 완벽 가이드. 기초 문법부터 실전 예제까지 모두 담았습니다.',
+        url: 'https://example.com/javascript-guide',
+        hashtags: ['JavaScript', 'Programming', 'WebDev', 'Tutorial'],
+        readingTime: 15,
+        isImportant: true
+    },
+    {
+        id: 2,
+        image: 'https://images.unsplash.com/photo-1498050108023-c5249f4df085?q=80&w=2072&auto=format&fit=crop',
+        title: 'React와 Vue.js 비교 분석',
+        description: '현대 웹 개발의 양대 산맥, React와 Vue.js의 특징과 차이점을 상세히 비교 분석합니다.',
+        url: 'https://example.com/react-vs-vue',
+        hashtags: ['React', 'Vue', 'Frontend', 'Comparison'],
+        readingTime: 10,
+        isImportant: false
+    },
+    {
+        id: 3,
+        image: 'https://images.unsplash.com/photo-1555066931-4365d14bab8c?q=80&w=2070&auto=format&fit=crop',
+        title: 'Python으로 시작하는 데이터 분석',
+        description: 'Python과 주요 데이터 분석 라이브러리를 활용한 실무 데이터 분석 방법론',
+        url: 'https://example.com/python-data-analysis',
+        hashtags: ['Python', 'DataScience', 'Analytics'],
+        readingTime: 20,
+        isImportant: false
+    }
+]);
+
 const showCreateModal = ref(false);
+
+// 이벤트 핸들러 함수들
+const handleDelete = (id) => {
+    bookmarks.value = bookmarks.value.filter(bookmark => bookmark.id !== id);
+};
+
+const handleManageTags = (id) => {
+    console.log('태그 관리:', id);
+};
+
+const handleToggleImportant = (id) => {
+    const bookmark = bookmarks.value.find(b => b.id === id);
+    if (bookmark) {
+        bookmark.isImportant = !bookmark.isImportant;
+    }
+};
+
+const handleCopyToShared = (id) => {
+    console.log('공유 컬렉션으로 복사:', id);
+};
+
+const handleMove = (id) => {
+    console.log('다른 컬렉션으로 이동:', id);
+};
 </script>
 
 <style scoped>
@@ -145,7 +207,7 @@ const showCreateModal = ref(false);
     overflow-y: auto;
 }
 
-.collections-grid {
+.cards-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
     gap: 24px;

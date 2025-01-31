@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
 import java.util.Optional;
 
+
 public interface PersonalCollectionRepository extends JpaRepository<PersonalCollection, Long> {
     // 개인컬렉션 목록 조회
     List<PersonalCollection> findByUserId(Long userId);

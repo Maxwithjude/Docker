@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 public class sharedCollectionRequest {
     private String name;
 
-    public SharedCollection toEntity() {
-        return SharedCollection
-    }
+//    public SharedCollection toEntity() {
+////        return SharedCollection
+//    }
 }

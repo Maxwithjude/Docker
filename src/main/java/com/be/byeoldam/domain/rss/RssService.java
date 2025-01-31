@@ -47,11 +47,13 @@ public class RssService {
     @Transactional
     public void unsubscribeRss(Long userId, Long rssId) {
 
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new CustomException("사용자를 찾을 수 없습니다."));
+        if (!userRepository.existsById(userId)) {
+            throw new CustomException("사용자를 찾을 수 없습니다.");
+        }
 
-        Rss rss = rssRepository.findById(rssId)
-                .orElseThrow(() -> new CustomException("RSS를 찾을 수 없습니다."));
+        if (!rssRepository.existsById(rssId)) {
+            throw new CustomException("RSS를 찾을 수 없습니다.");
+        }
 
         if (!userRssRepository.existsByUserIdAndRssId(userId, rssId)) {
             throw new CustomException("구독하지 않은 RSS입니다.");
@@ -63,8 +65,9 @@ public class RssService {
     @Transactional
     public List<UserRssResponse> getUserRssList(Long userId) {
 
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new CustomException("사용자를 찾을 수 없습니다."));
+        if (!userRepository.existsById(userId)) {
+            throw new CustomException("사용자를 찾을 수 없습니다.");
+        }
 
         List<UserRss> userRssList = userRssRepository.findByUserId(userId);
 
@@ -80,8 +83,9 @@ public class RssService {
     @Transactional
     public RssLatestPostsResponse getRssLatestArticles(Long userId, Long rssId) {
 
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new CustomException("사용자를 찾을 수 없습니다."));
+        if (!userRepository.existsById(userId)) {
+            throw new CustomException("사용자를 찾을 수 없습니다.");
+        }
 
         Rss rss = rssRepository.findById(rssId)
                 .orElseThrow(() -> new CustomException("RSS를 찾을 수 없습니다."));

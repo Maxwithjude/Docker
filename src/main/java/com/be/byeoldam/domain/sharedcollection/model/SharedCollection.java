@@ -17,15 +17,15 @@ public class SharedCollection extends BaseTimeEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    // nullable false
-    @Column(nullable = false, length = 10)
+    // nullable false, length = 20
+    @Column(nullable = false, length = 20)
     private String name;
 
     private SharedCollection(String name) {
         this.name = name;
     }
 
-    public static SharedCollection createSharedCollection(String name) {
+    public static SharedCollection create(String name) {
         return new SharedCollection(name);
     }
 

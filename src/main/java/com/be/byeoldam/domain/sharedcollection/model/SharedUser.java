@@ -28,4 +28,11 @@ public class SharedUser extends BaseTimeEntity { // 공유컬렉션-유저 매�
     @Enumerated(EnumType.STRING)
     @Column(name = "role", nullable = false)
     private Role role;
+
+    @Builder
+    public SharedUser(User user, SharedCollection sharedCollection, Role role) {
+        this.user = user;
+        this.sharedCollection = sharedCollection;
+        this.role = role;
+    }
 }

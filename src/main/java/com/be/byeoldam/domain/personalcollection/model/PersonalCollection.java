@@ -26,13 +26,21 @@ public class PersonalCollection extends BaseTimeEntity {
     @JoinColumn(name="user_id", nullable=false)
     private User user;
 
-    //not null, varchar(10)
+    //not null, varchar(20)
     @Column(name="name", nullable=false, length=20)
     private String name;
 
-    @Builder
-    public PersonalCollection(User user, String name) {
-        this.user = user;
+    private PersonalCollection(String name, User user) {
         this.name = name;
+        this.user = user;
+    }
+
+    public static PersonalCollection create(String name, User user) {
+        return new PersonalCollection(name, user);
+    }
+
+    public void updateName(String updatedName) {
+        // TODO : 이름 빈 값 예외
+        this.name = updatedName;
     }
 }

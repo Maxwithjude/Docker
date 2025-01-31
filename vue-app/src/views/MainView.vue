@@ -54,7 +54,8 @@ import Header from '@/common/Header.vue';
 import SideBar from '@/common/SideBar.vue';
 import Collection from '@/common/Collection.vue';
 import CreateCollection from '@/modal/CreateCollection.vue';
-
+import { useCounterStore } from '@/stores/counter';
+const store = useCounterStore();
 const isDeleteMode = ref(false);
 const collections = ref([
     {

@@ -8,6 +8,7 @@ import com.be.byeoldam.domain.notification.model.InviteNotification;
 import com.be.byeoldam.domain.notification.model.Notification;
 import com.be.byeoldam.domain.sharedcollection.model.SharedCollection;
 import com.be.byeoldam.domain.user.model.User;
+import com.be.byeoldam.domain.user.repository.UserRepository;
 import com.be.byeoldam.exception.CustomException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -33,6 +34,9 @@ class NotificationServiceTest {
 
     @Mock
     private NotificationRepository notificationRepository;
+
+    @Mock
+    private UserRepository userRepository;
 
     private BookmarkNotification bookmarkNotification;
     private InviteNotification inviteNotification;
@@ -62,8 +66,8 @@ class NotificationServiceTest {
     void getNotifications() {
         // given
         Long userId = 100L;
-        List<Notification> notifications = List.of(bookmarkNotification, inviteNotification);
-        when(notificationRepository.findByUserId(userId)).thenReturn(notifications);
+        when(userRepository.findById(userId)).thenReturn(Optional.of(user));
+        when(notificationRepository.findByUser(user)).thenReturn(List.of(bookmarkNotification, inviteNotification));
 
         // when
         List<NotificationResponse> responses = notificationService.getNotifications(userId);
@@ -80,7 +84,8 @@ class NotificationServiceTest {
         assertThat(responses.get(1).getMessage()).isEqualTo("초대자닉네임님이 컬렉션에 초대했습니다.");
         assertThat(responses.get(1).getCreatedAt()).isEqualTo(LocalDateTime.of(2025, 1, 17, 12, 34, 56));
 
-        verify(notificationRepository, times(1)).findByUserId(userId);
+        verify(userRepository, times(1)).findById(userId);
+        verify(notificationRepository, times(1)).findByUser(user);
     }
 
 
@@ -91,8 +96,8 @@ class NotificationServiceTest {
         Long notificationId = 1L;
         Long userId = 100L;
 
-        when(notificationRepository.findById(notificationId)).thenReturn(Optional.of(bookmarkNotification));
-        when(bookmarkNotification.getUser().getId()).thenReturn(userId);
+        when(userRepository.findById(userId)).thenReturn(Optional.of(user));
+        when(notificationRepository.findByIdAndUser(notificationId, user)).thenReturn(Optional.of(bookmarkNotification));
 
         // when, then (예외 발생 없이 정상 동작 확인)
         assertThatCode(() -> notificationService.deleteNotification(notificationId, userId))
@@ -109,7 +114,8 @@ class NotificationServiceTest {
         Long notificationId = 1L;
         Long userId = 100L;
 
-        when(notificationRepository.findById(notificationId)).thenReturn(Optional.empty());
+        when(userRepository.findById(userId)).thenReturn(Optional.of(user));
+        when(notificationRepository.findByIdAndUser(notificationId, user)).thenReturn(Optional.empty());
 
         // when, then (예외 발생 확인)
         assertThatThrownBy(() -> notificationService.deleteNotification(notificationId, userId))
@@ -126,14 +132,16 @@ class NotificationServiceTest {
         // given
         Long notificationId = 1L;
         Long userId = 200L;
+        User otherUser = mock(User.class);
+        ReflectionTestUtils.setField(otherUser, "id", 200L);
 
-        when(notificationRepository.findById(notificationId)).thenReturn(Optional.of(bookmarkNotification));
-        when(bookmarkNotification.getUser().getId()).thenReturn(100L);
+        when(userRepository.findById(userId)).thenReturn(Optional.of(otherUser));
+        when(notificationRepository.findByIdAndUser(notificationId, otherUser)).thenReturn(Optional.empty());
 
         // when, then (예외 발생 확인)
         assertThatThrownBy(() -> notificationService.deleteNotification(notificationId, userId))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessage("해당 알림에 대한 권한이 없습니다.");
+                .isInstanceOf(CustomException.class)
+                .hasMessage("해당 알림이 존재하지 않습니다.");
 
         // delete 메서드가 호출되지 않았는지 검증
         verify(notificationRepository, never()).delete(any());
@@ -144,11 +152,12 @@ class NotificationServiceTest {
     void deleteAllNotifications() {
         // given
         Long userId = 100L;
+        when(userRepository.findById(userId)).thenReturn(Optional.of(user));
 
         // when
         notificationService.deleteAllNotifications(userId);
 
         // then
-        verify(notificationRepository, times(1)).deleteByUser_Id(userId);
+        verify(notificationRepository, times(1)).deleteByUser(user);
     }
 }

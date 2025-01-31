@@ -1,52 +1,74 @@
-package com.be.byeoldam.domain.notification;
+    package com.be.byeoldam.domain.notification;
 
-import com.be.byeoldam.domain.notification.model.BookmarkNotification;
-import com.be.byeoldam.domain.notification.model.InviteNotification;
-import com.be.byeoldam.domain.notification.model.Notification;
-import com.be.byeoldam.domain.user.model.User;
-import com.be.byeoldam.domain.user.repository.UserRepository;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+    import com.be.byeoldam.config.AuditingConfig;
+    import com.be.byeoldam.config.QuerydslConfig;
+    import com.be.byeoldam.domain.notification.model.BookmarkNotification;
+    import com.be.byeoldam.domain.notification.model.InviteNotification;
+    import com.be.byeoldam.domain.notification.model.Notification;
+    import com.be.byeoldam.domain.sharedcollection.model.SharedCollection;
+    import com.be.byeoldam.domain.user.dto.UserRegisterRequest;
+    import com.be.byeoldam.domain.user.model.User;
+    import com.be.byeoldam.domain.user.repository.UserRepository;
+    import org.junit.jupiter.api.BeforeEach;
+    import org.junit.jupiter.api.DisplayName;
+    import org.junit.jupiter.api.Test;
+    import org.springframework.beans.factory.annotation.Autowired;
+    import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
+    import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+    import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
+    import org.springframework.context.annotation.Import;
 
-import java.util.List;
+    import java.util.List;
 
-import static com.be.byeoldam.domain.notification.model.QNotification.notification;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.when;
+    import static org.assertj.core.api.Assertions.assertThat;
 
-@ExtendWith(MockitoExtension.class)
-class NotificationRepositoryTest {
 
-    @Mock
-    private NotificationRepository notificationRepository;
+    @DataJpaTest
+    @Import({AuditingConfig.class, QuerydslConfig.class})
+    @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
+    class NotificationRepositoryTest {
 
-    @Test
-    @DisplayName("findByUserId 메서드 테스트")
-    void findByUserId_ShouldReturnNotificationsForUser() {
-        // Given
-        User user = User.builder()
-                .email("test@ssafy.com")
-                .nickname("Alice")
-                .password("1234")
-                .build();
-        Notification notification1 = new InviteNotification(user, "You are invited!", null, "Alice");
-        Notification notification2 = new BookmarkNotification(user, "7 days passed", null);
+        @Autowired
+        private NotificationRepository notificationRepository;
 
-        when(notificationRepository.findByUserId(user.getId())).thenReturn(List.of(notification1, notification2));
+        @Autowired
+        private UserRepository userRepository;
 
-        // When
-        List<Notification> notifications = notificationRepository.findByUserId(user.getId());
+        @Autowired
+        private TestEntityManager entityManager;
 
-        // Then
-        assertThat(notifications).hasSize(2); // 알림이 2개여야 함
-        assertThat(notifications).extracting("message")
-                .containsExactlyInAnyOrder("You are invited!", "7 days passed");
+        private User user;
+
+        @BeforeEach
+        void setUp() {
+
+            UserRegisterRequest request = new UserRegisterRequest("test@example.com", "1234", "testUser");
+            user = request.toEntity();
+            userRepository.save(user);
+
+            // Given: 초대 알림 저장
+            SharedCollection sharedCollection = SharedCollection.createSharedCollection("컬렉션 이름");
+            InviteNotification inviteNotification = new InviteNotification(user, "You are invited!", sharedCollection, "Alice");
+            entityManager.persist(inviteNotification);
+
+            // Given: 북마크 알림 저장
+            BookmarkNotification bookmarkNotification = new BookmarkNotification(user, "7 days passed", null);
+            entityManager.persist(bookmarkNotification);
+
+            // 영속성 컨텍스트 반영
+            entityManager.flush();
+            entityManager.clear();
+        }
+
+        @Test
+        @DisplayName("findByUser 메서드 테스트")
+        void findByUser_ShouldReturnNotificationsForUser() {
+            // When
+            List<Notification> notifications = notificationRepository.findByUser(user);
+
+            // Then
+            assertThat(notifications).hasSize(2); // 알림이 2개여야 함
+            assertThat(notifications).extracting("message")
+                    .containsExactlyInAnyOrder("You are invited!", "7 days passed");
+        }
     }
-}

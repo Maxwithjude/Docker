@@ -34,11 +34,39 @@
       </el-button-group>
     </div>
   </el-popover>
+
+  <el-dialog
+    v-model="showCopyModal"
+    :modal="true"
+    :show-close="true"
+    destroy-on-close
+    append-to-body
+    class="bookmark-copy-dialog"
+  >
+    <BookmarkCopyShared @close="showCopyModal = false" />
+  </el-dialog>
+
+  <el-dialog
+    v-model="showMoveModal"
+    :modal="true"
+    :show-close="true"
+    destroy-on-close
+    append-to-body
+    class="bookmark-move-dialog"
+  >
+    <BookmarkMovePersonal 
+      :bookmark-id="bookmarkId"
+      @close="showMoveModal = false"
+      @move-complete="handleMoveComplete"
+    />
+  </el-dialog>
 </template>
 
 <script setup>
 import { ref } from 'vue'
 import { ElMessage } from 'element-plus'
+import BookmarkCopyShared from '@/modal/BookmarkCopyShared.vue'
+import BookmarkMovePersonal from '@/modal/BookmarkMovePersonal.vue'
 
 const emit = defineEmits(['delete'])
 const props = defineProps({
@@ -49,17 +77,21 @@ const props = defineProps({
 })
 
 const isVisible = ref(false)
+const showCopyModal = ref(false)
+const showMoveModal = ref(false)
 
 const toggleImportant = () => {
   // TODO: Implement toggle important
 }
 
 const copyToSharedCollection = () => {
-  // TODO: Implement copy to shared collection
+  isVisible.value = false
+  showCopyModal.value = true
 }
 
 const showMoveDialog = () => {
-  // TODO: Implement move dialog
+  isVisible.value = false
+  showMoveModal.value = true
 }
 
 const showTagManagement = () => {
@@ -69,6 +101,11 @@ const showTagManagement = () => {
 const openDeleteModal = () => {
   isVisible.value = false
   emit('delete')
+}
+
+const handleMoveComplete = () => {
+  ElMessage.success('북마크가 성공적으로 이동되었습니다.')
+  // TODO: 필요한 경우 부모 컴포넌트에 이동 완료 이벤트 발생
 }
 </script>
 
@@ -103,5 +140,22 @@ const openDeleteModal = () => {
 
 :deep(.bookmark-settings-popover) {
   padding: 0;
+}
+
+:deep(.bookmark-copy-dialog) {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+:deep(.bookmark-copy-dialog .el-dialog) {
+  margin: 0 !important;
+  width: 500px;
+}
+
+:deep(.bookmark-move-dialog .el-dialog) {
+  margin: 0 !important;
+  width: 500px;
 }
 </style>

@@ -33,8 +33,8 @@ public class UserRss {
         this.isRead = isRead;
     }
 
-    public static UserRss subscribeRss(User user, Rss rss, String latestTitle) {
-        return new UserRss(user, rss, latestTitle, false);
+    public static UserRss subscribeRss(User user, Rss rss) {
+        return new UserRss(user, rss, null, false);
     }
 
     public void updateRss(String latestTitle) {

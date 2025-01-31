@@ -19,7 +19,6 @@ export const useCounterStore = defineStore('counter', () => {
       "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
     }
   })
-
   return { count, doubleCount, increment, user }
 })
 

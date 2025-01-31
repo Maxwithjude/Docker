@@ -2,7 +2,7 @@ package com.be.byeoldam.domain.rss;
 
 import com.be.byeoldam.domain.rss.dto.RssLatestPostsResponse;
 import com.be.byeoldam.domain.rss.dto.RssPostResponse;
-import com.be.byeoldam.domain.rss.dto.RssSubscribeReuest;
+import com.be.byeoldam.domain.rss.dto.RssSubscribeRequest;
 import com.be.byeoldam.domain.rss.dto.UserRssResponse;
 import com.be.byeoldam.domain.rss.model.Rss;
 import com.be.byeoldam.domain.rss.model.UserRss;
@@ -26,12 +26,12 @@ public class RssService {
     private final UserRepository userRepository;
 
     @Transactional
-    public void subscribeRss(Long userId, RssSubscribeReuest rssSubscribeReuest) {
+    public void subscribeRss(Long userId, RssSubscribeRequest rssSubscribeRequest) {
 
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new CustomException("사용자를 찾을 수 없습니다."));
 
-        String rssUrl = rssSubscribeReuest.getRssUrl();
+        String rssUrl = rssSubscribeRequest.getRssUrl();
 
         Rss rss = rssRepository.findByRssUrl(rssUrl)
                 .orElseGet(() -> rssRepository.save(Rss.createRss(rssUrl, extractRssName(rssUrl))));
@@ -41,7 +41,7 @@ public class RssService {
             throw new CustomException("이미 구독한 RSS입니다.");
         }
 
-        userRssRepository.save(rssSubscribeReuest.toEntity(user, rss));
+        userRssRepository.save(rssSubscribeRequest.toEntity(user, rss));
     }
 
     @Transactional

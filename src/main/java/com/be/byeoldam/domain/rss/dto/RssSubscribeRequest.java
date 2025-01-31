@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor(access = lombok.AccessLevel.PROTECTED)
 @AllArgsConstructor
-public class RssSubscribeReuest {
+public class RssSubscribeRequest {
 
     private String rssUrl;
 

@@ -1,85 +1,71 @@
-<script setup>
-import { RouterLink, RouterView } from 'vue-router'
-import HelloWorld from './components/HelloWorld.vue'
-</script>
-
 <template>
-  <header>
-    <img alt="Vue logo" class="logo" src="@/assets/logo.svg" width="125" height="125" />
-
-    <div class="wrapper">
-      <HelloWorld msg="You did it!" />
-
-      <nav>
-        <RouterLink to="/">Home</RouterLink>
-        <RouterLink to="/about">About</RouterLink>
-      </nav>
-    </div>
-  </header>
-
-  <RouterView />
+  <div class="container">
+    <nav>
+      <RouterLink :to="{ name: 'storage' }">저장</RouterLink>
+      <RouterLink :to="{ name: 'alarm' }">알림</RouterLink>
+      <RouterLink :to="{ name: 'feed' }">피드</RouterLink>
+    </nav>
+    <RouterView />
+  </div>
 </template>
 
-<style scoped>
-header {
-  line-height: 1.5;
-  max-height: 100vh;
-}
+<script setup>
+import { RouterView } from "vue-router";
+</script>
 
-.logo {
-  display: block;
-  margin: 0 auto 2rem;
+<style scoped>
+.container {
+  width: 400px;
+  min-height: 400px;
+  padding: 16px;
+  border-radius: 12px;
 }
 
 nav {
-  width: 100%;
-  font-size: 12px;
+  display: flex;
+  position: relative;
+  margin-bottom: 16px;
   text-align: center;
-  margin-top: 2rem;
 }
 
-nav a.router-link-exact-active {
-  color: var(--color-text);
-}
-
-nav a.router-link-exact-active:hover {
-  background-color: transparent;
+/* 하단 언더라인 */
+nav::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 1px;
+  background-color: #eee;
 }
 
 nav a {
-  display: inline-block;
-  padding: 0 1rem;
-  border-left: 1px solid var(--color-border);
+  flex: 1;
+  text-decoration: none;
+  color: #666;
+  padding: 8px 16px;
+  text-align: center;
+  position: relative;
+  z-index: 1;
+  transition: background-color 0.2s ease; /* hover 애니메이션 효과 */
 }
 
-nav a:first-of-type {
-  border: 0;
+nav a.router-link-active {
+  color: #4169e1;
+  font-weight: bold;
+  background-color: transparent; /* 활성 탭의 배경색 제거 */
+  border-radius: 4px 4px 0 0;
 }
 
-@media (min-width: 1024px) {
-  header {
-    display: flex;
-    place-items: center;
-    padding-right: calc(var(--section-gap) / 2);
-  }
-
-  .logo {
-    margin: 0 2rem 0 0;
-  }
-
-  header .wrapper {
-    display: flex;
-    place-items: flex-start;
-    flex-wrap: wrap;
-  }
-
-  nav {
-    text-align: left;
-    margin-left: -1rem;
-    font-size: 1rem;
-
-    padding: 1rem 0;
-    margin-top: 1rem;
-  }
+/* 활성 탭의 하단 파란색 라인 */
+nav a.router-link-active::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background-color: #4169e1;
+  z-index: 2;
 }
 </style>

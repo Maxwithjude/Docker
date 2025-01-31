@@ -7,6 +7,19 @@ export const useCounterStore = defineStore('counter', () => {
   function increment() {
     count.value++
   }
+  const user = ref({
+    "success": true,
+    "message": "some message",
+    "results": {
+      "userId": 123,
+      "email": "user@example.com",
+      "nickname": "userNickname",
+      "createdAt": "2025-01-01T12:00:00",
+      "accessToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+      "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+    }
+  })
 
-  return { count, doubleCount, increment }
+  return { count, doubleCount, increment, user }
 })
+

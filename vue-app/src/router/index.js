@@ -36,13 +36,15 @@ const router = createRouter({
     },
     // 컬렉션 선택 페이지 : 최초 로그인일 때만
     {
-      path: '/user/:id/collectionSelect',
+      // 추후 유저 로그인 개발하면 /user/:id 추가하기
+      path: '/collectionSelect',
       name: 'collectionSelect',
       component: CollectionSelectView,
     },
     // 태그 선택 페이지 : 최초 로그인일 때만
     {
-      path: '/user/:id/tagSelect',
+      // 추후 유저 로그인 개발하면 /user/:id 추가
+      path: '/tagSelect',
       name: 'tagSelect',
       component: TagSelectView,
     },

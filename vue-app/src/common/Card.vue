@@ -6,41 +6,10 @@
                 <span v-else class="star-icon empty">☆</span>
             </div>
             <div class="settings">
-                <el-popover
-                    placement="bottom-end"
-                    :width="200"
-                    trigger="click"
-                    popper-class="bookmark-settings-popover"
-                    v-model:visible="isSettingsVisible"
-                >
-                    <template #reference>
-                        <button class="settings-button">⋮</button>
-                    </template>
-                    
-                    <div class="popover-content">
-                        <el-button-group vertical class="settings-menu">
-                            <el-button link @click="toggleImportant">
-                                {{ isImportant ? '중요 북마크 해제' : '중요 북마크로 설정' }}
-                            </el-button>
-                            
-                            <el-button link @click="copyToSharedCollection">
-                                공유 컬렉션으로 복사
-                            </el-button>
-                            
-                            <el-button link @click="showMoveDialog">
-                                다른 컬렉션으로 이동
-                            </el-button>
-                            
-                            <el-button link @click="showTagManagement">
-                                태그 관리
-                            </el-button>
-                            
-                            <el-button link class="delete-button" @click="confirmDelete">
-                                북마크 삭제
-                            </el-button>
-                        </el-button-group>
-                    </div>
-                </el-popover>
+                <BookmarkSettings 
+                    :is-important="props.isImportant"
+                    @delete="openDeleteModal"
+                />
             </div>
         </div>
         <img 
@@ -78,12 +47,30 @@
             </div>
         </div>
     </div>
+    
+    <!-- 삭제 모달을 카드 밖으로 이동 -->
+    <el-dialog
+        v-model="isDeleteModalVisible"
+        :show-close="false"
+        :close-on-click-modal="false"
+        width="400px"
+        align-center
+        append-to-body
+    >
+        <BookmarkDel
+            @close="closeDeleteModal"
+            @confirm="handleDeleteConfirm"
+        />
+    </el-dialog>
 </template>
 
 <script setup>
 import { ref, computed } from 'vue';
+import { ElMessage } from 'element-plus';
+import BookmarkDel from '@/modal/BookmarkDel.vue';
+import BookmarkSettings from '@/common/BookmarkSettings.vue';
 
-const isSettingsVisible = ref(false);
+const isDeleteModalVisible = ref(false);
 
 const defaultImage = 'https://images.unsplash.com/photo-1481627834876-b7833e8f5570?q=80&w=2128&auto=format&fit=crop';
 
@@ -122,24 +109,21 @@ const visibleTags = computed(() => props.hashtags.slice(0, 2));
 const remainingTags = computed(() => props.hashtags.slice(2));
 const remainingTagsCount = computed(() => Math.max(0, props.hashtags.length - 2));
 
-const toggleImportant = () => {
-    // TODO: Implement toggle important
+const openDeleteModal = () => {
+    isDeleteModalVisible.value = true;
 };
 
-const copyToSharedCollection = () => {
-    // TODO: Implement copy to shared collection
+const closeDeleteModal = () => {
+    isDeleteModalVisible.value = false;
 };
 
-const showMoveDialog = () => {
-    // TODO: Implement move dialog
-};
-
-const showTagManagement = () => {
-    // TODO: Implement tag management
-};
-
-const confirmDelete = () => {
-    // TODO: Implement delete confirmation
+const handleDeleteConfirm = () => {
+    // TODO: 실제 삭제 API 호출
+    ElMessage({
+        type: 'success',
+        message: '북마크가 삭제되었습니다.'
+    });
+    isDeleteModalVisible.value = false;
 };
 </script>
 

@@ -11,10 +11,10 @@
   },
   "dependencies": {
     "@fortawesome/fontawesome-free": "^6.7.2",
-    "element-plus": "^2.9.3",
     "@headlessui/vue": "^1.7.23",
     "@heroicons/vue": "^2.2.0",
     "@tailwindcss/postcss": "^4.0.0",
+    "element-plus": "^2.9.3",
     "flowbite": "^3.0.0",
     "pinia": "^2.3.0",
     "vue": "^3.5.13",

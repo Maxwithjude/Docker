@@ -46,12 +46,13 @@
             user = request.toEntity();
             userRepository.save(user);
 
-            // Given: 초대 알림 저장
             SharedCollection sharedCollection = SharedCollection.createSharedCollection("컬렉션 이름");
+            entityManager.persist(sharedCollection);  // 컬렉션을 먼저 저장
+            entityManager.flush();
+
             InviteNotification inviteNotification = new InviteNotification(user, "You are invited!", sharedCollection, "Alice");
             entityManager.persist(inviteNotification);
 
-            // Given: 북마크 알림 저장
             BookmarkNotification bookmarkNotification = new BookmarkNotification(user, "7 days passed", null);
             entityManager.persist(bookmarkNotification);
 

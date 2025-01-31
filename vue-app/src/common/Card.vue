@@ -5,9 +5,43 @@
                 <span v-if="props.isImportant" class="star-icon">★</span>
                 <span v-else class="star-icon empty">☆</span>
             </div>
-            <button class="settings-button" @click="showSettings">
-                ⋮
-            </button>
+            <div class="settings">
+                <el-popover
+                    placement="bottom-end"
+                    :width="200"
+                    trigger="click"
+                    popper-class="bookmark-settings-popover"
+                    v-model:visible="isSettingsVisible"
+                >
+                    <template #reference>
+                        <button class="settings-button">⋮</button>
+                    </template>
+                    
+                    <div class="popover-content">
+                        <el-button-group vertical class="settings-menu">
+                            <el-button link @click="toggleImportant">
+                                {{ isImportant ? '중요 북마크 해제' : '중요 북마크로 설정' }}
+                            </el-button>
+                            
+                            <el-button link @click="copyToSharedCollection">
+                                공유 컬렉션으로 복사
+                            </el-button>
+                            
+                            <el-button link @click="showMoveDialog">
+                                다른 컬렉션으로 이동
+                            </el-button>
+                            
+                            <el-button link @click="showTagManagement">
+                                태그 관리
+                            </el-button>
+                            
+                            <el-button link class="delete-button" @click="confirmDelete">
+                                북마크 삭제
+                            </el-button>
+                        </el-button-group>
+                    </div>
+                </el-popover>
+            </div>
         </div>
         <img 
             :src="props.image || defaultImage" 
@@ -43,26 +77,13 @@
                 </span>
             </div>
         </div>
-
-        <BookmarkSettings
-            v-if="isSettingsVisible"
-            :position="settingsPosition"
-            :isImportant="props.isImportant"
-            @delete="handleDelete"
-            @manageTags="handleTags"
-            @toggleImportant="handleImportant"
-            @copyToShared="handleCopyToShared"
-            @move="handleMove"
-            @close="isSettingsVisible = false"
-        />
     </div>
 </template>
 
 <script setup>
-import { ref, computed, onMounted, onUnmounted } from 'vue';
-import BookmarkSettings from './BookmarkSettings.vue';
+import { ref, computed } from 'vue';
 
-const showTooltip = ref(false);
+const isSettingsVisible = ref(false);
 
 const defaultImage = 'https://images.unsplash.com/photo-1481627834876-b7833e8f5570?q=80&w=2128&auto=format&fit=crop';
 
@@ -101,67 +122,25 @@ const visibleTags = computed(() => props.hashtags.slice(0, 2));
 const remainingTags = computed(() => props.hashtags.slice(2));
 const remainingTagsCount = computed(() => Math.max(0, props.hashtags.length - 2));
 
-const emit = defineEmits(['delete', 'manageTags', 'toggleImportant', 'copyToShared', 'move']);
-
-const isSettingsVisible = ref(false);
-const settingsPosition = ref({ x: 0, y: 0 });
-
-const showSettings = (event) => {
-    // 이벤트 전파 중단
-    event.stopPropagation();
-    
-    // 버튼의 위치 계산
-    const rect = event.target.getBoundingClientRect();
-    settingsPosition.value = {
-        x: rect.right + 5,
-        y: rect.top
-    };
-    
-    isSettingsVisible.value = true;
+const toggleImportant = () => {
+    // TODO: Implement toggle important
 };
 
-// 설정 메뉴의 각 액션 핸들러
-const handleDelete = () => {
-    emit('delete');
-    isSettingsVisible.value = false;
+const copyToSharedCollection = () => {
+    // TODO: Implement copy to shared collection
 };
 
-const handleTags = () => {
-    emit('manageTags');
-    isSettingsVisible.value = false;
+const showMoveDialog = () => {
+    // TODO: Implement move dialog
 };
 
-const handleImportant = () => {
-    emit('toggleImportant');
-    isSettingsVisible.value = false;
+const showTagManagement = () => {
+    // TODO: Implement tag management
 };
 
-const handleCopyToShared = () => {
-    emit('copyToShared');
-    isSettingsVisible.value = false;
+const confirmDelete = () => {
+    // TODO: Implement delete confirmation
 };
-
-const handleMove = () => {
-    emit('move');
-    isSettingsVisible.value = false;
-};
-
-// 설정 메뉴 외부 클릭 시 닫기
-const closeSettings = (event) => {
-    if (isSettingsVisible.value) {
-        isSettingsVisible.value = false;
-    }
-};
-
-// 컴포넌트 마운트 시 이벤트 리스너 추가
-onMounted(() => {
-    document.addEventListener('click', closeSettings);
-});
-
-// 컴포넌트 언마운트 시 이벤트 리스너 제거
-onUnmounted(() => {
-    document.removeEventListener('click', closeSettings);
-});
 </script>
 
 <style scoped>
@@ -316,6 +295,10 @@ onUnmounted(() => {
     color: #ccc;
 }
 
+.settings {
+    position: relative;
+}
+
 .settings-button {
     background: none;
     border: none;
@@ -328,5 +311,27 @@ onUnmounted(() => {
 
 .settings-button:hover {
     background-color: #f0f0f0;
+}
+
+.settings-menu {
+    width: 100%;
+}
+
+.settings-menu .el-button {
+    justify-content: flex-start;
+    padding: 8px 16px;
+    width: 100%;
+}
+
+.settings-menu .el-button:hover {
+    background-color: #f5f7fa;
+}
+
+.settings-menu .delete-button {
+    color: #f56c6c;
+}
+
+:deep(.bookmark-settings-popover) {
+    padding: 0;
 }
 </style>

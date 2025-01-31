@@ -34,15 +34,15 @@
             <button @click="removeCollection(collection)">x</button>
           </span>
         </div>
-    
-        <button class="next-button">다음</button>
+        <RouterLink :to="{name: 'tagSelect'}"><button class="next-button">
+          다음</button></RouterLink>
       </div>
     </div>  
   </template>
   
   <script setup>
   import { ref } from "vue";
-  
+import { RouterLink } from "vue-router";
   // 폴더 리스트
   const folders = ref([
     { name: "바로가기" },
@@ -87,7 +87,7 @@
   </script>
   
   <style scoped>
-/* 전체 컨테이너 가운데 배치치*/
+/* 전체 컨테이너 가운데 배치*/
 .wrapper {
   display: grid;
   place-items: center;

@@ -1,41 +1,43 @@
 <template>
-    <div class="page-container">
-      <h2 class="headline">나만의 컬렉션 만들기</h2>
-      <p class="paragraph">
-        추천 컬렉션을 선택하거나, 나만의 개성있는 컬렉션명을 입력해보세요. <br />
-        설정한 컬렉션은 자동으로 생성됩니다.
-      </p>
-  
-      <div class="folders">
-        <div
-          v-for="(folder, index) in folders"
-          :key="index"
-          class="folder"
-          :class="{ selected: selectedFolders.includes(folder.name) }"
-          @click="toggleFolder(folder.name)"
-        >
-          <img src="@/assets/folder-icon.png" alt="폴더" />
-          <span>{{ folder.name }}</span>
+    <div class="wrapper">
+      <div class="page-container">
+        <h2 class="headline">나만의 컬렉션 만들기</h2>
+        <p class="paragraph">
+          추천 컬렉션을 선택하거나, 나만의 개성있는 컬렉션명을 입력해보세요. <br />
+          설정한 컬렉션은 자동으로 생성됩니다.
+        </p>
+    
+        <div class="folders">
+          <div
+            v-for="(folder, index) in folders"
+            :key="index"
+            class="folder"
+            :class="{ selected: selectedFolders.includes(folder.name) }"
+            @click="toggleFolder(folder.name)"
+          >
+            <img src="@/assets/폴더이미지.png" alt="폴더" />
+            <span>{{ folder.name }}</span>
+          </div>
         </div>
+    
+        <input
+          type="text"
+          v-model="customCollection"
+          class="collection-input"
+          placeholder="생성할 컬렉션명을 입력하고 엔터를 누르세요."
+          @keyup.enter="addCustomCollection"
+        />
+    
+        <div class="selected-collections">
+          <span v-for="(collection, index) in selectedFolders" :key="index" class="tag">
+            {{ collection }}
+            <button @click="removeCollection(collection)">x</button>
+          </span>
+        </div>
+    
+        <button class="next-button">다음</button>
       </div>
-  
-      <input
-        type="text"
-        v-model="customCollection"
-        class="collection-input"
-        placeholder="생성할 컬렉션명을 입력하세요."
-        @keyup.enter="addCustomCollection"
-      />
-  
-      <div class="selected-collections">
-        <span v-for="(collection, index) in selectedFolders" :key="index" class="tag">
-          {{ collection }}
-          <button @click="removeCollection(collection)">x</button>
-        </span>
-      </div>
-  
-      <button class="next-button">다음</button>
-    </div>
+    </div>  
   </template>
   
   <script setup>
@@ -85,6 +87,13 @@
   </script>
   
   <style scoped>
+/* 전체 컨테이너 가운데 배치치*/
+.wrapper {
+  display: grid;
+  place-items: center;
+  height: 100vh;
+}
+
   .page-container {
     width: 680px;
     height: auto;

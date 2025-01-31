@@ -7,28 +7,28 @@
     v-model:visible="isVisible"
   >
     <template #reference>
-      <slot name="reference"></slot>
+      <button class="settings-button">⋮</button>
     </template>
     
     <div class="popover-content">
       <el-button-group vertical class="settings-menu">
-        <el-button type="text" @click="toggleImportant">
+        <el-button link @click="toggleImportant">
           {{ isImportant ? '중요 북마크 해제' : '중요 북마크로 설정' }}
         </el-button>
         
-        <el-button type="text" @click="copyToSharedCollection">
+        <el-button link @click="copyToSharedCollection">
           공유 컬렉션으로 복사
         </el-button>
         
-        <el-button type="text" @click="showMoveDialog">
+        <el-button link @click="showMoveDialog">
           다른 컬렉션으로 이동
         </el-button>
         
-        <el-button type="text" @click="showTagManagement">
+        <el-button link @click="showTagManagement">
           태그 관리
         </el-button>
         
-        <el-button type="text" class="delete-button" @click="confirmDelete">
+        <el-button link class="delete-button" @click="openDeleteModal">
           북마크 삭제
         </el-button>
       </el-button-group>
@@ -37,61 +37,54 @@
 </template>
 
 <script setup>
-import { ref } from 'vue';
+import { ref } from 'vue'
+import { ElMessage } from 'element-plus'
 
-const isVisible = ref(false);
-const isImportant = ref(false);
+const emit = defineEmits(['delete'])
+const props = defineProps({
+  isImportant: {
+    type: Boolean,
+    default: false
+  }
+})
+
+const isVisible = ref(false)
 
 const toggleImportant = () => {
-  isImportant.value = !isImportant.value;
-  // TODO: API 호출하여 중요 상태 업데이트
-};
+  // TODO: Implement toggle important
+}
 
 const copyToSharedCollection = () => {
-  // TODO: 공유 컬렉션 선택 다이얼로그 표시
-};
+  // TODO: Implement copy to shared collection
+}
 
 const showMoveDialog = () => {
-  // TODO: 이동할 컬렉션 선택 다이얼로그 표시
-};
+  // TODO: Implement move dialog
+}
 
 const showTagManagement = () => {
-  // TODO: 태그 관리 다이얼로그 표시
-};
+  // TODO: Implement tag management
+}
 
-const confirmDelete = () => {
-  ElMessageBox.confirm(
-    '이 북마크를 삭제하시겠습니까?',
-    '경고',
-    {
-      confirmButtonText: '삭제',
-      cancelButtonText: '취소',
-      type: 'warning',
-    }
-  ).then(() => {
-    // TODO: 북마크 삭제 API 호출
-    ElMessage({
-      type: 'success',
-      message: '북마크가 삭제되었습니다.',
-    });
-  }).catch(() => {});
-};
+const openDeleteModal = () => {
+  isVisible.value = false
+  emit('delete')
+}
 </script>
 
 <style scoped>
-.bookmark-actions {
-  position: absolute;
-  top: 8px;
-  right: 8px;
-}
-
 .settings-button {
-  padding: 4px;
-  color: #909399;
+  background: none;
+  border: none;
+  font-size: 1.2rem;
+  color: #666;
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 4px;
 }
 
 .settings-button:hover {
-  color: #409EFF;
+  background-color: #f0f0f0;
 }
 
 .settings-menu {
@@ -102,10 +95,6 @@ const confirmDelete = () => {
   justify-content: flex-start;
   padding: 8px 16px;
   width: 100%;
-}
-
-.settings-menu .el-button:hover {
-  background-color: #f5f7fa;
 }
 
 .settings-menu .delete-button {

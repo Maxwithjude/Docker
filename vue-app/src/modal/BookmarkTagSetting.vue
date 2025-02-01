@@ -25,7 +25,7 @@
 <script setup>
 import { ref } from 'vue'
 
-const tags = ref(['태그1', '태그2', '태그3']) // 초기 태그 데이터
+const tags = ref(['태그1', '태그2', '태그3', '태그4', '태그5']) // 초기 태그 데이터
 const newTag = ref('')
 
 const addTag = () => {

@@ -60,6 +60,17 @@
       @move-complete="handleMoveComplete"
     />
   </el-dialog>
+
+  <el-dialog
+    v-model="showTagModal"
+    :modal="true"
+    :show-close="true"
+    destroy-on-close
+    append-to-body
+    class="bookmark-tag-dialog"
+  >
+    <BookmarkTagSetting @close="showTagModal = false" />
+  </el-dialog>
 </template>
 
 <script setup>
@@ -67,6 +78,7 @@ import { ref } from 'vue'
 import { ElMessage } from 'element-plus'
 import BookmarkCopyShared from '@/modal/BookmarkCopyShared.vue'
 import BookmarkMovePersonal from '@/modal/BookmarkMovePersonal.vue'
+import BookmarkTagSetting from '@/modal/BookmarkTagSetting.vue'
 
 const emit = defineEmits(['delete'])
 const props = defineProps({
@@ -79,6 +91,7 @@ const props = defineProps({
 const isVisible = ref(false)
 const showCopyModal = ref(false)
 const showMoveModal = ref(false)
+const showTagModal = ref(false)
 
 const toggleImportant = () => {
   // TODO: Implement toggle important
@@ -95,7 +108,8 @@ const showMoveDialog = () => {
 }
 
 const showTagManagement = () => {
-  // TODO: Implement tag management
+  isVisible.value = false
+  showTagModal.value = true
 }
 
 const openDeleteModal = () => {
@@ -155,6 +169,11 @@ const handleMoveComplete = () => {
 }
 
 :deep(.bookmark-move-dialog .el-dialog) {
+  margin: 0 !important;
+  width: 500px;
+}
+
+:deep(.bookmark-tag-dialog .el-dialog) {
   margin: 0 !important;
   width: 500px;
 }

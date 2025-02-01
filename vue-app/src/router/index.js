@@ -12,6 +12,8 @@ import SharedView from '@/views/SharedView.vue'
 import SearchView from '@/views/SearchView.vue'
 import FeedView from '@/views/FeedView.vue'
 import OldView from '@/views/OldView.vue'
+import PersonalDetailView from '../views/PersonalDetailView.vue'
+import SharedDetailView from '../views/SharedDetailView.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -96,7 +98,18 @@ const router = createRouter({
       name: 'old',
       component: OldView,
     },
-  
+    // 개인 상세 페이지
+    {
+      path: '/personal-collection/:id',
+      name: 'personal-detail',
+      component: PersonalDetailView
+    },
+    // 공유 상세 페이지
+    {
+      path: '/shared-collection/:id',
+      name: 'shared-detail',
+      component: SharedDetailView
+    }
   ],
 })
 

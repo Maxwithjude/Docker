@@ -16,6 +16,8 @@
             :src="props.image || defaultImage" 
             :alt="props.title" 
             class="card-image"
+            @click="handleImageClick"
+            style="cursor: pointer"
         >
         <div class="card-content">
             <h2 class="card-title">{{ props.title }}</h2>
@@ -69,6 +71,7 @@ import { ref, computed } from 'vue';
 import { ElMessage } from 'element-plus';
 import BookmarkDel from '@/modal/BookmarkDel.vue';
 import BookmarkSettings from '@/common/BookmarkSettings.vue';
+import { useRouter } from 'vue-router';
 
 const isDeleteModalVisible = ref(false);
 
@@ -102,8 +105,18 @@ const props = defineProps({
     isImportant: {
         type: Boolean,
         default: false
+    },
+    isPersonal: {
+        type: Boolean,
+        required: true
+    },
+    bookmarkId: {
+        type: String,
+        required: true
     }
 });
+
+const router = useRouter();
 
 const visibleTags = computed(() => props.hashtags.slice(0, 2));
 const remainingTags = computed(() => props.hashtags.slice(2));
@@ -124,6 +137,13 @@ const handleDeleteConfirm = () => {
         message: '북마크가 삭제되었습니다.'
     });
     isDeleteModalVisible.value = false;
+};
+
+const handleImageClick = () => {
+    const route = props.isPersonal 
+        ? `/personal-collection/${props.bookmarkId}`
+        : `/shared-collection/${props.bookmarkId}`;
+    router.push(route);
 };
 </script>
 

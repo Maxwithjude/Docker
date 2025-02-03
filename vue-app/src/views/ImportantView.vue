@@ -6,7 +6,7 @@
             <div class="body">
                 <h1 class="page-title">중요 북마크</h1>
                 
-                <div v-if="importantBookmarks.length === 0" class="empty-state">
+                <div v-if="!bookmarkResults.length" class="empty-state">
                     <i class="fas fa-star empty-icon"></i>
                     <p class="empty-text">중요 표시된 북마크가 없습니다.</p>
                     <p class="empty-description">북마크에 별표를 클릭하여 중요 북마크로 지정할 수 있습니다.</p>
@@ -14,15 +14,18 @@
                 
                 <div v-else class="cards-grid">
                     <Card
-                        v-for="bookmark in importantBookmarks"
-                        :key="bookmark.id"
-                        :image="bookmark.image"
+                        v-for="bookmark in bookmarkResults"
+                        :bookmarkId="bookmark.bookmark_id"
+                        :url="bookmark.url"
+                        :img="bookmark.img"
                         :title="bookmark.title"
                         :description="bookmark.description"
-                        :url="bookmark.url"
-                        :hashtags="bookmark.hashtags"
-                        :readingTime="bookmark.readingTime"
-                        :isImportant="bookmark.isImportant"
+                        :tag="bookmark.tag"
+                        :priority="bookmark.priority"
+                        :isPersonal="bookmark.isPersonal"
+                        :createdAt="bookmark.created_at"
+                        :updatedAt="bookmark.updated_at"
+                        @togglePriority="togglePriority(bookmark)"
                     />
                 </div>
             </div>
@@ -36,12 +39,43 @@ import Header from '@/common/Header.vue';
 import SideBar from '@/common/SideBar.vue';
 import Card from '@/common/Card.vue';
 
-// 여기에 실제 북마크 데이터를 가져오는 로직이 들어갈 예정
-const bookmarks = ref([]);
+const togglePriority = (bookmark) => {
+    bookmark.priority = !bookmark.priority;
+}
 
-const importantBookmarks = computed(() => {
-    return bookmarks.value.filter(bookmark => bookmark.isImportant);
-});
+// 여기에 실제 북마크 데이터를 가져오는 로직이 들어갈 예정
+const bookmarks = ref([
+    {
+        "success":true,
+        "message":"some message",
+        "results": [
+            {
+                "bookmark_id" : 1,
+                "url" : "https://naver.com",
+                "img" : "https://edu.ssafy.com/image.jpg",
+                "title" : "네이버 메인 페이지",
+                "description" : "네이버는 다양한 정보를 ...",
+                "priority" : true,
+                "created_at" : "2024-01-01",
+                "updated_at" : "2024-01-02",
+                "tag" : ["서핑", "웹"]
+            }, 
+            {
+                "bookmark_id" : 2,
+                "url" : "https://edu.ssafy.com",
+                "img" : "https://edu.ssafy.com/image.jpg",
+                "title" : "싸피 메인 페이지",
+                "description" : "대한민국 청년 삼성 ...",
+                "priority" : true,
+                "created_at" : "2024-01-01",
+                "updated_at" : "2024-01-02",
+                "tag" : ["싸피", "IT"]
+            }
+        ]
+    }
+]);
+
+const bookmarkResults = computed(() => bookmarks.value[0]?.results || []);
 </script>
 
 <style scoped>

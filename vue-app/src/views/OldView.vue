@@ -1,22 +1,39 @@
+<!-- <div v-if="oldBookmarks.length === 0" class="empty-state">
+                    <i class="fas fa-history empty-icon"></i>
+                    <p class="empty-text">30일이 지난 북마크가 없습니다.</p>
+                    <p class="empty-description">
+                        추가한지 30일이 지난 북마크들이 이곳에 표시됩니다.<br>
+                        오래된 북마크들을 정리하고 관리해보세요. -->
+
 <template>
     <div class="layout">
         <Header />
         <div class="content-wrapper">
             <SideBar />
             <div class="body">
-                <h1 class="page-title">오래된 북마크</h1>
-
-                <div v-if="oldBookmarks.length === 0" class="empty-state">
-                    <i class="fas fa-history empty-icon"></i>
-                    <p class="empty-text">30일이 지난 북마크가 없습니다.</p>
-                    <p class="empty-description">
-                        추가한지 30일이 지난 북마크들이 이곳에 표시됩니다.<br>
-                        오래된 북마크들을 정리하고 관리해보세요.
-                    </p>
+                <h1 class="page-title">30일 이상 읽지않은 북마크</h1>
+                
+                <div v-if="!bookmarkResults.length" class="empty-state">
+                    <i class="fas fa-star empty-icon"></i>
+                    <p class="empty-text">오랜기간 읽지않은 북마크가 없습니다.</p>
+                    <p class="empty-description">북마크에 별표를 클릭하여 중요 북마크로 지정할 수 있습니다.</p>
                 </div>
-
-                <div v-else class="bookmarks-grid">
-                    <!-- 북마크가 있을 때의 UI -->
+                
+                <div v-else class="cards-grid">
+                    <Card
+                        v-for="bookmark in bookmarkResults"
+                        :bookmarkId="bookmark.bookmark_id"
+                        :url="bookmark.url"
+                        :img="bookmark.img"
+                        :title="bookmark.title"
+                        :description="bookmark.description"
+                        :tag="bookmark.tag"
+                        :priority="bookmark.priority"
+                        :isPersonal="bookmark.isPersonal"
+                        :createdAt="bookmark.created_at"
+                        :updatedAt="bookmark.updated_at"
+                        @togglePriority="togglePriority(bookmark)"
+                    />
                 </div>
             </div>
         </div>
@@ -24,11 +41,48 @@
 </template>
 
 <script setup>
-import { ref } from 'vue';
+import { ref, computed } from 'vue';
 import Header from '@/common/Header.vue';
 import SideBar from '@/common/SideBar.vue';
+import Card from '@/common/Card.vue';
 
-const oldBookmarks = ref([]);
+const togglePriority = (bookmark) => {
+    bookmark.priority = !bookmark.priority;
+}
+
+// 여기에 실제 북마크 데이터를 가져오는 로직이 들어갈 예정
+const bookmarks = ref([
+    {
+        "success":true,
+        "message":"some message",
+        "results": [
+            {
+                "bookmark_id" : 1,
+                "url" : "https://naver.com",
+                "img" : "https://edu.ssafy.com/image.jpg",
+                "title" : "네이버 메인 페이지",
+                "description" : "네이버는 다양한 정보를 ...",
+                "priority" : true,
+                "created_at" : "2024-01-01",
+                "updated_at" : "2024-01-02",
+                "tag" : ["서핑", "웹"]
+            }, 
+            {
+                "bookmark_id" : 2,
+                "url" : "https://edu.ssafy.com",
+                "img" : "https://edu.ssafy.com/image.jpg",
+                "title" : "싸피 메인 페이지",
+                "description" : "대한민국 청년 삼성 ...",
+                "priority" : true,
+                "created_at" : "2024-01-01",
+                "updated_at" : "2024-01-02",
+                "tag" : ["싸피", "IT"]
+            }
+        ]
+    }
+]);
+
+const bookmarkResults = computed(() => bookmarks.value[0]?.results || []);
 </script>
 
 <style scoped>
@@ -86,13 +140,11 @@ const oldBookmarks = ref([]);
 }
 
 .empty-description {
-    font-size: 0.95rem;
+    font-size: 0.9rem;
     color: #888;
-    line-height: 1.5;
-    max-width: 400px;
 }
 
-.bookmarks-grid {
+.cards-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
     gap: 24px;

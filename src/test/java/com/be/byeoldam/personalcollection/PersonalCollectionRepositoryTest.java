@@ -8,6 +8,7 @@ import com.be.byeoldam.domain.personalcollection.repository.PersonalCollectionRe
 import com.be.byeoldam.domain.user.dto.UserRegisterRequest;
 import com.be.byeoldam.domain.user.model.User;
 import com.be.byeoldam.domain.user.repository.UserRepository;
+import com.be.byeoldam.exception.CustomException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -15,8 +16,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
+
 import java.util.List;
-import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -45,8 +46,7 @@ public class PersonalCollectionRepositoryTest {
     // @Rollback(false)
     void savePersonalCollectionTest() {
         // Given
-        PersonalCollectionRequest request = new PersonalCollectionRequest("exCollection");
-        PersonalCollection collection = request.toEntity(user);
+        PersonalCollection collection = new PersonalCollectionRequest("exCollection").toEntity(user);
 
         // when
         PersonalCollection savedCollection = personalCollectionRepository.save(collection);
@@ -54,25 +54,25 @@ public class PersonalCollectionRepositoryTest {
         // then
         assertThat(savedCollection).isNotNull();
         assertThat(savedCollection.getId()).isNotNull();
-        assertThat(collection.getName()).isNotNull();
+        assertThat(savedCollection.getName()).isEqualTo(collection.getName());
         assertThat(savedCollection.getUser()).isEqualTo(user);
     }
 
-    // TODO : 테스트 보완 필요..?
     @Test
     @DisplayName("유저의 collection 목록 조회")
     void findPersonalCollectionTest() {
         // given
         String name1 = "ex11";
         String name2 = "ex22";
-        PersonalCollectionRequest request1 = new PersonalCollectionRequest("ex11");
-        PersonalCollectionRequest request2 = new PersonalCollectionRequest("ex22");
-        PersonalCollection collection1 = request1.toEntity(user);
-        PersonalCollection collection2 = request2.toEntity(user);
+        PersonalCollection collection1 = new PersonalCollectionRequest(name1).toEntity(user);
+        PersonalCollection collection2 = new PersonalCollectionRequest(name2).toEntity(user);
         personalCollectionRepository.save(collection1);
         personalCollectionRepository.save(collection2);
+        personalCollectionRepository.flush();
+
         // when
-        List<PersonalCollection> collections = personalCollectionRepository.findByUserId(user.getId());
+        List<PersonalCollection> collections = personalCollectionRepository.findByUser(user);
+
         // then
         assertThat(collections).extracting("name").containsExactlyInAnyOrder(name1, name2);
     }
@@ -81,39 +81,37 @@ public class PersonalCollectionRepositoryTest {
     @DisplayName("개인컬렉션 수정 - 이름")
     void updatePersonalCollectionTest() {
         // given
-        PersonalCollectionRequest request = new PersonalCollectionRequest("exCollection");
-        PersonalCollection collection = request.toEntity(user);
+        PersonalCollection collection = new PersonalCollectionRequest("oldCollection").toEntity(user);
         personalCollectionRepository.save(collection);
 
-        String updatedName = "updateName";
+        String newName = "updateName";
 
         // when
-        PersonalCollection updatedCollection = personalCollectionRepository.findById(collection.getId()).orElseThrow(() -> new IllegalArgumentException("해당 개인컬렉션 없음"));
+        PersonalCollection updatedCollection = personalCollectionRepository.findById(collection.getId())
+                .orElseThrow(() -> new IllegalArgumentException("해당 개인컬렉션이 존재하지 않습니다."));
 
-        updatedCollection.updateName(updatedName);
-        personalCollectionRepository.save(collection);
+        updatedCollection.updateName(newName);
+        personalCollectionRepository.flush();
 
         // then
-        assertThat(updatedCollection.getName()).isEqualTo(updatedName);
-        assertThat(updatedCollection.getUser()).isEqualTo(user);
+        PersonalCollection resultCollection = personalCollectionRepository.findById(collection.getId())
+                .orElseThrow(() -> new CustomException("해당 컬렉션이 존재하지 않습니다."));
+        assertThat(resultCollection.getName()).isEqualTo(newName);
+        assertThat(resultCollection.getUser()).isEqualTo(user);
     }
 
     @Test
     @DisplayName("개인컬렉션 개별 삭제")
     void deletePersonalCollectionTest() {
         // given
-        PersonalCollectionRequest request = new PersonalCollectionRequest("exCollection");
-        PersonalCollection collection = request.toEntity(user);
+        PersonalCollection collection = new PersonalCollectionRequest("exCollection").toEntity(user);
         personalCollectionRepository.save(collection);
 
         // when
         personalCollectionRepository.deleteById(collection.getId());
 
         // then
-        Optional<PersonalCollection> deletedCollection = personalCollectionRepository.findById(collection.getId());
-        assertThat(deletedCollection).isEmpty();
+        boolean exists = personalCollectionRepository.existsById(collection.getId());
+        assertThat(exists).isFalse();
     }
-
-    // TODO : 개인 컬렉션 조회
-
 }

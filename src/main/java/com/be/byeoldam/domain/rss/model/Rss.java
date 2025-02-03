@@ -1,7 +1,6 @@
 package com.be.byeoldam.domain.rss.model;
 
 import jakarta.persistence.*;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -18,14 +17,14 @@ public class Rss {
     private String rssUrl;
 
     @Column(nullable=false)
-    private String rssTitle;
+    private String name; // 구독 채널 이름
 
-    private Rss(String rssUrl, String rssTitle) {
+    private Rss(String rssUrl, String name) {
         this.rssUrl = rssUrl;
-        this.rssTitle = rssTitle;
+        this.name = name;
     }
 
-    public static Rss createRss(String rssUrl, String rssTitle) {
-        return new Rss(rssUrl, rssTitle);
+    public static Rss createRss(String rssUrl, String name) {
+        return new Rss(rssUrl, name);
     }
 }

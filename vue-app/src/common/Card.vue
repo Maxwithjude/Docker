@@ -111,7 +111,11 @@ const props = defineProps({
         required: true
     },
     bookmarkId: {
-        type: String,
+        type: Number,
+        required: true
+    },
+    id: {
+        type: Number,
         required: true
     }
 });
@@ -145,6 +149,8 @@ const handleImageClick = () => {
         : `/shared-collection/${props.bookmarkId}`;
     router.push(route);
 };
+
+const emit = defineEmits(['delete', 'manageTags', 'toggleImportant', 'copyToShared', 'move']);
 </script>
 
 <style scoped>

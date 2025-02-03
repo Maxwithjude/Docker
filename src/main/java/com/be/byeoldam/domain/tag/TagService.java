@@ -1,10 +1,14 @@
 package com.be.byeoldam.domain.tag;
 
 
+import com.be.byeoldam.domain.common.repository.TagBookmarkUrlRepository;
+import com.be.byeoldam.domain.tag.dto.RecommendedUrlResponse;
+import com.be.byeoldam.domain.tag.dto.RecommendedUrlByTagRequest;
 import com.be.byeoldam.domain.tag.model.Tag;
 import com.be.byeoldam.domain.tag.model.UserTag;
 import com.be.byeoldam.domain.tag.repository.TagRepository;
 import com.be.byeoldam.domain.tag.repository.UserTagRepository;
+import com.be.byeoldam.domain.tag.util.JsoupUtil;
 import com.be.byeoldam.domain.user.model.User;
 import com.be.byeoldam.domain.user.repository.UserRepository;
 import com.be.byeoldam.exception.CustomException;
@@ -25,7 +29,7 @@ public class TagService {
     private final TagRepository tagRepository;
     private final UserRepository userRepository;
     private final UserTagRepository userTagRepository;
-
+    private final TagBookmarkUrlRepository tagBookmarkUrlRepository;
 
     // 참조 횟수가 많은 상위 10개 태그를 조회
     @Transactional(readOnly = true)
@@ -87,4 +91,14 @@ public class TagService {
         }
         
     }
+
+
+    // 태그 기반 검색(무한 스크롤)
+    List<RecommendedUrlResponse> getBookmarkUrlsByTagName(RecommendedUrlByTagRequest request) {
+       List<String> urlList = tagBookmarkUrlRepository.findBookmarkUrlIdsByTagName(request.getTagName(),request.getCursorId(), request.getSize());
+        return urlList.stream()
+                .map(JsoupUtil::fetchMetadata)
+                .collect(Collectors.toList());
+    }
+
 }

@@ -2,14 +2,12 @@ import { ref, computed } from "vue";
 import { defineStore } from "pinia";
 import axios from "axios";
 import router from "@/router";
-
-
 const REST_API_URL = `http://localhost:8080/api`;
 
 export const useUserStore = defineStore("user", () => {
   const loginUser = ref(null);
 //   const currentUser = ref(null);
-
+    const userId = computed(() => loginUser.value);
   const user = ref({
     "success": true,
     "message": "some message",
@@ -52,11 +50,11 @@ export const useUserStore = defineStore("user", () => {
       sessionStorage.setItem("access-token", res.data["access-token"]);
 
       const token = res.data["access-token"].split(".");
-
+        //첫 토큰 페이로드에 id가 담겨있으면 1은 언제든 백과 맞추어 변경 가능
       const id = JSON.parse(atob(token[1]))["id"];
 
       loginUser.value = id;
-
+      sessionStorage.setItem("userId", id); // 세션에도 저장
       router.push({ name: "main" });
     } catch (err) {
       console.error(err);
@@ -101,29 +99,6 @@ export const useUserStore = defineStore("user", () => {
     }
   };
 
-  // **추가된 함수: 사용자 정보 가져오기**
-  const fetchUserInfo = async () => {
-    try {
-      const response = await axios.get(`${REST_API_URL}/userinfo`, {
-        headers: { Authorization: `Bearer ${sessionStorage.getItem("access-token")}` },
-      });
-      return response.data;
-    } catch (error) {
-      console.error("사용자 정보 가져오기 실패:", error);
-      throw new Error("사용자 정보를 불러오지 못했습니다.");
-    }
-  };
-  
-  const loadCurrentUser = async () => {
-    try {
-        const userInfo = await fetchUserInfo();
-        currentUser.value = userInfo;
-    } catch (error) {
-        console.error("사용자 정보 로드 실패:", error);
-    }
-  };
-
-
   //마이페이지 조회 밑에 리턴 함수명 주석 해제해야 사용 가능능
   const getMyPage = async () => {
     try {
@@ -161,11 +136,10 @@ export const useUserStore = defineStore("user", () => {
     emailVerification,
     logout,
     signup,
+    userId,
 //     getMyPage,
 //     withdrawalOfMembership,
 //     putMyPage,
 //     getMyPage,
-    fetchUserInfo, // 추가된 부분
-    loadCurrentUser, // 사용자 정보 로드 추가
   };
 });

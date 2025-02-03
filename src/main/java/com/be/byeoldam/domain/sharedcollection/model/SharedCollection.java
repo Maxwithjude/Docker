@@ -21,4 +21,12 @@ public class SharedCollection extends BaseTimeEntity {
     @Column(nullable = false, length = 10)
     private String name;
 
+    private SharedCollection(String name) {
+        this.name = name;
+    }
+
+    public static SharedCollection createSharedCollection(String name) {
+        return new SharedCollection(name);
+    }
+
 }

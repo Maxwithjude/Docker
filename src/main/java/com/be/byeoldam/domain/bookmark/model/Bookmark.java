@@ -43,4 +43,14 @@ public class Bookmark extends BaseTimeEntity {
 
     @Column(name="is_read")
     private boolean isRead;
+
+    @Builder
+    public Bookmark(BookmarkUrl bookmarkUrl, PersonalCollection personalcollection, SharedCollection sharedCollection, User user, boolean priority, boolean isRead) {
+        this.bookmarkUrl = bookmarkUrl;
+        this.personalcollection = personalcollection;
+        this.sharedCollection = sharedCollection;
+        this.user = user;
+        this.priority = priority;
+        this.isRead = isRead;
+    }
 }

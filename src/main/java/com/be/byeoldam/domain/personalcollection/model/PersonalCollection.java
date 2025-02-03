@@ -1,14 +1,9 @@
 package com.be.byeoldam.domain.personalcollection.model;
 
-
 import com.be.byeoldam.common.entity.BaseTimeEntity;
-import com.be.byeoldam.domain.bookmark.model.Bookmark;
 import com.be.byeoldam.domain.user.model.User;
 import jakarta.persistence.*;
 import lombok.*;
-
-import java.util.ArrayList;
-import java.util.List;
 
 @Entity
 @Table(name="personal_collection")
@@ -20,14 +15,11 @@ public class PersonalCollection extends BaseTimeEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    // 1: N에서 N에 해당되는 관계
-    // user_id null 안됨
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="user_id", nullable=false)
     private User user;
 
-    //not null, varchar(10)
-    @Column(name="name", nullable=false, length=10)
+    @Column(name="name", nullable=false, length=20)
     private String name;
 
     private PersonalCollection(String name, User user) {
@@ -35,8 +27,11 @@ public class PersonalCollection extends BaseTimeEntity {
         this.user = user;
     }
 
-    public static PersonalCollection createPersonalCollection(String name, User user) {
+    public static PersonalCollection create(String name, User user) {
         return new PersonalCollection(name, user);
     }
 
+    public void updateName(String updatedName) {
+        this.name = updatedName;
+    }
 }

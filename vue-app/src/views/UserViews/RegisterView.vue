@@ -168,6 +168,12 @@ import { ref } from "vue";
   const handleRegister = () => {
     if (password.value !== confirmPassword.value) {
       modal.value = { visible: true, success: false, message: "비밀번호 확인이" };
+    //   const payload ={
+    //     nickname: nickname.value,
+    //     email: email.value;
+    //     password: password.value;
+    //   }
+        // userStore.signup(payload);
       return;
     }
   

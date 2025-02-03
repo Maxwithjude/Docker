@@ -9,8 +9,6 @@ import java.util.Optional;
 public interface TagRepository extends JpaRepository<Tag, Long>, TagRepositoryCustom {
     List<Tag> findTop10ByOrderByReferenceCountDesc();
 
-    List<Tag> findByUserId(Long userId);
-
     Optional<Tag> findByName(String name);
 
     List<Tag> findByNameIn(List<String> names);

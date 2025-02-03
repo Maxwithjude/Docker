@@ -1,14 +1,15 @@
 package com.be.byeoldam.domain.tag.model;
 
 import com.be.byeoldam.domain.user.model.User;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
+import jakarta.persistence.*;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-@Entity
+
+@Getter
 @NoArgsConstructor
+@Entity
+@IdClass(UserTagId.class)
 public class UserTag {
     @Id
     @ManyToOne

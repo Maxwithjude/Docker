@@ -40,7 +40,13 @@ public class TagService {
     // 사용자 정의 태그 조회
     @Transactional(readOnly = true)
     public List<String> getUserTags(Long userId) {
-        return tagRepository.findByUserId(userId).stream().map(Tag::getName).collect(Collectors.toList());
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new CustomException("사용자를 찾을 수 없습니다."));
+
+        return userTagRepository.findByUser(user)
+                .stream()
+                .map(userTag -> userTag.getTag().getName())
+                .collect(Collectors.toList());
     }
 
 

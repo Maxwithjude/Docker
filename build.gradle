@@ -45,6 +45,10 @@ dependencies {
     // JSOUP (RSS 파싱)
     implementation group: 'org.jsoup', name: 'jsoup', version: '1.18.1'
 
+    // ROME (RSS 파싱)
+    implementation group: 'com.rometools', name: 'rome', version: '2.1.0'
+
+
 }
 
 // === ⭐ QueryDsl 빌드 옵션 (선택) ===

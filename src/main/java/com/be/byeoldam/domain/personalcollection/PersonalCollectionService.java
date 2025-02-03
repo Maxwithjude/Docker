@@ -1,7 +1,7 @@
 package com.be.byeoldam.domain.personalcollection;
 
 import com.be.byeoldam.domain.personalcollection.dto.PersonalCollectionRequest;
-import com.be.byeoldam.domain.personalcollection.dto.UpdatePersonalCollectionResponse;
+import com.be.byeoldam.domain.personalcollection.dto.PersonalCollectionResponse;
 import com.be.byeoldam.domain.personalcollection.model.PersonalCollection;
 import com.be.byeoldam.domain.personalcollection.repository.PersonalCollectionRepository;
 import com.be.byeoldam.domain.user.model.User;
@@ -34,15 +34,17 @@ public class PersonalCollectionService {
 
     // 개인컬렉션 목록 조회
     @Transactional(readOnly = true)
-    public List<PersonalCollection> getPersonalCollections(Long userId) {
+    public List<PersonalCollectionResponse> getPersonalCollections(Long userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new CustomException("사용자를 찾을 수 없습니다."));
-        return personalCollectionRepository.findByUser(user);
+        return personalCollectionRepository.findByUser(user).stream()
+                .map(collection -> PersonalCollectionResponse.of(collection.getId(), collection.getName()))
+                .toList();
     }
 
     // 개인컬렉션 이름 수정
     @Transactional
-    public UpdatePersonalCollectionResponse updatePersonalCollection(PersonalCollectionRequest request, Long userId, Long collectionId) {
+    public PersonalCollectionResponse updatePersonalCollection(PersonalCollectionRequest request, Long userId, Long collectionId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new CustomException("사용자를 찾을 수 없습니다."));
 
@@ -55,7 +57,7 @@ public class PersonalCollectionService {
         String newName = request.getName();
         validate(user, newName);
         collection.updateName(newName);
-        return UpdatePersonalCollectionResponse.of(collectionId, newName, collection.getUpdatedAt());
+        return PersonalCollectionResponse.of(collectionId, newName);
     }
 
     // 개인컬렉션 삭제
@@ -73,13 +75,8 @@ public class PersonalCollectionService {
     }
 
     // 개인컬렉션 이름 검증(create, update)
+    // TODO : 나중에 controller에서 @Valid로 입력 길이, null 처리
     private void validate(User user, String name) {
-        if (name == null || name.trim().isEmpty()) {
-            throw new CustomException("컬렉션 이름은 필수입니다.");
-        }
-        if (name.length() > 20) {
-            throw new CustomException("컬렉션 이름은 20자 이내여야 합니다.");
-        }
         if (personalCollectionRepository.existsByUserIdAndName(user.getId(), name)) {
             throw new CustomException("같은 이름의 컬렉션이 이미 존재합니다.");
         }

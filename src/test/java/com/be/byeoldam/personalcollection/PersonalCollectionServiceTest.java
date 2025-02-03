@@ -2,7 +2,7 @@ package com.be.byeoldam.personalcollection;
 
 import com.be.byeoldam.domain.personalcollection.PersonalCollectionService;
 import com.be.byeoldam.domain.personalcollection.dto.PersonalCollectionRequest;
-import com.be.byeoldam.domain.personalcollection.dto.UpdatePersonalCollectionResponse;
+import com.be.byeoldam.domain.personalcollection.dto.PersonalCollectionResponse;
 import com.be.byeoldam.domain.personalcollection.model.PersonalCollection;
 import com.be.byeoldam.domain.personalcollection.repository.PersonalCollectionRepository;
 import com.be.byeoldam.domain.user.model.User;
@@ -120,7 +120,7 @@ class PersonalCollectionServiceTest {
         when(personalCollectionRepository.existsByUserIdAndName(anyLong(), eq("Updated Name"))).thenReturn(false);
 
         // when
-        UpdatePersonalCollectionResponse response =
+        PersonalCollectionResponse response =
                 personalCollectionService.updatePersonalCollection(new PersonalCollectionRequest("Updated Name"), 1L, 1L);
 
         // then

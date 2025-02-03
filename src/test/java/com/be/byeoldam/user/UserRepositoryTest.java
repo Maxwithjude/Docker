@@ -2,6 +2,7 @@ package com.be.byeoldam.user;
 
 
 import com.be.byeoldam.config.AuditingConfig;
+import com.be.byeoldam.config.QuerydslConfig;
 import com.be.byeoldam.domain.user.dto.UserRegisterRequest;
 import com.be.byeoldam.domain.user.model.User;
 import com.be.byeoldam.domain.user.repository.UserRepository;
@@ -16,7 +17,7 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 
 @DataJpaTest
-@Import(AuditingConfig.class)
+@Import({AuditingConfig.class, QuerydslConfig.class})
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 public class UserRepositoryTest {
     @Autowired
@@ -32,7 +33,7 @@ public class UserRepositoryTest {
 
         User retrievedUser = userRepository.findById(user.getId()).orElse(null);
         assertThat(retrievedUser).isNotNull();
-        assertThat(retrievedUser.getEmail()).isEqualTo("test1@example.com");
+        assertThat(retrievedUser.getEmail()).isEqualTo("test111@example.com");
         assertThat(retrievedUser.getNickname()).isEqualTo("testNickname");
     }
 }

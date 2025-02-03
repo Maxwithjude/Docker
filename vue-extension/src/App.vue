@@ -13,13 +13,6 @@
 import { RouterView } from "vue-router";
 </script>
 
-<style>
-/* 전역 스타일: scoped 속성 제거하고 별도의 스타일 블록으로 분리 */
-/* :root {
-  font-family: Pretendard, -apple-system, BlinkMacSystemFont, system-ui, Roboto, 'Helvetica Neue', 'Segoe UI', 'Apple SD Gothic Neo', 'Noto Sans KR', 'Malgun Gothic', sans-serif;
-} */
-</style>
-
 <style scoped>
 .container {
   width: 400px;
@@ -55,6 +48,8 @@ nav a {
   position: relative;
   z-index: 1;
   transition: background-color 0.2s ease; /* hover 애니메이션 효과 */
+  font-weight: 300;  
+  font-size: 15px;  
 }
 
 nav a.router-link-active {

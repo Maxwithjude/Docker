@@ -3,7 +3,8 @@ import { createPinia } from "pinia";
 
 import App from "./App.vue";
 import router from "./router";
-import "./assets/css/index.css";
+import "./assets/css/index.css"; // tailwind
+import "./assets/css/main.css"; // pretendard font
 
 const app = createApp(App);
 

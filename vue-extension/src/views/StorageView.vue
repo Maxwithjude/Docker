@@ -96,3 +96,10 @@ const saveBookmark = () => {
   console.log('저장 로직 구현 예정')
 }
 </script>
+
+<style scoped>
+/* 설명 텍스트 */
+/* .text-sm {
+  font-weight: 400; 
+} */
+</style>

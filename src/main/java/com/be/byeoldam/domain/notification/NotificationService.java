@@ -4,6 +4,8 @@ import com.be.byeoldam.domain.notification.dto.NotificationResponse;
 import com.be.byeoldam.domain.notification.model.BookmarkNotification;
 import com.be.byeoldam.domain.notification.model.InviteNotification;
 import com.be.byeoldam.domain.notification.model.Notification;
+import com.be.byeoldam.domain.user.model.User;
+import com.be.byeoldam.domain.user.repository.UserRepository;
 import com.be.byeoldam.exception.CustomException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -16,6 +18,7 @@ import java.util.List;
 public class NotificationService {
 
     private final NotificationRepository notificationRepository;
+    private final UserRepository userRepository;
 
     /**
      * 사용자의 알림 목록을 조회하는 메서드
@@ -24,7 +27,11 @@ public class NotificationService {
      */
     @Transactional(readOnly = true)
     public List<NotificationResponse> getNotifications(Long userId) {
-        List<Notification> notifications = notificationRepository.findByUserId(userId);
+
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new CustomException("사용자를 찾을 수 없습니다."));
+
+        List<Notification> notifications = notificationRepository.findByUser(user);
 
         return notifications.stream()
                 .map(this::toResponse)
@@ -38,11 +45,15 @@ public class NotificationService {
      */
     @Transactional
     public void deleteNotification(Long notificationId, Long userId) {
-        Notification notification = notificationRepository.findById(notificationId)
+
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new CustomException("사용자를 찾을 수 없습니다."));
+
+        Notification notification = notificationRepository.findByIdAndUser(notificationId, user)
                 .orElseThrow(() -> new CustomException("해당 알림이 존재하지 않습니다."));
 
-        if (!notification.getUser().getId().equals(userId)) {
-            throw new IllegalArgumentException("해당 알림에 대한 권한이 없습니다.");
+        if (notification.getUser().getId() != userId) {
+            throw new CustomException("해당 알림에 대한 권한이 없습니다.");
         }
 
         notificationRepository.delete(notification);
@@ -54,7 +65,15 @@ public class NotificationService {
      */
     @Transactional
     public void deleteAllNotifications(Long userId) {
-        notificationRepository.deleteByUser_Id(userId);
+
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new CustomException("사용자를 찾을 수 없습니다."));
+
+        if (user.getId() != userId) {
+            throw new CustomException("해당 알림에 대한 권한이 없습니다.");
+        }
+
+        notificationRepository.deleteByUser(user);
     }
 
     /**
@@ -75,9 +94,9 @@ public class NotificationService {
             // 초대 알림은 url이 없음 (null)
         } else if (notification instanceof BookmarkNotification) { // 북마크 알림일 경우
             BookmarkNotification bookmarkNotification = (BookmarkNotification) notification;
-            title = bookmarkNotification.getBookmark().getBookmarkUrl().getUrl();
+            url = bookmarkNotification.getBookmark().getBookmarkUrl().getUrl();
             message = bookmarkNotification.getMessage();
-            url = getTitleFromUrl(title);
+            title = getTitleFromUrl(url);
         }
 
 

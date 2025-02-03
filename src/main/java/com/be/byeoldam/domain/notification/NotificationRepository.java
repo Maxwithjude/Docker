@@ -1,24 +1,17 @@
 package com.be.byeoldam.domain.notification;
 
 import com.be.byeoldam.domain.notification.model.Notification;
+import com.be.byeoldam.domain.user.model.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface NotificationRepository extends JpaRepository<Notification, Long> {
-    /**
-     * 유저의 알림 목록 조회
-     * SELECT n
-     * FROM Notification n
-     * WHERE n.user.id = :userId
-     */
-    List<Notification> findByUserId(Long userId);
 
-    /**
-     * 유저의 알림 전체 삭제
-     * DELETE
-     * FROM Notification n
-     * WHERE n.user.id = :userId
-     */
-    void deleteByUser_Id(Long userId);
+        List<Notification> findByUser(User user);
+
+        Optional<Notification> findByIdAndUser(Long notificationId, User user);
+
+        void deleteByUser(User user);
 }

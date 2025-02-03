@@ -13,8 +13,15 @@ import com.be.byeoldam.domain.user.repository.UserRepository;
 import com.be.byeoldam.exception.CustomException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
 import org.springframework.stereotype.Service;
 
+import javax.sql.rowset.spi.XmlReader;
+import java.io.IOException;
+import java.net.URL;
 import java.util.List;
 
 @Service
@@ -31,7 +38,7 @@ public class RssService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new CustomException("사용자를 찾을 수 없습니다."));
 
-        String rssUrl = rssSubscribeRequest.getRssUrl();
+        String rssUrl = findRssUrl(rssSubscribeRequest.getSiteUrl()); // RSS URL 추출
 
         Rss rss = rssRepository.findByRssUrl(rssUrl)
                 .orElseGet(() -> rssRepository.save(Rss.createRss(rssUrl, extractRssName(rssUrl))));
@@ -43,6 +50,8 @@ public class RssService {
 
         userRssRepository.save(rssSubscribeRequest.toEntity(user, rss));
     }
+
+
 
     @Transactional
     public void unsubscribeRss(Long userId, Long rssId) {
@@ -116,4 +125,31 @@ public class RssService {
         return null;
     }
 
+
+
+    // RSS URL 추출 메서드
+    private String findRssUrl(String siteUrl) {
+        try {
+            Document doc = Jsoup.connect(siteUrl).get();
+            Elements links = doc.select("link[type=application/rss+xml], link[type=application/atom+xml]");
+            if (links.isEmpty()) {
+                throw new CustomException("RSS URL을 찾을 수 없습니다.");
+            }
+            for (Element link : links) {
+                String rssUrl = link.attr("href");
+
+                // 상대경로 처리 (예: "/rss.xml" → "https://example.com/rss.xml")
+                if (!rssUrl.startsWith("http")) {
+                    rssUrl = siteUrl + (rssUrl.startsWith("/") ? rssUrl : "/" + rssUrl);
+                }
+
+                return rssUrl;
+            }
+
+        } catch (IOException e) {
+            throw new CustomException("RSS URL을 찾을 수 없습니다.");
+        }
+
+        throw new CustomException("RSS URL을 찾을 수 없습니다.");
+    }
 }

@@ -10,7 +10,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 public class SharedCollectionRequest {
-
     private String name;
 
     public SharedCollection toEntity() {

@@ -49,12 +49,25 @@
 </template>
 
 <script setup>
-import { ref } from 'vue';
+import { onMounted, ref } from 'vue';
 import Header from '@/common/Header.vue';
 import SideBar from '@/common/SideBar.vue';
 import Collection from '@/common/Collection.vue';
 import CreateCollection from '@/modal/CreateCollection.vue';
 import { useCounterStore } from '@/stores/counter';
+
+import { useUserStore } from '@/stores/user';
+import { useCollectionStore } from '@/stores/collection';
+
+const userStore = useUserStore()
+const collectionStore = useCollectionStore();
+
+//로그인 되어 있으면 정보 다 불러오기기
+// onMounted(()=> {
+//     if(userStore.userId){
+//         collectionStore.fetchAllCollections();
+//     }
+// })
 const store = useCounterStore();
 const isDeleteMode = ref(false);
 const collections = ref([

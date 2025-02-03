@@ -2,14 +2,12 @@ import { ref, computed } from "vue";
 import { defineStore } from "pinia";
 import axios from "axios";
 import router from "@/router";
-import { id } from "element-plus/es/locale";
-
 const REST_API_URL = `http://localhost:8080/api`;
 
 export const useUserStore = defineStore("user", () => {
   const loginUser = ref(null);
 //   const currentUser = ref(null);
-
+    const userId = computed(() => loginUser.value);
   const user = ref({
     "success": true,
     "message": "some message",
@@ -52,11 +50,11 @@ export const useUserStore = defineStore("user", () => {
       sessionStorage.setItem("access-token", res.data["access-token"]);
 
       const token = res.data["access-token"].split(".");
-
+        //첫 토큰 페이로드에 id가 담겨있으면 1은 언제든 백과 맞추어 변경 가능
       const id = JSON.parse(atob(token[1]))["id"];
 
       loginUser.value = id;
-
+      sessionStorage.setItem("userId", id); // 세션에도 저장
       router.push({ name: "main" });
     } catch (err) {
       console.error(err);
@@ -161,6 +159,7 @@ export const useUserStore = defineStore("user", () => {
     emailVerification,
     logout,
     signup,
+    userId,
 //     getMyPage,
 //     withdrawalOfMembership,
 //     putMyPage,

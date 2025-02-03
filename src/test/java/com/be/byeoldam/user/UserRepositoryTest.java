@@ -24,16 +24,16 @@ public class UserRepositoryTest {
     private UserRepository userRepository;
 
     @Test
-    @Rollback(false)
+    // @Rollback(false)
     void testSaveAndFindUser() {
-        UserRegisterRequest userRegisterRequest = new UserRegisterRequest("test1@example.com", "1234", "testNickname");
+        UserRegisterRequest userRegisterRequest = new UserRegisterRequest("test1111@example.com", "1234", "testNickname");
 
         User user = userRegisterRequest.toEntity();
         userRepository.save(user);
 
         User retrievedUser = userRepository.findById(user.getId()).orElse(null);
         assertThat(retrievedUser).isNotNull();
-        assertThat(retrievedUser.getEmail()).isEqualTo("test111@example.com");
+        assertThat(retrievedUser.getEmail()).isEqualTo("test1111@example.com");
         assertThat(retrievedUser.getNickname()).isEqualTo("testNickname");
     }
 }

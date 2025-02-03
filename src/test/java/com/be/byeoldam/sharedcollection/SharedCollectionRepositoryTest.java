@@ -16,9 +16,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.context.annotation.Import;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
@@ -31,7 +29,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class SharedCollectionRepositoryTest {
 
     @Autowired
-    private SharedCollectionRepository personalCollectionRepository;
+    private SharedCollectionRepository sharedCollectionRepository;
 
     @Autowired
     private SharedUserRepository sharedUserRepository;
@@ -40,8 +38,7 @@ public class SharedCollectionRepositoryTest {
     private UserRepository userRepository;
 
     private User user;
-    @Autowired
-    private SharedCollectionRepository sharedCollectionRepository;
+
 
     @BeforeEach
     void setUp() {

@@ -13,7 +13,7 @@
     <div class="popover-content">
       <el-button-group vertical class="settings-menu">
         <el-button link @click="toggleImportant">
-          {{ isImportant ? '중요 북마크 해제' : '중요 북마크로 설정' }}
+          {{ props.priority ? '중요 북마크 해제' : '중요 북마크로 설정' }}
         </el-button>
         
         <el-button link @click="copyToSharedCollection">
@@ -27,10 +27,11 @@
         <el-button link @click="showTagManagement">
           태그 관리
         </el-button>
-        
-        <el-button link class="delete-button" @click="openDeleteModal">
-          북마크 삭제
+
+        <el-button @click="openDeleteModal" class="delete-button">
+          삭제
         </el-button>
+        
       </el-button-group>
     </div>
   </el-popover>
@@ -55,7 +56,6 @@
     class="bookmark-move-dialog"
   >
     <BookmarkMovePersonal 
-      :bookmark-id="bookmarkId"
       @close="showMoveModal = false"
       @move-complete="handleMoveComplete"
     />
@@ -71,6 +71,21 @@
   >
     <BookmarkTagSetting @close="showTagModal = false" />
   </el-dialog>
+
+  <el-dialog
+      v-model="showDeleteModal"
+      :modal="true"
+      :show-close="true"
+      destroy-on-close
+      append-to-body
+      width="400px"
+      class="bookmark-delete-modal"
+  >
+      <BookmarkDel
+          @close="showDeleteModal = false"
+          @confirm="handleDeleteConfirm"
+      />
+    </el-dialog>
 </template>
 
 <script setup>
@@ -79,10 +94,11 @@ import { ElMessage } from 'element-plus'
 import BookmarkCopyShared from '@/modal/BookmarkCopyShared.vue'
 import BookmarkMovePersonal from '@/modal/BookmarkMovePersonal.vue'
 import BookmarkTagSetting from '@/modal/BookmarkTagSetting.vue'
+import BookmarkDel from '@/modal/BookmarkDel.vue'
 
-const emit = defineEmits(['delete'])
+const emit = defineEmits(['toggleImportant'])
 const props = defineProps({
-  isImportant: {
+  priority: {
     type: Boolean,
     default: false
   }
@@ -92,9 +108,14 @@ const isVisible = ref(false)
 const showCopyModal = ref(false)
 const showMoveModal = ref(false)
 const showTagModal = ref(false)
+const showDeleteModal = ref(false)
+
+
+
 
 const toggleImportant = () => {
   // TODO: Implement toggle important
+  emit('toggleImportant')
 }
 
 const copyToSharedCollection = () => {
@@ -114,7 +135,7 @@ const showTagManagement = () => {
 
 const openDeleteModal = () => {
   isVisible.value = false
-  emit('delete')
+  showDeleteModal.value = true
 }
 
 const handleMoveComplete = () => {
@@ -150,31 +171,8 @@ const handleMoveComplete = () => {
 
 .settings-menu .delete-button {
   color: #f56c6c;
+  border: none;
+  background: none;
 }
 
-:deep(.bookmark-settings-popover) {
-  padding: 0;
-}
-
-:deep(.bookmark-copy-dialog) {
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-}
-
-:deep(.bookmark-copy-dialog .el-dialog) {
-  margin: 0 !important;
-  width: 500px;
-}
-
-:deep(.bookmark-move-dialog .el-dialog) {
-  margin: 0 !important;
-  width: 500px;
-}
-
-:deep(.bookmark-tag-dialog .el-dialog) {
-  margin: 0 !important;
-  width: 500px;
-}
 </style>

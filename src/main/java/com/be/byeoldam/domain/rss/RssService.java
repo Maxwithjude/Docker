@@ -11,15 +11,20 @@ import com.be.byeoldam.domain.rss.repository.UserRssRepository;
 import com.be.byeoldam.domain.user.model.User;
 import com.be.byeoldam.domain.user.repository.UserRepository;
 import com.be.byeoldam.exception.CustomException;
+import com.rometools.rome.feed.synd.SyndFeed;
+import com.rometools.rome.io.SyndFeedInput;
+import com.rometools.rome.io.XmlReader;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import javax.sql.rowset.spi.XmlReader;
 import java.io.IOException;
 import java.net.URL;
 import java.util.List;
@@ -71,6 +76,11 @@ public class RssService {
         userRssRepository.deleteByUserIdAndRssId(userId, rssId);
     }
 
+    /**
+     * 사용자의 RSS 구독 목록을 조회하는 메서드
+     * @param userId
+     * @return
+     */
     @Transactional
     public List<UserRssResponse> getUserRssList(Long userId) {
 
@@ -89,8 +99,14 @@ public class RssService {
                 .toList();
     }
 
+    /**
+     * 특정 RSS 최신 글 목록을 조회하는 메서드
+     * @param userId
+     * @param rssId
+     * @return
+     */
     @Transactional
-    public RssLatestPostsResponse getRssLatestArticles(Long userId, Long rssId) {
+    public RssLatestPostsResponse getRssLatestArticles(Long userId, Long rssId, Pageable pageable) {
 
         if (!userRepository.existsById(userId)) {
             throw new CustomException("사용자를 찾을 수 없습니다.");
@@ -103,10 +119,16 @@ public class RssService {
                 .orElseThrow(() -> new CustomException("구독하지 않은 RSS입니다."));
 
         String latestTitle = userRss.getLatestTitle();
+        String previousTitle = userRss.getPreviousTitle();
 
-        List<RssPostResponse> latestArticles = fetchRssArticles(rss.getRssUrl(), latestTitle);
 
-        // todo 최신 글 제목 업데이트 로직
+        Page<RssPostResponse> latestArticles = fetchRssPosts(rss.getRssUrl(), previousTitle, pageable);
+
+        // 첫 페이지 요청 시에만 latestTitle 업데이트
+        if (pageable.getPageNumber() == 0 && !latestArticles.isEmpty()) {
+            String newestTitle = latestArticles.getContent().get(0).getTitle();
+            userRss.updateTitles(newestTitle);
+        }
 
         return RssLatestPostsResponse.of(
                 rss.getId(),
@@ -115,14 +137,54 @@ public class RssService {
         );
     }
 
-    // todo : RSS의 최신 글 목록을 가져오는 메서드
-    private List<RssPostResponse> fetchRssArticles(String rssUrl, String latestTitle) {
-        return null;
+    // RSS의 최신 글 목록을 가져오는 메서드
+    private Page<RssPostResponse> fetchRssPosts(String rssUrl, String previousTitle, Pageable pageable) {
+        try {
+            // RSS 피드 가져오기
+            URL feedSource = new URL(rssUrl);
+            SyndFeedInput input = new SyndFeedInput();
+            SyndFeed feed = input.build(new XmlReader(feedSource));
+
+            int totalSize = feed.getEntries().size(); // 전체 글 개수
+
+            // 페이징 처리
+            List<RssPostResponse> pagedArticles = feed.getEntries().stream()
+                    .skip(pageable.getOffset())
+                    .limit(pageable.getPageSize())
+                    .map(entry -> {
+                        String title = entry.getTitle();
+                        String link = entry.getLink();
+
+                        // previousTitle과 비교하여 is_read 판별
+                        boolean isRead = previousTitle != null && title.compareTo(previousTitle) <= 0;
+
+                        return RssPostResponse.builder()
+                                .title(title)
+                                .url(link)
+                                .isRead(isRead)
+                                .build();
+                    }).toList();
+
+            return new PageImpl<>(pagedArticles, pageable, totalSize);
+
+        } catch (Exception e) {
+            throw new CustomException("RSS 피드를 가져오는 중 오류가 발생했습니다.");
+        }
     }
 
-    //todo : RSS 이름 추출
+    /**
+     * RSS 이름 추출 메서드
+     */
     private String extractRssName(String rssUrl) {
-        return null;
+        try {
+            URL feedSource = new URL(rssUrl);
+            SyndFeedInput input = new SyndFeedInput();
+            SyndFeed feed = input.build(new XmlReader(feedSource));
+
+            return feed.getTitle(); // RSS 피드 제목 반환
+        } catch (Exception e) {
+            throw new CustomException("RSS 제목을 가져오는 중 오류가 발생했습니다.");
+        }
     }
 
     /**
@@ -138,7 +200,11 @@ public class RssService {
         }
     }
 
-    // RSS URL 추출 메서드
+    /**
+     * RSS URL 추출 메서드
+     * @param siteUrl
+     * @return
+     */
     private String findRssUrl(String siteUrl) {
         try {
             Document doc = Jsoup.connect(siteUrl).get();

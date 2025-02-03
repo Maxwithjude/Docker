@@ -20,5 +20,4 @@ public class UpdatePersonalCollectionResponse {
                 .updatedAt(updatedAt)
                 .build();
     }
-
 }

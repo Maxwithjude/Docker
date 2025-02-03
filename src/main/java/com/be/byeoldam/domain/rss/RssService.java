@@ -125,7 +125,18 @@ public class RssService {
         return null;
     }
 
-
+    /**
+     * RSS 구독 가능한 URL인지 확인하는 메서드
+     */
+    public boolean isSubscribed(String url) {
+        try {
+            Document doc = Jsoup.connect(url).get();
+            Elements links = doc.select("link[type=application/rss+xml]");
+            return !links.isEmpty();
+        } catch (IOException e) {
+            return false;
+        }
+    }
 
     // RSS URL 추출 메서드
     private String findRssUrl(String siteUrl) {

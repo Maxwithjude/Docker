@@ -46,7 +46,10 @@ public class RssService {
         String rssUrl = findRssUrl(rssSubscribeRequest.getSiteUrl()); // RSS URL 추출
 
         Rss rss = rssRepository.findByRssUrl(rssUrl)
-                .orElseGet(() -> rssRepository.save(Rss.createRss(rssUrl, extractRssName(rssUrl))));
+                .orElseGet(() -> {
+                    String rssName = extractRssName(rssUrl);
+                    return rssRepository.save(Rss.createRss(rssUrl, rssName));
+                });
 
         // 이미 구독한 RSS인지 확인
         if (userRssRepository.existsByUserIdAndRssId(userId, rss.getId())) {
@@ -147,6 +150,11 @@ public class RssService {
 
             int totalSize = feed.getEntries().size(); // 전체 글 개수
 
+            // 글이 없는 경우
+            if (feed.getEntries().isEmpty()) {
+                return Page.empty(pageable);
+            }
+
             // 페이징 처리
             List<RssPostResponse> pagedArticles = feed.getEntries().stream()
                     .skip(pageable.getOffset())
@@ -210,7 +218,7 @@ public class RssService {
             Document doc = Jsoup.connect(siteUrl).get();
             Elements links = doc.select("link[type=application/rss+xml], link[type=application/atom+xml]");
             if (links.isEmpty()) {
-                throw new CustomException("RSS URL을 찾을 수 없습니다.");
+                throw new IOException("No RSS URL found");
             }
             for (Element link : links) {
                 String rssUrl = link.attr("href");
@@ -227,6 +235,6 @@ public class RssService {
             throw new CustomException("RSS URL을 찾을 수 없습니다.");
         }
 
-        throw new CustomException("RSS URL을 찾을 수 없습니다.");
+        return null;
     }
 }

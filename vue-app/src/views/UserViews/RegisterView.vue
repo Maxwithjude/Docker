@@ -118,7 +118,6 @@
   
   <script setup>
   import { useUserStore } from "@/stores/user";
-import { en } from "element-plus/es/locale";
 import { ref } from "vue";
   
   const userStore = useUserStore();

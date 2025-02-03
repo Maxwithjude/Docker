@@ -99,29 +99,6 @@ export const useUserStore = defineStore("user", () => {
     }
   };
 
-  // **추가된 함수: 사용자 정보 가져오기**
-  const fetchUserInfo = async () => {
-    try {
-      const response = await axios.get(`${REST_API_URL}/userinfo`, {
-        headers: { Authorization: `Bearer ${sessionStorage.getItem("access-token")}` },
-      });
-      return response.data;
-    } catch (error) {
-      console.error("사용자 정보 가져오기 실패:", error);
-      throw new Error("사용자 정보를 불러오지 못했습니다.");
-    }
-  };
-  
-  const loadCurrentUser = async () => {
-    try {
-        const userInfo = await fetchUserInfo();
-        currentUser.value = userInfo;
-    } catch (error) {
-        console.error("사용자 정보 로드 실패:", error);
-    }
-  };
-
-
   //마이페이지 조회 밑에 리턴 함수명 주석 해제해야 사용 가능능
   const getMyPage = async () => {
     try {
@@ -164,7 +141,5 @@ export const useUserStore = defineStore("user", () => {
 //     withdrawalOfMembership,
 //     putMyPage,
 //     getMyPage,
-    fetchUserInfo, // 추가된 부분
-    loadCurrentUser, // 사용자 정보 로드 추가
   };
 });

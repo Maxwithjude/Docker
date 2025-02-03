@@ -12,7 +12,7 @@
     
     <div class="popover-content">
       <el-button-group vertical class="settings-menu">
-        <el-button link @click="toggleImportant">
+        <el-button link @click="togglePriority">
           {{ props.priority ? '중요 북마크 해제' : '중요 북마크로 설정' }}
         </el-button>
         
@@ -96,7 +96,7 @@ import BookmarkMovePersonal from '@/modal/BookmarkMovePersonal.vue'
 import BookmarkTagSetting from '@/modal/BookmarkTagSetting.vue'
 import BookmarkDel from '@/modal/BookmarkDel.vue'
 
-const emit = defineEmits(['toggleImportant'])
+const emit = defineEmits(['togglePriority'])
 const props = defineProps({
   priority: {
     type: Boolean,
@@ -110,12 +110,8 @@ const showMoveModal = ref(false)
 const showTagModal = ref(false)
 const showDeleteModal = ref(false)
 
-
-
-
-const toggleImportant = () => {
-  // TODO: Implement toggle important
-  emit('toggleImportant')
+const togglePriority = () => {
+  emit('togglePriority')
 }
 
 const copyToSharedCollection = () => {

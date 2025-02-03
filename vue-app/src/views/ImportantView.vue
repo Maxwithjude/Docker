@@ -22,9 +22,10 @@
                         :description="bookmark.description"
                         :tag="bookmark.tag"
                         :priority="bookmark.priority"
-                        :isPersonal="true"
+                        :isPersonal="bookmark.isPersonal"
                         :createdAt="bookmark.created_at"
                         :updatedAt="bookmark.updated_at"
+                        @togglePriority="togglePriority(bookmark)"
                     />
                 </div>
             </div>
@@ -37,6 +38,10 @@ import { ref, computed } from 'vue';
 import Header from '@/common/Header.vue';
 import SideBar from '@/common/SideBar.vue';
 import Card from '@/common/Card.vue';
+
+const togglePriority = (bookmark) => {
+    bookmark.priority = !bookmark.priority;
+}
 
 // 여기에 실제 북마크 데이터를 가져오는 로직이 들어갈 예정
 const bookmarks = ref([

@@ -8,8 +8,7 @@
             <div class="settings">
                 <BookmarkSettings 
                     :priority="props.priority"
-                    @toggle-important="toggleImportant"
-                    
+                    @toggle-priority="togglePriority"
                 />
             </div>
         </div>
@@ -92,10 +91,6 @@ const props = defineProps({
         type: Boolean,
         default: false
     },
-    isPersonal: {
-        type: Boolean,
-        required: true
-    },
     createdAt: {
         type: String,
         required: true
@@ -120,11 +115,11 @@ const handleImageClick = () => {
     router.push(route);
 };
 
-const toggleImportant = () => {
-    props.priority = !props.priority;
+const togglePriority = () => {
+    emit('togglePriority');
 }
 
-// const emit = defineEmits(['delete', 'manageTags', 'toggleImportant', 'copyToShared', 'move']);
+const emit = defineEmits(['togglePriority']);
 </script>
 
 <style scoped>

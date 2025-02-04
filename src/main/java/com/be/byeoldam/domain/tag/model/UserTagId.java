@@ -9,7 +9,6 @@ import java.io.Serializable;
 
 @Getter
 @NoArgsConstructor
-@AllArgsConstructor
 @EqualsAndHashCode
 public class UserTagId implements Serializable {
     private Long user;

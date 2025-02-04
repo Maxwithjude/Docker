@@ -8,8 +8,7 @@ import lombok.NoArgsConstructor;
 import java.io.Serializable;
 
 @Getter
-@NoArgsConstructor
-@AllArgsConstructor
+@NoArgsConstructor //@IdClass를 사용 시, 필요
 @EqualsAndHashCode
 public class TagBookmarkUrlId implements Serializable {
     private Long tag;

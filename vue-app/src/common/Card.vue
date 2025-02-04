@@ -54,10 +54,6 @@ import { ref, computed } from 'vue';
 import BookmarkSettings from '@/common/BookmarkSettings.vue';
 import { useRouter } from 'vue-router';
 
-
-const imageSrc = computed(() => props.img || 'https://images.unsplash.com/photo-1481627834876-b7833e8f5570?q=80&w=2128&auto=format&fit=crop');
-
-
 const props = defineProps({
     bookmarkId: {
         type: Number,
@@ -83,10 +79,6 @@ const props = defineProps({
         type: Array,
         default: () => []
     },
-    // readingTime: {
-    //     type: Number,
-    //     required: true
-    // },
     priority: {
         type: Boolean,
         default: false
@@ -98,6 +90,10 @@ const props = defineProps({
     updatedAt: {
         type: String,
         required: true
+    },
+    isPersonal: {
+        type: Boolean,
+        required: true
     }
 });
 
@@ -107,6 +103,17 @@ const visibleTags = computed(() => props.tag.slice(0, 2));
 // const remainingTags = computed(() => props.tag.slice(2));
 const remainingTagsCount = computed(() => Math.max(0, props.tag.length - 2));
 
+const emit = defineEmits(['togglePriority']);
+
+const togglePriority = () => {
+    emit('togglePriority');
+};
+
+const imageSrc = computed(() => {
+    return props.img && props.img.startsWith('http') 
+        ? props.img 
+        : 'https://images.unsplash.com/photo-1481627834876-b7833e8f5570?q=80&w=2128&auto=format&fit=crop';
+});
 
 const handleImageClick = () => {
     const route = props.isPersonal 
@@ -114,12 +121,6 @@ const handleImageClick = () => {
         : `/shared-collection/${props.bookmarkId}`;
     router.push(route);
 };
-
-const togglePriority = () => {
-    emit('togglePriority');
-}
-
-const emit = defineEmits(['togglePriority']);
 </script>
 
 <style scoped>
@@ -267,7 +268,7 @@ const emit = defineEmits(['togglePriority']);
 .star-icon {
     color: #FFD700;
     font-size: 1.2rem;
-    cursor: pointer;
+    /* cursor: pointer; */
 }
 
 .star-icon.empty {

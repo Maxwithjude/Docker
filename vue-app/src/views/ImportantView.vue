@@ -58,7 +58,8 @@ const bookmarks = ref([
                 "priority" : true,
                 "created_at" : "2024-01-01",
                 "updated_at" : "2024-01-02",
-                "tag" : ["서핑", "웹"]
+                "tag" : ["서핑", "웹"],
+                "isPersonal" : true
             }, 
             {
                 "bookmark_id" : 2,
@@ -69,7 +70,8 @@ const bookmarks = ref([
                 "priority" : true,
                 "created_at" : "2024-01-01",
                 "updated_at" : "2024-01-02",
-                "tag" : ["싸피", "IT"]
+                "tag" : ["싸피", "IT"],
+                "isPersonal" : false
             }
         ]
     }

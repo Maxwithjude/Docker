@@ -1,6 +1,14 @@
 <template>
     <div class="collection-container">
-        <h2 class="collection-title">{{ collectionInfo.name }}</h2>
+        <div class="collection-header">
+            <h2 class="collection-title">{{ collectionInfo.name }}</h2>
+            <div class="shared-users">
+                공유 멤버:
+                <span v-for="(user, index) in collectionInfo.users" :key="user.user_id" class="user-name">
+                    {{ user.nickname }}{{ index < collectionInfo.users.length - 1 ? ', ' : '' }}
+                </span>
+            </div>
+        </div>
         <div v-if="bookmarks.length > 0" class="bookmarks-grid">
             <Card
                 v-for="bookmark in bookmarks"
@@ -12,7 +20,7 @@
                 :description="bookmark.description"
                 :tag="bookmark.tag"
                 :priority="bookmark.priority"
-                :isPersonal="true"
+                :isPersonal="false"
                 :createdAt="bookmark.created_at"
                 :updatedAt="bookmark.updated_at"
                 @togglePriority="togglePriority(bookmark)"
@@ -41,8 +49,11 @@ const props = defineProps({
 
 // collection_id에 해당하는 북마크들을 찾아서 반환
 const bookmarks = computed(() => {
-    const bookmarksData = counterStore.personalCollectionsBookmarks.results;
-    return bookmarksData.name === props.collectionInfo.name ? bookmarksData.bookmarks : [];
+    const bookmarksData = counterStore.sharedCollectionsBookmarks;
+    // results가 객체이므로 직접 collection_id를 비교
+    return bookmarksData.results.collection_id === props.collectionInfo.collection_id
+        ? bookmarksData.results.bookmarks
+        : [];
 });
 
 const togglePriority = (bookmark) => {
@@ -53,6 +64,13 @@ const togglePriority = (bookmark) => {
 <style scoped>
 .collection-container {
     margin-bottom: 30px;
+}
+
+.collection-header {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    margin-bottom: 20px;
 }
 
 .collection-title {
@@ -82,5 +100,15 @@ const togglePriority = (bookmark) => {
 .empty-message p:first-child {
     font-size: 1.1em;
     color: #333;
+}
+
+.shared-users {
+    color: #666;
+    font-size: 0.9rem;
+}
+
+.user-name {
+    color: #333;
+    font-weight: 500;
 }
 </style>

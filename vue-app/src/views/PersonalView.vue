@@ -1,14 +1,57 @@
 <template>
     <div class="layout">
-        <Header />
+        <Header class="header" />
         <div class="content-wrapper">
-            <SideBar />
-            <div class="body">
-                기본 페이지
-                <PersonalCollectionList
-                    v-for="collectionInfo in personalCollections[0].results" 
-                    :key="collectionInfo.collection_id" 
-                    :collectionInfo="collectionInfo" 
+            <SideBar class="sidebar" />
+            <div class="main-content">
+                <div class="body">
+                    <div class="top-section">
+                        <div class="filter-buttons">
+                            <button 
+                                :class="['filter-btn', selectedCollection === 'all' ? 'active' : '']"
+                                @click="selectedCollection = 'all'"
+                            >
+                                전체보기
+                            </button>
+                            <button 
+                                v-for="collection in collections"
+                                :key="collection.collection_id"
+                                :class="['filter-btn', selectedCollection === collection.name ? 'active' : '']"
+                                @click="selectedCollection = collection.name"
+                            >
+                                {{ collection.name }}
+                            </button>
+                        </div>
+                        <button class="new-collection-btn" @click="createNewCollection">
+                            <span class="plus-icon">+</span>
+                            새 컬렉션
+                        </button>
+                    </div>
+                    <div class="collections-wrapper">
+                        <template v-if="selectedCollection === 'all'">
+                            <PersonalCollectionList
+                                v-for="collection in collections" 
+                                :key="collection.collection_id" 
+                                :collectionInfo="collection"
+                                class="collection-item"
+                            />
+                        </template>
+                        <template v-else>
+                            <PersonalCollectionList
+                                v-for="collection in filteredCollections" 
+                                :key="collection.collection_id" 
+                                :collectionInfo="collection"
+                                class="collection-item"
+                            />
+                        </template>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div v-if="showCreateModal" class="modal-overlay">
+            <div class="modal-content">
+                <CreateCollection 
+                    @close="showCreateModal = false"
                 />
             </div>
         </div>
@@ -18,34 +61,24 @@
 <script setup>
 import Header from '@/common/Header.vue'
 import SideBar from '@/common/SideBar.vue'
-import { ref } from 'vue';
+import { computed, ref } from 'vue';
 import PersonalCollectionList from '@/component/PersonalCollectionList.vue';
-// import { useCollectionStore } from '@/stores/collection';
+import CreateCollection from '@/modal/CreateCollection.vue';
+import { useCounterStore } from '@/stores/counter';
 
-// const collectionStore = useCollectionStore();
+const counterStore = useCounterStore(); 
+const selectedCollection = ref('all');
+const showCreateModal = ref(false);
 
+const collections = computed(() => counterStore.personalCollections.results);
 
-const personalCollections = ref([
-    {
-        "success" : true,
-        "message" : "some message",
-        "results": [
-            {
-                "collection_id" : 1,
-                "name" : "웹서핑",
-                "created_at" : "2024-01-01",
-                "updated_at" : "2024-01-02"
-            }, 
-            {
-                "collection_id" : 2,
-                "name" : "자바",
-                "created_at" : "2024-01-01",
-                "updated_at" : "2024-01-02"
-            }
-        ] 
-    }
-]);
+const filteredCollections = computed(() => {
+    return collections.value.filter(collection => collection.name === selectedCollection.value);
+});
 
+const createNewCollection = () => {
+    showCreateModal.value = true;
+};
 </script>
 
 <style scoped>
@@ -55,14 +88,135 @@ const personalCollections = ref([
     min-height: 100vh;
 }
 
+.header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 100;
+    background: white;
+}
+
 .content-wrapper {
     display: flex;
+    margin-top: 60px; /* 헤더 높이만큼 여백 추가 */
+    height: calc(100vh - 60px); /* 전체 높이에서 헤더 높이를 뺀 만큼 설정 */
+}
+
+.sidebar {
+    position: fixed;
+    left: 0;
+    top: 60px; /* 헤더 높이만큼 떨어뜨림 */
+    bottom: 0;
+    width: 240px; /* 사이드바 너비 */
+    background: white;
+    z-index: 99;
+}
+
+.main-content {
     flex: 1;
+    margin-left: 240px; /* 사이드바 너비만큼 여백 */
+    overflow-y: auto; /* 본문 내용만 스크롤 가능하도록 */
+    height: 100%;
 }
 
 .body {
-    flex: 1;
     padding: 20px;
+}
+
+.collections-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 60px;
+}
+
+.collection-item {
+    width: 100%;
+}
+
+.top-section {
+    position: sticky;
+    top: 0;
+    background: white;
+    padding: 10px 0;
+    z-index: 98;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 40px;
+}
+
+.filter-buttons {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    flex: 1;
+}
+
+.filter-btn {
+    padding: 8px 16px;
+    border: 1px solid #ddd;
+    border-radius: 20px;
+    background: white;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.filter-btn:hover {
+    background: #f5f5f5;
+}
+
+.filter-btn.active {
+    background: #007bff;
+    color: white;
+    border-color: #007bff;
+}
+
+.new-collection-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 16px;
+    border: none;
+    border-radius: 20px;
+    background: #007bff;
+    color: white;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-weight: 500;
+}
+
+.new-collection-btn:hover {
+    background: #0056b3;
+}
+
+.plus-icon {
+    font-size: 1.2em;
+    font-weight: bold;
+}
+
+/* 모달 관련 스타일 추가 */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.modal-content {
+    background: white;
+    /* padding: 20px; */
+    border-radius: 8px;
+    width: 90%;
+    max-width: 500px;
+    max-height: 80vh;
+    overflow-y: auto;
 }
 </style>
 

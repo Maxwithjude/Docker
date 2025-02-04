@@ -11,7 +11,6 @@ import com.be.byeoldam.domain.user.model.User;
 import com.be.byeoldam.domain.user.repository.UserRepository;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -33,6 +32,7 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 @DataJpaTest
 @Import({AuditingConfig.class, QuerydslConfig.class})
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
+@Rollback
 public class TagRepositoryTest {
 
     @Autowired
@@ -54,7 +54,6 @@ public class TagRepositoryTest {
     }
 
     @Test
-    @Rollback
     void testSaveAndFindTag() {
         // Given
         String tagName = "공부";
@@ -74,7 +73,6 @@ public class TagRepositoryTest {
 
     @Test
     @Transactional
-    @Rollback
     void testDecrementReferenceCountByName() {
         // Given: 새로운 Tag 객체를 생성하고 DB에 저장
         String tagName = "공부3";
@@ -96,7 +94,6 @@ public class TagRepositoryTest {
     @Test
     @DisplayName("사용자의 기존 태그를 삭제한 후, 새로운 태그들을 추가하기")
     @Transactional
-    @Rollback
     public void 사용자_태그_삭제_후_추가() {
         // Given
         // 유저 저장

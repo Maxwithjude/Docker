@@ -41,7 +41,10 @@
         placeholder="북마크를 설명할 태그를 입력해보세요."
         class="flex-1 p-2 border rounded-md focus:outline-none focus:border-gray-400"
       >
-      <button class="flex items-center justify-center bg-gradient-to-r from-blue-400 to-blue-600 text-white w-10 h-10 rounded-md" @click="addTag">
+      <button 
+      class="flex items-center justify-center bg-blue-500 text-white w-10 h-10 rounded-md hover:bg-blue-600 transition-colors duration-200" 
+      @click="addTag"
+    >
         <span class="text-lg font-bold">+</span>
       </button>
     </div>
@@ -64,16 +67,14 @@
       </label>
     </div>
 
-    <!-- 하단 버튼 -->
-    <div class="flex justify-end gap-2">
-      <div class="flex justify-end gap-2">
- <!-- 하단 버튼 -->
-<div class="flex justify-end gap-2">
-  <button class="flex items-center justify-center bg-gradient-to-r from-blue-400 to-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-500 transition-colors duration-200">
-    Save
-  </button>
-</div>
-</div>
+    <!-- 저장 버튼 -->
+    <div class="flex justify-end">
+      <button 
+        @click="saveBookmark"
+        class="px-6 py-2 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-md hover:from-blue-600 hover:to-blue-700 transition-all duration-200 flex items-center gap-2"
+      >
+        <span>저장</span>
+      </button>
     </div>
   </div>
 </template>

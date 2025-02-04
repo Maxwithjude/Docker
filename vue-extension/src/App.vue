@@ -7,7 +7,7 @@
         </RouterLink>
         <RouterLink :to="{ name: 'alarm' }" class="nav-item">
           <span class="nav-text">알림</span>
-          <span class="notification-badge">2</span>
+          <span class="notification-badge">5</span>
         </RouterLink>
         <RouterLink :to="{ name: 'feed' }" class="nav-item">
           <span class="nav-text">피드</span>

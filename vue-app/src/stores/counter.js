@@ -176,8 +176,39 @@ export const useCounterStore = defineStore('counter', () => {
       }
     }
   )
-
-  return { user, personalCollections, personalCollectionsBookmarks, sharedCollections, sharedCollectionsBookmarks }
+  const importantBookmarks = ref(
+    {
+      "success":true,
+      "message":"some message",
+      "results": [
+        {
+          "bookmark_id" : 1,
+          "url" : "https://naver.com",
+          "img" : "https://edu.ssafy.com/image.jpg",
+          "title" : "네이버 메인 페이지",
+          "description" : "네이버는 다양한 정보를 ...",
+          "priority" : true,
+          "created_at" : "2024-01-01",
+          "updated_at" : "2024-01-02",
+          "tag" : ["서핑", "웹"],
+          "isPersonal" : true
+        }, 
+        {
+          "bookmark_id" : 2,
+          "url" : "https://edu.ssafy.com",
+          "img" : "https://edu.ssafy.com/image.jpg",
+          "title" : "싸피 메인 페이지",
+          "description" : "대한민국 청년 삼성 ...",
+          "priority" : true,
+          "created_at" : "2024-01-01",
+          "updated_at" : "2024-01-02",
+          "tag" : ["싸피", "IT"],
+          "isPersonal" : false
+        }
+      ]
+    }
+);
+  return { user, personalCollections, personalCollectionsBookmarks, sharedCollections, sharedCollectionsBookmarks, importantBookmarks }
 })
 
 

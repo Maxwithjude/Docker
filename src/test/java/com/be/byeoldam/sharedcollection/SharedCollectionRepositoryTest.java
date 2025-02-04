@@ -39,7 +39,6 @@ public class SharedCollectionRepositoryTest {
 
     private User user;
 
-
     @BeforeEach
     void setUp() {
         String[] names = new String[] {"BangJang", "user1", "user2", "Ejected"};
@@ -53,9 +52,10 @@ public class SharedCollectionRepositoryTest {
     @DisplayName("공유컬렉션 생성 테스트")
     void createSharedCollectionTest() {
         // given
-        String name = "sCollection";
+        String name = "newCollection";
         SharedCollection collection = new SharedCollectionRequest(name).toEntity();
         sharedCollectionRepository.save(collection);
+        System.out.println(user.getId());
         SharedUser sharedUser = SharedUser.builder().user(user).sharedCollection(collection).role(Role.OWNER).build();
         sharedUserRepository.save(sharedUser);
 
@@ -76,7 +76,6 @@ public class SharedCollectionRepositoryTest {
     @Test
     @DisplayName("유저의 공유컬렉션 목록 조회")
     void getSharedCollectionTest() {
-        User user = userRepository.findById(1L).get();
     }
 
     @Test

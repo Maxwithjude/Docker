@@ -141,7 +141,7 @@ public class RssService {
     }
 
     // RSS의 최신 글 목록을 가져오는 메서드
-    private Page<RssPostResponse> fetchRssPosts(String rssUrl, String previousTitle, Pageable pageable) {
+    public Page<RssPostResponse> fetchRssPosts(String rssUrl, String previousTitle, Pageable pageable) {
         try {
             // RSS 피드 가져오기
             URL feedSource = new URL(rssUrl);
@@ -183,7 +183,7 @@ public class RssService {
     /**
      * RSS 이름 추출 메서드
      */
-    private String extractRssName(String rssUrl) {
+    public String extractRssName(String rssUrl) {
         try {
             URL feedSource = new URL(rssUrl);
             SyndFeedInput input = new SyndFeedInput();
@@ -213,7 +213,7 @@ public class RssService {
      * @param siteUrl
      * @return
      */
-    private String findRssUrl(String siteUrl) {
+    public String findRssUrl(String siteUrl) {
         try {
             Document doc = Jsoup.connect(siteUrl).get();
             Elements links = doc.select("link[type=application/rss+xml], link[type=application/atom+xml]");

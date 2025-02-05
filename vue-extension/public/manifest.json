@@ -4,11 +4,29 @@
   "version": "1.0.0",
   "manifest_version": 3,
   "action": {
-    "default_popup": "index.html"
+    "default_popup": "index.html",
+    "default_icon" : "favicon.ico"
   },
-  "permissions": ["activeTab", "tabs", "contextMenus", "storage"],
-  "host_permissions": ["<all_urls>"],
+  "permissions": [
+    "windows",
+    "activeTab",
+    "tabs",
+    "contextMenus",
+    "storage"
+  ],
   "background": {
     "service_worker": "background.js"
+  },
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["contentScript.js"]
+    }
+  ],
+  "host_permissions": [
+    "https://api.example.com/*"
+  ],
+  "icons": {
+    
   }
 }

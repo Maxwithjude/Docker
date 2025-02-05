@@ -1,3 +1,29 @@
+// 0. 북마크 기본 렌더링 데이터
+chrome.runtime.onInstalled.addListener(() => {
+  fetchDataAndStore();
+});
+
+chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+  if (message.action === "fetchData") {
+    fetchDataAndStore();
+    sendResponse({ status: "ok" });
+  }
+});
+
+function fetchDataAndStore() {
+  // 1. 사용자 컬렉션 리스트 가져오기
+  // 2. GPT API로 핵심 키워드 가져오기
+  // 3. RSS 피드 구독 가능 여부 확인
+  const data = {
+    collections: ["Collection A", "Collection B"],
+    keywords: ["AI", "Machine Learning"],
+    rssAvailable: true,
+  };
+
+  chrome.storage.local.set({ storageViewData: data });
+}
+
+
 // 1. 알림배지
 
 // 2. 컨텍스트 메뉴 생성 및 관리

@@ -80,7 +80,11 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'; 
+
+onMounted(()=>{
+  
+})
 
 // 상태 관리
 const newTag = ref('')
@@ -106,9 +110,17 @@ const addTag = () => {
 const removeTag = (index) => {
   tags.value.splice(index, 1);
 }
-const saveBookmark = () => {
-  // API 호출 로직 추가 예정
-  console.log('저장 로직 구현 예정')
+
+const saveBookmark = async () => {
+  try {
+    // 북마크 저장 API 호출 로직
+    
+    // 저장 성공 후 창 닫기
+    window.close()
+  } catch (error) {
+    console.error('저장 실패:', error)
+    // 에러 처리
+  }
 }
 </script>
 

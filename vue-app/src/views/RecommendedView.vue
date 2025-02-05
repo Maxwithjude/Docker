@@ -1,61 +1,63 @@
 <template>
     <div class="layout">
-        <Header />
+        <Header class="header"/>
         <div class="content-wrapper">
-            <SideBar />
-            <div class="body">
-                <h1 class="page-title">추천 북마크</h1>
+            <SideBar class="sidebar"/>
+            <div class="main-content">
+                <div class="body">
+                    <h1 class="page-title">추천 북마크</h1>
 
                 
-                <div v-if="isLoading" class="loading-state">
-                    <i class="fas fa-spinner fa-spin loading-icon"></i>
-                    <p>추천 북마크를 불러오는 중입니다...</p>
-                </div>
+                    <div v-if="isLoading" class="loading-state">
+                        <i class="fas fa-spinner fa-spin loading-icon"></i>
+                        <p>추천 북마크를 불러오는 중입니다...</p>
+                    </div>
 
-                <div v-else-if="interestTags.length === 0" class="empty-state">
-                    <i class="fas fa-lightbulb empty-icon"></i>
-                    <p class="empty-text">관심 태그를 설정하고 맞춤 추천을 받아보세요!</p>
-                    <p class="empty-description">관심 태그를 설정하면 회원님의 관심사에 맞는 북마크를 추천해드립니다.</p>
-                    <button class="set-tags-button" @click="goToTagSettings">
-                        관심 태그 설정하기
-                    </button>
-                </div>
+                    <div v-else-if="interestTags.length === 0" class="empty-state">
+                        <i class="fas fa-lightbulb empty-icon"></i>
+                        <p class="empty-text">관심 태그를 설정하고 맞춤 추천을 받아보세요!</p>
+                        <p class="empty-description">관심 태그를 설정하면 회원님의 관심사에 맞는 북마크를 추천해드립니다.</p>
+                        <button class="set-tags-button" @click="goToTagSettings">
+                            관심 태그 설정하기
+                        </button>
+                    </div>
 
-                <div v-else-if="recommendedBookmarks.length === 0" class="empty-state">
-                    <i class="fas fa-thumbs-up empty-icon"></i>
-                    <p class="empty-text">추천할 북마크가 없습니다.</p>
-                    <p class="empty-description">
-                        {{ selectedTag 
-                            ? `'${selectedTag}' 태그와 관련된 북마크가 없습니다.` 
-                            : '북마크를 더 저장하면 관련된 추천을 받을 수 있습니다.' 
-                        }}
-                    </p>
-                </div>
-                
-                <template v-else>
-                    <div class="recommendation-info">
-                        <p>
+                    <div v-else-if="recommendedBookmarks.length === 0" class="empty-state">
+                        <i class="fas fa-thumbs-up empty-icon"></i>
+                        <p class="empty-text">추천할 북마크가 없습니다.</p>
+                        <p class="empty-description">
                             {{ selectedTag 
-                                ? `'${selectedTag}' 태그와 관련된 ${recommendedBookmarks.length}개의 북마크를 찾았습니다.`
-                                : `회원님의 관심사와 관련된 ${recommendedBookmarks.length}개의 북마크를 찾았습니다.`
+                                ? `'${selectedTag}' 태그와 관련된 북마크가 없습니다.` 
+                                : '북마크를 더 저장하면 관련된 추천을 받을 수 있습니다.' 
                             }}
                         </p>
                     </div>
-                    
-                    <div class="cards-grid">
-                        <Card
-                            v-for="bookmark in recommendedBookmarks"
-                            :key="bookmark.id"
-                            :image="bookmark.image"
-                            :title="bookmark.title"
-                            :description="bookmark.description"
-                            :url="bookmark.url"
-                            :hashtags="bookmark.hashtags"
-                            :readingTime="bookmark.readingTime"
-                            :isImportant="false"
-                        />
-                    </div>
-                </template>
+                
+                    <template v-else>
+                        <div class="recommendation-info">
+                            <p>
+                                {{ selectedTag 
+                                    ? `'${selectedTag}' 태그와 관련된 ${recommendedBookmarks.length}개의 북마크를 찾았습니다.`
+                                    : `회원님의 관심사와 관련된 ${recommendedBookmarks.length}개의 북마크를 찾았습니다.`
+                                }}
+                            </p>
+                        </div>
+                        
+                        <div class="cards-grid">
+                            <Card
+                                v-for="bookmark in recommendedBookmarks"
+                                :key="bookmark.id"
+                                :image="bookmark.image"
+                                :title="bookmark.title"
+                                :description="bookmark.description"
+                                :url="bookmark.url"
+                                :hashtags="bookmark.hashtags"
+                                :readingTime="bookmark.readingTime"
+                                :isImportant="false"
+                            />
+                        </div>
+                    </template>
+                </div>
             </div>
         </div>
     </div>
@@ -126,23 +128,42 @@ onMounted(() => {
     display: flex;
     flex-direction: column;
     min-height: 100vh;
-    overflow: hidden;
+}
+
+.header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 100;
+    background: white;
 }
 
 .content-wrapper {
     display: flex;
-    flex: 1;
+    margin-top: 60px; /* 헤더 높이만큼 여백 추가 */
+    height: calc(100vh - 60px); /* 전체 높이에서 헤더 높이를 뺀 만큼 설정 */
+}
+
+.sidebar {
     position: fixed;
-    top: 60px; /* 헤더 높이 */
-    bottom: 0;
     left: 0;
-    right: 0;
+    top: 60px; /* 헤더 높이만큼 떨어뜨림 */
+    bottom: 0;
+    width: 240px; /* 사이드바 너비 */
+    background: white;
+    z-index: 99;
+}
+
+.main-content {
+    flex: 1;
+    margin-left: 240px; /* 사이드바 너비만큼 여백 */
+    overflow-y: auto; /* 본문 내용만 스크롤 가능하도록 */
+    height: 100%;
 }
 
 .body {
-    flex: 1;
     padding: 20px;
-    overflow-y: auto;
 }
 
 .page-title {

@@ -1,61 +1,63 @@
 <template>
     <div class="layout">
-        <Header />
+        <Header class="header"/>
         <div class="content-wrapper">
-            <SideBar />
-            <div class="detail-view">
-                <!-- URL 프리뷰 섹션 -->
-                <section class="preview-section">
-                    <h2>URL 프리뷰</h2>
-                    <div v-if="bookmark" class="content">
-                        <div class="action-buttons">
-                            <a :href="bookmark.url" target="_blank" class="original-link-btn">
-                                <i class="fas fa-external-link-alt"></i>
-                                원본 페이지로 이동
-                            </a>
+            <SideBar class="sidebar"/>
+            <div class="main-content">
+                <div class="detail-view">
+                    <!-- URL 프리뷰 섹션 -->
+                    <section class="preview-section">
+                        <h2>URL 프리뷰</h2>
+                        <div v-if="bookmark" class="content">
+                            <div class="action-buttons">
+                                <a :href="bookmark.url" target="_blank" class="original-link-btn">
+                                    <i class="fas fa-external-link-alt"></i>
+                                    원본 페이지로 이동
+                                </a>
+                            </div>
+                            <iframe
+                                :src="bookmark.url"
+                                class="website-preview"
+                                frameborder="0"
+                                sandbox="allow-same-origin allow-scripts allow-popups allow-forms"
+                                loading="lazy"
+                            ></iframe>
+                            <div class="iframe-fallback" v-if="iframeError">
+                                <p>미리보기를 불러올 수 없습니다.</p>
+                            </div>
                         </div>
-                        <iframe
-                            :src="bookmark.url"
-                            class="website-preview"
-                            frameborder="0"
-                            sandbox="allow-same-origin allow-scripts allow-popups allow-forms"
-                            loading="lazy"
-                        ></iframe>
-                        <div class="iframe-fallback" v-if="iframeError">
-                            <p>미리보기를 불러올 수 없습니다.</p>
-                        </div>
-                    </div>
-                </section>
+                    </section>
                 
 
-                <!-- 메모장 섹션 -->
-                <section class="memo-section">
-                    <h2>메모장</h2>
-                    <div class="memo-input">
-                        <textarea 
-                            v-model="newMemo" 
-                            placeholder="메모를 입력하세요..."
-                            rows="4"
-                        ></textarea>
-                        <button @click="addMemo" class="add-memo-btn">메모 추가</button>
-                    </div>
-                    <div class="memo-list">
-                        <div v-for="memo in memos" :key="memo.id" class="memo-item">
-                            <div class="memo-header">
-                                <span class="user-name">{{ memo.userName }}</span>
-                                <span class="memo-date">{{ memo.date }}</span>
-                            </div>
-                            <div class="memo-content">{{ memo.content }}</div>
-                            <button 
-                                v-if="memo.userName === currentUser.name" 
-                                @click="deleteMemo(memo.id)" 
-                                class="delete-memo-btn"
-                            >
-                                삭제
-                            </button>
+                    <!-- 메모장 섹션 -->
+                    <section class="memo-section">
+                        <h2>메모장</h2>
+                        <div class="memo-input">
+                            <textarea 
+                                v-model="newMemo" 
+                                placeholder="메모를 입력하세요..."
+                                rows="4"
+                            ></textarea>
+                            <button @click="addMemo" class="add-memo-btn">메모 추가</button>
                         </div>
-                    </div>
-                </section>
+                        <div class="memo-list">
+                            <div v-for="memo in memos" :key="memo.id" class="memo-item">
+                                <div class="memo-header">
+                                    <span class="user-name">{{ memo.userName }}</span>
+                                    <span class="memo-date">{{ memo.date }}</span>
+                                </div>
+                                <div class="memo-content">{{ memo.content }}</div>
+                                <button 
+                                    v-if="memo.userName === currentUser.name" 
+                                    @click="deleteMemo(memo.id)" 
+                                    class="delete-memo-btn"
+                                >
+                                    삭제
+                                </button>
+                            </div>
+                        </div>
+                    </section>
+                </div>
             </div>
         </div>
     </div>
@@ -66,8 +68,10 @@ import { ref, onMounted } from 'vue';
 import { useRoute } from 'vue-router';
 import Header from '@/common/Header.vue';
 import SideBar from '@/common/SideBar.vue';
+import { useCounterStore } from '@/stores/counter';
 
 const route = useRoute();
+const store = useCounterStore();
 const bookmark = ref(null);
 const newMemo = ref('');
 const memos = ref([]);
@@ -101,17 +105,23 @@ const handleIframeError = () => {
 };
 
 onMounted(() => {
-    // 임시 데이터
     const bookmarkId = parseInt(route.params.id);
-    bookmark.value = {
-        id: bookmarkId,
-        image: 'https://images.unsplash.com/photo-1481627834876-b7833e8f5570?q=80&w=2128&auto=format&fit=crop',
-        title: '프로그래밍 입문자를 위한 자바스크립트 기초 가이드',
-        description: '자바스크립트를 처음 시작하는 분들을 위한 완벽 가이드. 기초 문법부터 실전 예제까지 모두 담았습니다.',
-        url: 'https://example.com/docker-kubernetes-guide',
-        hashtags: ['JavaScript', 'Programming', 'WebDev', 'Tutorial'],
-        readingTime: 15,
-    };
+    // store의 sharedCollectionsBookmarks에서 북마크 찾기
+    const foundBookmark = store.sharedCollectionsBookmarks.results.bookmarks.find(
+        b => b.bookmark_id === bookmarkId
+    );
+    
+    if (foundBookmark) {
+        bookmark.value = {
+            id: foundBookmark.bookmark_id,
+            image: foundBookmark.img,
+            title: foundBookmark.title,
+            description: foundBookmark.description,
+            url: foundBookmark.url,
+            hashtags: foundBookmark.tag,
+            // readingTime: 15, // 이 값은 API에 없는 것 같습니다
+        };
+    }
 });
 </script>
 
@@ -123,14 +133,40 @@ onMounted(() => {
     min-height: 100vh;
 }
 
-.content-wrapper {
-    display: flex;
-    flex: 1;
+.header {
     position: fixed;
-    top: 60px;
-    bottom: 0;
+    top: 0;
     left: 0;
     right: 0;
+    z-index: 100;
+    background: white;
+}
+
+.content-wrapper {
+    display: flex;
+    margin-top: 60px; /* 헤더 높이만큼 여백 추가 */
+    height: calc(100vh - 60px); /* 전체 높이에서 헤더 높이를 뺀 만큼 설정 */
+}
+
+.sidebar {
+    position: fixed;
+    left: 0;
+    top: 60px; /* 헤더 높이만큼 떨어뜨림 */
+    bottom: 0;
+    width: 240px; /* 사이드바 너비 */
+    background: white;
+    z-index: 99;
+}
+
+.main-content {
+    flex: 1;
+    margin-left: 240px; /* 사이드바 너비만큼 여백 */
+    overflow-y: auto; /* 본문 내용만 스크롤 가능하도록 */
+    height: 100%;
+}
+
+.body {
+    padding: 20px;
 }
 
 .detail-view {

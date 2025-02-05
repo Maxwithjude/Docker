@@ -10,22 +10,14 @@ import com.be.byeoldam.domain.rss.repository.UserRssRepository;
 import com.be.byeoldam.domain.user.model.User;
 import com.be.byeoldam.domain.user.repository.UserRepository;
 import com.be.byeoldam.exception.CustomException;
-import com.rometools.rome.feed.synd.SyndEntry;
-import com.rometools.rome.feed.synd.SyndFeed;
-import com.rometools.rome.io.FeedException;
-import com.rometools.rome.io.SyndFeedInput;
-import com.rometools.rome.io.XmlReader;
-import org.jsoup.Jsoup;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import java.util.List;
@@ -36,7 +28,6 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
-import static org.springframework.data.domain.PageRequest.*;
 
 @ExtendWith(MockitoExtension.class)
 class RssServiceTest {
@@ -66,7 +57,8 @@ class RssServiceTest {
     }
 
     @Test
-    void 구독_정상동작() {
+    @DisplayName("정상적인 RSS 구독 테스트")
+    void subscibe_success() {
         // Given
         RssSubscribeRequest request = new RssSubscribeRequest("https://blog.naver.com/eunrosophy/223324773246");
 
@@ -83,7 +75,8 @@ class RssServiceTest {
     }
 
     @Test
-    void 이미_구독한_RSS_구독시_예외발생() {
+    @DisplayName("이미 구독한 RSS를 구독하려고 할 때 예외 발생")
+    void subscibe_already_subscribed() {
         // Given
         RssSubscribeRequest request = new RssSubscribeRequest("https://blog.naver.com/eunrosophy/223324773246");
 
@@ -98,7 +91,8 @@ class RssServiceTest {
     }
 
     @Test
-    void 존재하지_않는_사용자가_구독시_예외발생() {
+    @DisplayName("존재하지 않는 사용자가 구독하려고 할 때 예외 발생")
+    void subscibe_not_exist_user() {
         // Given
         RssSubscribeRequest request = new RssSubscribeRequest("https://blog.naver.com/eunrosophy/223324773246");
 
@@ -111,7 +105,8 @@ class RssServiceTest {
     }
 
     @Test
-    void 구독_취소_정상동작() {
+    @DisplayName("구독 취소 성공")
+    void unsubscribe_success() {
         // Given
         when(userRepository.existsById(1L)).thenReturn(true);
         when(rssRepository.existsById(10L)).thenReturn(true);
@@ -125,7 +120,8 @@ class RssServiceTest {
     }
 
     @Test
-    void 구독하지_않은_RSS_구독취소시_예외발생() {
+    @DisplayName("구독하지_않은_RSS_구독취소시_예외발생")
+    void unsubscribe_not_subscribed() {
         // Given
         when(userRepository.existsById(1L)).thenReturn(true);
         when(rssRepository.existsById(10L)).thenReturn(true);
@@ -138,7 +134,8 @@ class RssServiceTest {
     }
 
     @Test
-    void 사용자의_RSS_구독목록_정상조회() {
+    @DisplayName("사용자의_RSS_구독목록_정상조회")
+    void getUserRssList_success() {
         // Given
         UserRss userRss = UserRss.subscribeRss(user, rss);
 
@@ -160,7 +157,8 @@ class RssServiceTest {
     }
 
     @Test
-    void 존재하지_않는_사용자의_RSS_조회시_예외발생() {
+    @DisplayName("존재하지_않는_사용자의_RSS_조회시_예외발생")
+    void getUserRssList_not_exist_user() {
         // Given
         when(userRepository.existsById(1L)).thenReturn(false);
 

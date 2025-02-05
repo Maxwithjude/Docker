@@ -222,8 +222,7 @@ public class RssService {
             }
             for (Element link : links) {
                 String rssUrl = link.attr("href");
-
-                // 상대경로 처리 (예: "/rss.xml" → "https://example.com/rss.xml")
+                
                 if (!rssUrl.startsWith("http")) {
                     rssUrl = siteUrl + (rssUrl.startsWith("/") ? rssUrl : "/" + rssUrl);
                 }

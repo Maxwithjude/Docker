@@ -6,11 +6,10 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 
-import java.util.List;
-
 import static org.assertj.core.api.Assertions.assertThat;
 
 class RssServiceIntegrationTest {
+
     private final RssService rssService = new RssService(null, null, null);
 
     @Test
@@ -26,11 +25,6 @@ class RssServiceIntegrationTest {
         assertThat(result).isNotEmpty(); // 적어도 한 개 이상의 RSS 글이 있어야 함
         assertThat(result.getContent().size()).isLessThanOrEqualTo(5); // 5개 이하일 것
         assertThat(result.getContent().get(0).getTitle()).isNotBlank(); // 제목이 비어있으면 안 됨
-        List<RssPostResponse> posts = result.getContent();
-
-        for (RssPostResponse post : posts) {
-            System.out.println(post.getTitle());
-        }
     }
 
     @Test
@@ -43,7 +37,6 @@ class RssServiceIntegrationTest {
 
         // then
         assertThat(rssName).isNotBlank(); // 제목이 비어있으면 안 됨
-        System.out.println("RSS 제목: " + rssName);
     }
 
 
@@ -70,6 +63,5 @@ class RssServiceIntegrationTest {
         // then
         assertThat(rssUrl).isNotBlank(); // RSS URL이 비어있으면 안 됨
         assertThat(rssUrl).contains("rss.blog.naver.com"); // 네이버 블로그 RSS 패턴 확인
-        System.out.println("찾은 RSS URL: " + rssUrl);
     }
 }

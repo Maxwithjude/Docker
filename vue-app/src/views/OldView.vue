@@ -1,39 +1,34 @@
-<!-- <div v-if="oldBookmarks.length === 0" class="empty-state">
-                    <i class="fas fa-history empty-icon"></i>
-                    <p class="empty-text">30일이 지난 북마크가 없습니다.</p>
-                    <p class="empty-description">
-                        추가한지 30일이 지난 북마크들이 이곳에 표시됩니다.<br>
-                        오래된 북마크들을 정리하고 관리해보세요. -->
-
 <template>
     <div class="layout">
-        <Header />
+        <Header class="header"/>
         <div class="content-wrapper">
-            <SideBar />
-            <div class="body">
-                <h1 class="page-title">30일 이상 읽지않은 북마크</h1>
+            <SideBar class="sidebar"/>
+            <div class="main-content">
+                <div class="body">
+                    <h1 class="page-title">30일 이상 읽지않은 북마크</h1>
+                    
+                    <div v-if="!bookmarkResults.length" class="empty-state">
+                        <i class="fas fa-star empty-icon"></i>
+                        <p class="empty-text">오랜기간 읽지않은 북마크가 없습니다.</p>
+                        <p class="empty-description">[예시]북마크에 별표를 클릭하여 중요 북마크로 지정할 수 있습니다.</p>
+                    </div>
                 
-                <div v-if="!bookmarkResults.length" class="empty-state">
-                    <i class="fas fa-star empty-icon"></i>
-                    <p class="empty-text">오랜기간 읽지않은 북마크가 없습니다.</p>
-                    <p class="empty-description">[예시]북마크에 별표를 클릭하여 중요 북마크로 지정할 수 있습니다.</p>
-                </div>
-                
-                <div v-else class="cards-grid">
-                    <Card
-                        v-for="bookmark in bookmarkResults"
-                        :bookmarkId="bookmark.bookmark_id"
-                        :url="bookmark.url"
-                        :img="bookmark.img"
-                        :title="bookmark.title"
-                        :description="bookmark.description"
-                        :tag="bookmark.tag"
-                        :priority="bookmark.priority"
-                        :isPersonal="bookmark.isPersonal"
-                        :createdAt="bookmark.created_at"
-                        :updatedAt="bookmark.updated_at"
-                        @togglePriority="togglePriority(bookmark)"
-                    />
+                    <div v-else class="cards-grid">
+                        <Card
+                            v-for="bookmark in bookmarkResults"
+                            :bookmarkId="bookmark.bookmark_id"
+                            :url="bookmark.url"
+                            :img="bookmark.img"
+                            :title="bookmark.title"
+                            :description="bookmark.description"
+                            :tag="bookmark.tag"
+                            :priority="bookmark.priority"
+                            :isPersonal="bookmark.isPersonal"
+                            :createdAt="bookmark.created_at"
+                            :updatedAt="bookmark.updated_at"
+                            @togglePriority="togglePriority(bookmark)"
+                        />
+                    </div>
                 </div>
             </div>
         </div>
@@ -60,23 +55,42 @@ const togglePriority = (bookmark) => {
     display: flex;
     flex-direction: column;
     min-height: 100vh;
-    overflow: hidden;
+}
+
+.header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 100;
+    background: white;
 }
 
 .content-wrapper {
     display: flex;
-    flex: 1;
+    margin-top: 60px; /* 헤더 높이만큼 여백 추가 */
+    height: calc(100vh - 60px); /* 전체 높이에서 헤더 높이를 뺀 만큼 설정 */
+}
+
+.sidebar {
     position: fixed;
-    top: 60px; /* 헤더 높이 */
-    bottom: 0;
     left: 0;
-    right: 0;
+    top: 60px; /* 헤더 높이만큼 떨어뜨림 */
+    bottom: 0;
+    width: 240px; /* 사이드바 너비 */
+    background: white;
+    z-index: 99;
+}
+
+.main-content {
+    flex: 1;
+    margin-left: 240px; /* 사이드바 너비만큼 여백 */
+    overflow-y: auto; /* 본문 내용만 스크롤 가능하도록 */
+    height: 100%;
 }
 
 .body {
-    flex: 1;
     padding: 20px;
-    overflow-y: auto;
 }
 
 .page-title {

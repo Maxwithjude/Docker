@@ -11,6 +11,7 @@ import com.be.byeoldam.domain.sharedcollection.repository.SharedUserRepository;
 import com.be.byeoldam.domain.user.dto.UserRegisterRequest;
 import com.be.byeoldam.domain.user.model.User;
 import com.be.byeoldam.domain.user.repository.UserRepository;
+import com.be.byeoldam.exception.CustomException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -19,7 +20,10 @@ import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabas
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -39,13 +43,20 @@ public class SharedCollectionRepositoryTest {
 
     private User user;
 
+    private List<User> users;
+
+    String[] names = new String[] {"BangJang", "user1", "user2", "ejected"};
+    String[] emails = new String[] {"BangJang@example.com", "user1@example.com", "user2@example.com", "ejected@example.com"};
+
     @BeforeEach
     void setUp() {
-        String[] names = new String[] {"BangJang", "user1", "user2", "Ejected"};
-        for (String n : names) {
-            User user = new UserRegisterRequest(n, "1234", "testUser").toEntity();
+        users = new ArrayList<>();
+        for (int i = 0; i < names.length; i++) {
+            user = new UserRegisterRequest(emails[i], "1234", names[i]).toEntity();
             userRepository.save(user);
+            users.add(user);
         }
+        user = users.get(0);
     }
 
     @Test
@@ -55,7 +66,6 @@ public class SharedCollectionRepositoryTest {
         String name = "newCollection";
         SharedCollection collection = new SharedCollectionRequest(name).toEntity();
         sharedCollectionRepository.save(collection);
-        System.out.println(user.getId());
         SharedUser sharedUser = SharedUser.builder().user(user).sharedCollection(collection).role(Role.OWNER).build();
         sharedUserRepository.save(sharedUser);
 
@@ -65,7 +75,7 @@ public class SharedCollectionRepositoryTest {
 
         // then
         assertThat(foundCollection).isPresent();
-        assertThat(foundCollection.get().getName()).isEqualTo("exCollection");
+        assertThat(foundCollection.get().getName()).isEqualTo("newCollection");
 
         assertThat(foundSharedUser).isPresent();
         assertThat(foundSharedUser.get().getUser()).isEqualTo(user);
@@ -74,41 +84,171 @@ public class SharedCollectionRepositoryTest {
     }
 
     @Test
+    @DisplayName("공유컬렉션 멤버 관리 - 초대")
+    void inviteMemberTest() {
+        // given - 방 생성
+        String name = "newCollection";
+        SharedCollection collection = new SharedCollectionRequest(name).toEntity();
+        sharedCollectionRepository.save(collection);
+        SharedUser sharedUser = SharedUser.builder().user(user).sharedCollection(collection).role(Role.OWNER).build();
+        sharedUserRepository.save(sharedUser);
+
+        // 멤버 초대
+        for (int i=1; i<names.length; i++) {
+            User invitedUser = users.get(i);
+            SharedUser newMember = SharedUser.builder()
+                    .user(invitedUser)
+                    .sharedCollection(collection)
+                    .role(Role.MEMBER)
+                    .build();
+            sharedUserRepository.save(newMember);
+        }
+
+        // when
+        List<SharedUser> members = sharedUserRepository.findBySharedCollection(collection);
+
+        // then
+        // 초대된 멤버의 이메일 확인
+        for (int i = 1; i < members.size(); i++) {
+            assertThat(members.get(i).getUser().getEmail()).isEqualTo(emails[i]);
+        }
+
+        // 초대된 멤버의 역할 확인
+        assertThat(members.get(0).getRole()).isEqualTo(Role.OWNER); // 첫 번째 사용자는 방장
+        for (int i = 1; i < members.size(); i++) {
+            assertThat(members.get(i).getRole()).isEqualTo(Role.MEMBER); // 나머지는 MEMBER
+        }
+    }
+
+    @Test
     @DisplayName("유저의 공유컬렉션 목록 조회")
     void getSharedCollectionTest() {
+        // given - 방장인 공유 컬렉션
+        String name = "newCollection";
+        SharedCollection collection = new SharedCollectionRequest(name).toEntity();
+        sharedCollectionRepository.save(collection);
+        SharedUser sharedUser = SharedUser.builder().user(user).sharedCollection(collection).role(Role.OWNER).build();
+        sharedUserRepository.save(sharedUser);
+
+        // 멤버로 참여하고 있는 공유 컬렉션
+        String otherName = "MyCollection";
+        User otherUser = users.get(1);
+        SharedCollection otherCollection = new SharedCollectionRequest(otherName).toEntity();
+        sharedCollectionRepository.save(otherCollection);
+        SharedUser otherSharedUser = SharedUser.builder().user(otherUser).sharedCollection(otherCollection).role(Role.OWNER).build();
+        sharedUserRepository.save(otherSharedUser);
+
+        SharedUser memberUser = SharedUser.builder()
+                .user(user) // 기존 user가 멤버로 참여
+                .sharedCollection(otherCollection) // MyCollection에 추가됨
+                .role(Role.MEMBER)
+                .build();
+        sharedUserRepository.save(memberUser);
+
+        // when - user가 속한 공유 컬렉션 목록 조회
+        List<SharedCollection> userCollections = sharedUserRepository.findByUser(user)
+                .stream().map(SharedUser::getSharedCollection).collect(Collectors.toList());
+        // then - user는 2개의 공유 컬렉션에 속해야 함 (방장 1개 + 멤버 1개)
+        assertThat(userCollections).hasSize(2);
+        assertThat(userCollections).extracting("name").containsExactlyInAnyOrder(name, otherName);
     }
 
     @Test
     @DisplayName("공유컬렉션 수정 - 이름")
     void updateSharedCollectionTest() {
+        // given - 방장인 공유 컬렉션
+        SharedCollection collection = new SharedCollectionRequest("newCollection").toEntity();
+        sharedCollectionRepository.save(collection);
+        SharedUser sharedUser = SharedUser.builder().user(user).sharedCollection(collection).role(Role.OWNER).build();
+        sharedUserRepository.save(sharedUser);
 
+        String newName = "updateName";
+
+        // when
+        SharedCollection updatedCollection = sharedCollectionRepository.findById(collection.getId())
+                .orElseThrow(() -> new IllegalArgumentException("해당 컬렉션이 존재하지 않습니다."));
+
+        updatedCollection.updateName(newName);
+        sharedCollectionRepository.flush();
+
+        // then
+        SharedCollection resultCollection = sharedCollectionRepository.findById(collection.getId())
+                .orElseThrow(() -> new CustomException("해당 컬렉션이 존재하지 않습니다."));
+        assertThat(resultCollection.getName()).isEqualTo(newName);
     }
 
     @Test
     @DisplayName("공유컬렉션 삭제")
     void deleteSharedCollectionTest() {
+        // given - user가 방장인 공유컬렉션
+        SharedCollection collection = new SharedCollectionRequest("newCollection").toEntity();
+        sharedCollectionRepository.save(collection);
+        SharedUser sharedUser = SharedUser.builder().user(user).sharedCollection(collection).role(Role.OWNER).build();
+        sharedUserRepository.save(sharedUser);
 
-    }
+        // 멤버 유저(otherUser) 추가
+        for (int i=1; i<names.length; i++) {
+            User invitedUser = users.get(i);
+            SharedUser newMember = SharedUser.builder()
+                    .user(invitedUser)
+                    .sharedCollection(collection)
+                    .role(Role.MEMBER)
+                    .build();
+            sharedUserRepository.save(newMember);
+        }
 
-    @Test
-    @DisplayName("공유컬렉션 멤버 관리 - 초대")
-    void inviteMemberTest() {
+        List<SharedUser> sharedUserBeforeDelete = sharedUserRepository.findBySharedCollection(collection);
+        assertThat(sharedUserBeforeDelete).hasSize(names.length);
 
+        // when - sharedUser, sharedCollection에서 삭제할 공유컬렉션 데이터 삭제
+        sharedUserRepository.deleteBySharedCollection(collection);
+        sharedCollectionRepository.deleteById(collection.getId());
+
+        // then
+        List<SharedUser> sharedUserAfterDelete = sharedUserRepository.findBySharedCollection(collection);
+        Optional<SharedCollection> deletedCollection = sharedCollectionRepository.findById(collection.getId());
+
+        assertThat(deletedCollection).isEmpty();
+        assertThat(deletedCollection).isEmpty();
     }
 
     @Test
     @DisplayName("공유컬렉션 멤버 관리- 강퇴")
     void ejectMemberTest() {
+        // given - user가 방장인 공유컬렉션
+        SharedCollection collection = new SharedCollectionRequest("newCollection").toEntity();
+        sharedCollectionRepository.save(collection);
+        SharedUser sharedUser = SharedUser.builder().user(user).sharedCollection(collection).role(Role.OWNER).build();
+        sharedUserRepository.save(sharedUser);
 
+        // 멤버 유저(otherUser) 추가
+        for (int i=1; i<names.length; i++) {
+            User invitedUser = users.get(i);
+            SharedUser newMember = SharedUser.builder()
+                    .user(invitedUser)
+                    .sharedCollection(collection)
+                    .role(Role.MEMBER)
+                    .build();
+            sharedUserRepository.save(newMember);
+        }
+
+        // 강퇴할 유저
+        User ejectedUser = users.get(3);
+        SharedUser ejectedSharedUser = sharedUserRepository.findByUserAndSharedCollection(ejectedUser, collection)
+                .orElseThrow(() -> new IllegalArgumentException("해당 멤버는 컬렉션에 포함되어 있지 않습니다."));
+
+        // 멤버 강퇴 전 멤버 확인
+        List<SharedUser> sharedUserBeforeEject = sharedUserRepository.findBySharedCollection(collection);
+        assertThat(sharedUserBeforeEject).hasSize(names.length);
+
+        // when - 멤버 강퇴
+        sharedUserRepository.delete(ejectedSharedUser);
+
+        // then
+        List<SharedUser> sharedUserAfterEject = sharedUserRepository.findBySharedCollection(collection);
+        Optional<SharedUser> ejectedUserCheck = sharedUserRepository.findByUserAndSharedCollection(ejectedUser, collection);
+
+        assertThat(sharedUserAfterEject).hasSize(names.length - 1);
+        assertThat(ejectedUserCheck).isEmpty();
     }
-
-//    공유컬렉션 기능
-//1. 공유컬렉션 생성 : 생성한 사람이 방장
-//2. 공유컬렉션 수정 : 방장만 컬렉션 이름 수정 가능
-//3. 공유컬렉션 목록 조회 : 사용자가 속한 공유컬렉션 목록 조회
-//4. 공유컬렉션 멤버 조회 : 공유컬렉션의 멤버 조회
-//5. 멤버 관리 기능
-//    5-1. 초대 : 멤버 모두 초대 가능, email 입력해서 초대
-//.   5-2. 강퇴 : 방장만 사용자 강퇴 가능
-//6. 공유 컬렉션 삭제 : 방장만 공유컬렉션 삭제 가능
 }

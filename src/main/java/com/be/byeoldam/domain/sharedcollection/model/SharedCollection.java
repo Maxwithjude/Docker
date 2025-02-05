@@ -29,4 +29,8 @@ public class SharedCollection extends BaseTimeEntity {
         return new SharedCollection(name);
     }
 
+    public void updateName(String updatedName) {
+        this.name = updatedName;
+    }
+
 }

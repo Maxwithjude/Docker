@@ -1,6 +1,7 @@
 package com.be.byeoldam.domain.tag;
 
 
+import com.be.byeoldam.domain.common.repository.BookmarkUrlRepository;
 import com.be.byeoldam.domain.common.repository.TagBookmarkUrlRepository;
 import com.be.byeoldam.domain.tag.dto.RecommendedUrlResponse;
 import com.be.byeoldam.domain.tag.dto.RecommendedUrlByTagRequest;
@@ -30,8 +31,9 @@ public class TagService {
     private final UserRepository userRepository;
     private final UserTagRepository userTagRepository;
     private final TagBookmarkUrlRepository tagBookmarkUrlRepository;
+    private final BookmarkUrlRepository bookmarkUrlRepository;
 
-    // 참조 횟수가 많은 상위 10개 태그를 조회
+    // 참조 횟수가 많은 상위 10개 태그를 조회    ->  회원 가입 후 나오는 관심 태그 저장 페이지
     @Transactional(readOnly = true)
     public List<String> getRecommendedTags() {
         List<Tag> tags = tagRepository.findTop10ByOrderByReferenceCountDesc();
@@ -41,7 +43,7 @@ public class TagService {
     }
 
 
-    // 사용자 정의 태그 조회
+    // 사용자의 관심 태그 조회    ->   회원 가입 후 나오는 관심 태그 저장 페이지 / 마이페이지
     @Transactional(readOnly = true)
     public List<String> getUserTags(Long userId) {
         User user = userRepository.findById(userId)
@@ -54,7 +56,7 @@ public class TagService {
     }
 
 
-    // 사용자 정의 태그 삭제 후, 추가하기
+    // 사용자의 관심 태그 삭제 후, 추가하기  ->  마이페이지
     @Transactional
     public void addUserTag(Long userId, List<String> tagList) {
         User user = userRepository.findById(userId)
@@ -92,8 +94,12 @@ public class TagService {
         
     }
 
+    // 태그 기반 검색, 사용자 북마크 조회     ->    태그 기반 검색 페이지
 
-    // 태그 기반 검색(무한 스크롤)
+
+
+    // 태그 기반 검색, URL 추천(무한 스크롤)   ->    관심 태그 추천 페이지 / 태그 기반 검색 페이지
+    @Transactional(readOnly = true)
     List<RecommendedUrlResponse> getBookmarkUrlsByTagName(RecommendedUrlByTagRequest request) {
        List<String> urlList = tagBookmarkUrlRepository.findBookmarkUrlIdsByTagName(request.getTagName(),request.getCursorId(), request.getSize());
         return urlList.stream()
@@ -101,4 +107,12 @@ public class TagService {
                 .collect(Collectors.toList());
     }
 
+    // 태그 키워드 없이, 랜덤하게 URL 추천.(무한 스크롤).   ->  관심 태그 추천 페이지
+    @Transactional(readOnly = true)
+    List<RecommendedUrlResponse> getBookmarkUrlsByRandom(RecommendedUrlByTagRequest request) {
+        List<String> urlList = bookmarkUrlRepository.findUrlsByReference(request.getCursorId(), request.getSize());
+        return urlList.stream()
+                .map(JsoupUtil::fetchMetadata)
+                .collect(Collectors.toList());
+    }
 }

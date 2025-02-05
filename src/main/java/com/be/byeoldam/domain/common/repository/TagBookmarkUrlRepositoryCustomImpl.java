@@ -11,7 +11,7 @@ import java.util.List;
 
 
 @RequiredArgsConstructor
-public class TagBookmarkUrlRepositoryImpl implements TagBookmarkUrlRepositoryCustom{
+public class TagBookmarkUrlRepositoryCustomImpl implements TagBookmarkUrlRepositoryCustom{
     private final JPAQueryFactory queryFactory;
 
     @Override

@@ -32,7 +32,7 @@ public class Tag {
         this.color = Color.values()[new Random().nextInt(Color.values().length)];
     }
 
-    public static Tag createTag(String name){
+    public static Tag create(String name){
         return new Tag(name);
     }
 

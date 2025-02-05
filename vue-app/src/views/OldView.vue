@@ -45,44 +45,14 @@ import { ref, computed } from 'vue';
 import Header from '@/common/Header.vue';
 import SideBar from '@/common/SideBar.vue';
 import Card from '@/common/Card.vue';
+import { useCounterStore } from '@/stores/counter';
+
+const store = useCounterStore();
+const bookmarkResults = computed(() => store.oldBookmarks.results || []);
 
 const togglePriority = (bookmark) => {
     bookmark.priority = !bookmark.priority;
 }
-
-// 여기에 실제 북마크 데이터를 가져오는 로직이 들어갈 예정
-const bookmarks = ref([
-    {
-        "success":true,
-        "message":"some message",
-        "results": [
-            {
-                "bookmark_id" : 1,
-                "url" : "https://naver.com",
-                "img" : "https://edu.ssafy.com/image.jpg",
-                "title" : "네이버 메인 페이지",
-                "description" : "네이버는 다양한 정보를 ...",
-                "priority" : true,
-                "created_at" : "2024-01-01",
-                "updated_at" : "2024-01-02",
-                "tag" : ["서핑", "웹"]
-            }, 
-            {
-                "bookmark_id" : 2,
-                "url" : "https://edu.ssafy.com",
-                "img" : "https://edu.ssafy.com/image.jpg",
-                "title" : "싸피 메인 페이지",
-                "description" : "대한민국 청년 삼성 ...",
-                "priority" : true,
-                "created_at" : "2024-01-01",
-                "updated_at" : "2024-01-02",
-                "tag" : ["싸피", "IT"]
-            }
-        ]
-    }
-]);
-
-const bookmarkResults = computed(() => bookmarks.value[0]?.results || []);
 </script>
 
 <style scoped>

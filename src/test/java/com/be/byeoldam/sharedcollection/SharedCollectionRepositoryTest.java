@@ -66,7 +66,7 @@ public class SharedCollectionRepositoryTest {
         String name = "newCollection";
         SharedCollection collection = new SharedCollectionRequest(name).toEntity();
         sharedCollectionRepository.save(collection);
-        SharedUser sharedUser = SharedUser.builder().user(user).sharedCollection(collection).role(Role.OWNER).build();
+        SharedUser sharedUser = SharedUser.create(user, collection, Role.OWNER);
         sharedUserRepository.save(sharedUser);
 
         // when
@@ -90,17 +90,13 @@ public class SharedCollectionRepositoryTest {
         String name = "newCollection";
         SharedCollection collection = new SharedCollectionRequest(name).toEntity();
         sharedCollectionRepository.save(collection);
-        SharedUser sharedUser = SharedUser.builder().user(user).sharedCollection(collection).role(Role.OWNER).build();
+        SharedUser sharedUser = SharedUser.create(user, collection, Role.OWNER);
         sharedUserRepository.save(sharedUser);
 
         // 멤버 초대
         for (int i=1; i<names.length; i++) {
             User invitedUser = users.get(i);
-            SharedUser newMember = SharedUser.builder()
-                    .user(invitedUser)
-                    .sharedCollection(collection)
-                    .role(Role.MEMBER)
-                    .build();
+            SharedUser newMember = SharedUser.create(invitedUser, collection, Role.MEMBER);
             sharedUserRepository.save(newMember);
         }
 
@@ -127,7 +123,7 @@ public class SharedCollectionRepositoryTest {
         String name = "newCollection";
         SharedCollection collection = new SharedCollectionRequest(name).toEntity();
         sharedCollectionRepository.save(collection);
-        SharedUser sharedUser = SharedUser.builder().user(user).sharedCollection(collection).role(Role.OWNER).build();
+        SharedUser sharedUser = SharedUser.create(user, collection, Role.OWNER);
         sharedUserRepository.save(sharedUser);
 
         // 멤버로 참여하고 있는 공유 컬렉션
@@ -135,14 +131,10 @@ public class SharedCollectionRepositoryTest {
         User otherUser = users.get(1);
         SharedCollection otherCollection = new SharedCollectionRequest(otherName).toEntity();
         sharedCollectionRepository.save(otherCollection);
-        SharedUser otherSharedUser = SharedUser.builder().user(otherUser).sharedCollection(otherCollection).role(Role.OWNER).build();
+        SharedUser otherSharedUser = SharedUser.create(otherUser, otherCollection, Role.OWNER);
         sharedUserRepository.save(otherSharedUser);
 
-        SharedUser memberUser = SharedUser.builder()
-                .user(user) // 기존 user가 멤버로 참여
-                .sharedCollection(otherCollection) // MyCollection에 추가됨
-                .role(Role.MEMBER)
-                .build();
+        SharedUser memberUser = SharedUser.create(user, otherCollection, Role.MEMBER);
         sharedUserRepository.save(memberUser);
 
         // when - user가 속한 공유 컬렉션 목록 조회
@@ -159,7 +151,7 @@ public class SharedCollectionRepositoryTest {
         // given - 방장인 공유 컬렉션
         SharedCollection collection = new SharedCollectionRequest("newCollection").toEntity();
         sharedCollectionRepository.save(collection);
-        SharedUser sharedUser = SharedUser.builder().user(user).sharedCollection(collection).role(Role.OWNER).build();
+        SharedUser sharedUser = SharedUser.create(user, collection, Role.OWNER);
         sharedUserRepository.save(sharedUser);
 
         String newName = "updateName";
@@ -183,17 +175,13 @@ public class SharedCollectionRepositoryTest {
         // given - user가 방장인 공유컬렉션
         SharedCollection collection = new SharedCollectionRequest("newCollection").toEntity();
         sharedCollectionRepository.save(collection);
-        SharedUser sharedUser = SharedUser.builder().user(user).sharedCollection(collection).role(Role.OWNER).build();
+        SharedUser sharedUser = SharedUser.create(user, collection, Role.OWNER);
         sharedUserRepository.save(sharedUser);
 
         // 멤버 유저(otherUser) 추가
         for (int i=1; i<names.length; i++) {
             User invitedUser = users.get(i);
-            SharedUser newMember = SharedUser.builder()
-                    .user(invitedUser)
-                    .sharedCollection(collection)
-                    .role(Role.MEMBER)
-                    .build();
+            SharedUser newMember = SharedUser.create(invitedUser, collection, Role.MEMBER);
             sharedUserRepository.save(newMember);
         }
 
@@ -218,17 +206,13 @@ public class SharedCollectionRepositoryTest {
         // given - user가 방장인 공유컬렉션
         SharedCollection collection = new SharedCollectionRequest("newCollection").toEntity();
         sharedCollectionRepository.save(collection);
-        SharedUser sharedUser = SharedUser.builder().user(user).sharedCollection(collection).role(Role.OWNER).build();
+        SharedUser sharedUser = SharedUser.create(user, collection, Role.OWNER);
         sharedUserRepository.save(sharedUser);
 
         // 멤버 유저(otherUser) 추가
         for (int i=1; i<names.length; i++) {
             User invitedUser = users.get(i);
-            SharedUser newMember = SharedUser.builder()
-                    .user(invitedUser)
-                    .sharedCollection(collection)
-                    .role(Role.MEMBER)
-                    .build();
+            SharedUser newMember = SharedUser.create(invitedUser, collection, Role.MEMBER);
             sharedUserRepository.save(newMember);
         }
 

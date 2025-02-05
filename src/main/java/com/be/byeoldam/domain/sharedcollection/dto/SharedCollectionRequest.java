@@ -1,6 +1,9 @@
 package com.be.byeoldam.domain.sharedcollection.dto;
 
+import com.be.byeoldam.domain.sharedcollection.model.Role;
 import com.be.byeoldam.domain.sharedcollection.model.SharedCollection;
+import com.be.byeoldam.domain.sharedcollection.model.SharedUser;
+import com.be.byeoldam.domain.user.model.User;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;

@@ -29,10 +29,13 @@ public class SharedUser extends BaseTimeEntity { // 공유컬렉션-유저 매�
     @Column(name = "role", nullable = false)
     private Role role;
 
-    @Builder
-    public SharedUser(User user, SharedCollection sharedCollection, Role role) {
+    private SharedUser(User user, SharedCollection collection, Role role) {
         this.user = user;
-        this.sharedCollection = sharedCollection;
+        this.sharedCollection = collection;
         this.role = role;
+    }
+
+    public static SharedUser create(User user, SharedCollection collection, Role role) {
+        return new SharedUser(user, collection, role);
     }
 }

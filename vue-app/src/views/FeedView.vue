@@ -5,7 +5,20 @@
             <SideBar class="sidebar"/>
             <div class="main-content">
                 <div class="body">
-                    피드페이지
+                    <div class="rss-container">
+                        <FeedTabs 
+                            :feeds="rssStore.rssSubscriptions.results"
+                            :selected-feed="selectedFeed"
+                            @select-feed="selectFeed"
+                        />
+                        <div class="content-container">
+                            <FeedPostList 
+                                :posts="currentRssItems?.latest_posts"
+                                @select-post="selectPost"
+                            />
+                            <FeedPostContent :url="selectedPostUrl" />
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -15,6 +28,41 @@
 <script setup>
 import Header from '@/common/Header.vue'
 import SideBar from '@/common/SideBar.vue'
+import FeedTabs from '@/component/FeedTabs.vue'
+import FeedPostList from '@/component/FeedPostList.vue'
+import FeedPostContent from '@/component/FeedPostContent.vue'
+import { ref, onMounted } from 'vue'
+import { useCounterStore } from '@/stores/counter'
+
+const rssStore = useCounterStore()
+const selectedFeed = ref(1)
+const selectedPostUrl = ref(null)
+const currentRssItems = ref(null)
+
+// RSS 피드 아이템 로드
+const loadRssItems = async (rssId) => {
+  try {
+    const data = await rssStore.getRssSubscriptionItems(rssId)
+    currentRssItems.value = data.results
+  } catch (error) {
+    console.error('RSS 아이템 로드 실패:', error)
+  }
+}
+
+// 피드 선택 시 해당 피드의 아이템 로드
+const selectFeed = async (rssId) => {
+  selectedFeed.value = rssId
+  await loadRssItems(rssId)
+}
+
+// 컴포넌트 마운트 시 초기 데이터 로드
+onMounted(async () => {
+  await loadRssItems(selectedFeed.value)
+})
+
+const selectPost = (url) => {
+  selectedPostUrl.value = url
+}
 </script>
 
 <style scoped>
@@ -58,5 +106,18 @@ import SideBar from '@/common/SideBar.vue'
 
 .body {
     padding: 20px;
+}
+
+.rss-container {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.content-container {
+  display: flex;
+  flex: 1;
+  gap: 1rem;
+  padding: 1rem;
 }
 </style>

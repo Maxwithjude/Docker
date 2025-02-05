@@ -131,7 +131,7 @@ const handleImageClick = () => {
     overflow: hidden;
     transition: transform 0.2s;
     width: 240px;
-    position: relative; /* BookmarkSettings의 절대 위치 기준점 */
+    position: relative;
 }
 
 .card:hover {
@@ -140,43 +140,40 @@ const handleImageClick = () => {
 
 .card-image {
     width: 100%;
-    height: 180px;
+    height: 140px;
     object-fit: cover;
 }
 
 .card-content {
-    padding: 16px;
-    height: 200px;
+    padding: 12px;
+    height: 140px;
     display: flex;
     flex-direction: column;
 }
 
 .card-title {
-    margin: 0 0 12px 0;
+    margin: 0 0 8px 0;
     font-size: 1.1rem;
     color: #333;
-    display: -webkit-box;
-    /* -webkit-line-clamp: 2; */
-    -webkit-box-orient: vertical;
+    white-space: nowrap;
     overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .card-description {
     color: #666;
     font-size: 0.9rem;
-    line-height: 1.5;
-    display: -webkit-box;
-    /* -webkit-line-clamp: 3; */
-    -webkit-box-orient: vertical;
+    line-height: 1.4;
+    white-space: nowrap;
     overflow: hidden;
-    flex: 1;
-    margin-bottom: 8px;
+    text-overflow: ellipsis;
+    margin-bottom: 6px;
 }
 
 .card-url {
     font-size: 0.8rem;
     color: #666;
-    margin-bottom: 8px;
+    margin-bottom: 6px;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;

@@ -19,23 +19,23 @@
                             {{ isDeleteMode ? '삭제 완료' : '컬렉션 삭제' }}
                         </button>
                     </div>
-                </div>
-                <div v-if="collections.length === 0" class="empty-state">
-                    <i class="fas fa-folder-open empty-icon"></i>
-                    <p class="empty-text">컬렉션이 존재하지 않습니다.</p>
-                    <p class="empty-description">
-                        상단의 '컬렉션 생성' 버튼을 클릭하여<br>
-                        새로운 컬렉션을 만들어보세요!
-                    </p>
-                </div>
-                
-                <div v-else class="collections-grid">
-                    <Collection 
-                        v-for="collection in collections"
-                        :key="collection.id"
-                        :title="collection.title"
-                        :type="collection.type"
-                    />
+                    <div v-if="collections.length === 0" class="empty-state">
+                        <i class="fas fa-folder-open empty-icon"></i>
+                        <p class="empty-text">컬렉션이 존재하지 않습니다.</p>
+                        <p class="empty-description">
+                            상단의 '컬렉션 생성' 버튼을 클릭하여<br>
+                            새로운 컬렉션을 만들어보세요!
+                        </p>
+                    </div>
+                    
+                    <div v-else class="collections-grid">
+                        <Collection 
+                            v-for="collection in collections"
+                            :key="collection.id"
+                            :title="collection.title"
+                            :type="collection.type"
+                        />
+                    </div>
                 </div>
             </div>
         </div>

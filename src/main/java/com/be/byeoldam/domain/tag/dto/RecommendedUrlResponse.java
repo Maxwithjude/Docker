@@ -1,20 +1,30 @@
 package com.be.byeoldam.domain.tag.dto;
 
+import com.be.byeoldam.domain.tag.util.UrlPreview;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 @Getter
+@NoArgsConstructor
+@ToString
 public class RecommendedUrlResponse {
     private String url;
     private String title;
     private String description;
-    private String image;
+    private String imageUrl;
+    private int readingTime;
 
-    public static RecommendedUrlResponse of(String url, String title, String description, String image) {
-        RecommendedUrlResponse response = new RecommendedUrlResponse();
-        response.url = url;
-        response.title = title;
-        response.description = description;
-        response.image = image;
-        return response;
+    public RecommendedUrlResponse(String url, int readingTime) {
+        this.url = url;
+        this.readingTime = readingTime;
     }
+
+    public RecommendedUrlResponse updateFromPreview(UrlPreview preview){
+        this.title = preview.getTitle();
+        this.description = preview.getDescription();
+        this.imageUrl = preview.getImageUrl();
+        return this;
+    }
+
 }

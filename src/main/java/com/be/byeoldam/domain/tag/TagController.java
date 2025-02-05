@@ -18,9 +18,12 @@ public class TagController {
     private final TagService tagService;
 
     @GetMapping("/recommend")
-    public ResponseEntity<ResponseTemplate<List<String>>> recommendTags(){
+    public ResponseTemplate<List<String>> recommendTags(){
         List<String> recommendedTags = tagService.getRecommendedTags();
-        return ResponseEntity.ok(ResponseTemplate.ok(recommendedTags));
+        return ResponseTemplate.ok(recommendedTags);
     }
 
+    /*추천 북마크가 첫 요청인 경우는 request dto에 name을 null로 요청을 들어오게 해서,
+    request.getTagName이 null인 경우는 관심사 태그의 가장 첫번째 name을 적용하는 걸로
+    */
 }

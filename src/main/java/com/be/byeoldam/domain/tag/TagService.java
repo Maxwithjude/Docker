@@ -10,6 +10,7 @@ import com.be.byeoldam.domain.tag.model.UserTag;
 import com.be.byeoldam.domain.tag.repository.TagRepository;
 import com.be.byeoldam.domain.tag.repository.UserTagRepository;
 import com.be.byeoldam.domain.tag.util.JsoupUtil;
+import com.be.byeoldam.domain.tag.util.UrlPreview;
 import com.be.byeoldam.domain.user.model.User;
 import com.be.byeoldam.domain.user.repository.UserRepository;
 import com.be.byeoldam.exception.CustomException;
@@ -101,18 +102,10 @@ public class TagService {
     // 태그 기반 검색, URL 추천(무한 스크롤)   ->    관심 태그 추천 페이지 / 태그 기반 검색 페이지
     @Transactional(readOnly = true)
     List<RecommendedUrlResponse> getBookmarkUrlsByTagName(RecommendedUrlByTagRequest request) {
-       List<String> urlList = tagBookmarkUrlRepository.findBookmarkUrlIdsByTagName(request.getTagName(),request.getCursorId(), request.getSize());
-        return urlList.stream()
-                .map(JsoupUtil::fetchMetadata)
-                .collect(Collectors.toList());
-    }
-
-    // 태그 키워드 없이, 랜덤하게 URL 추천.(무한 스크롤).   ->  관심 태그 추천 페이지
-    @Transactional(readOnly = true)
-    List<RecommendedUrlResponse> getBookmarkUrlsByRandom(RecommendedUrlByTagRequest request) {
-        List<String> urlList = bookmarkUrlRepository.findUrlsByReference(request.getCursorId(), request.getSize());
-        return urlList.stream()
-                .map(JsoupUtil::fetchMetadata)
-                .collect(Collectors.toList());
+       List<RecommendedUrlResponse> urlList = tagBookmarkUrlRepository.findBookmarkUrlsByTagName(request.getTagName(),request.getCursorId(), request.getSize());
+        urlList.forEach(response ->
+                response.updateFromPreview(JsoupUtil.fetchMetadata(response.getUrl()))
+        );;
+        return urlList;
     }
 }

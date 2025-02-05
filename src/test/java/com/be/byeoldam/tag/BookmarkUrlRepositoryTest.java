@@ -46,12 +46,12 @@ class BookmarkUrlRepositoryTest {
     @BeforeEach
     void setUp() {
         // 1. URL 저장
-        BookmarkUrl url1 = bookmarkUrlRepository.save(new BookmarkUrl("https://www.naver.com/",0L,0));
-        BookmarkUrl url2 = bookmarkUrlRepository.save(new BookmarkUrl("https://www.google.com/",0L,0));
-        BookmarkUrl url3 = bookmarkUrlRepository.save(new BookmarkUrl("https://www.wikipedia.org",0L,0));
-        BookmarkUrl url4 = bookmarkUrlRepository.save(new BookmarkUrl("https://www.facebook.com",0L,0));
-        BookmarkUrl url5 = bookmarkUrlRepository.save(new BookmarkUrl("https://www.youtube.com",0L,0));
-        BookmarkUrl url6 = bookmarkUrlRepository.save(new BookmarkUrl("https://www.daum.net",0L,0));
+        BookmarkUrl url1 = bookmarkUrlRepository.save(new BookmarkUrl("https://www.naver.com/",2L,1));
+        BookmarkUrl url2 = bookmarkUrlRepository.save(new BookmarkUrl("https://www.google.com/",4L,2));
+        BookmarkUrl url3 = bookmarkUrlRepository.save(new BookmarkUrl("https://www.wikipedia.org",3L,3));
+        BookmarkUrl url4 = bookmarkUrlRepository.save(new BookmarkUrl("https://www.facebook.com",7L,4));
+        BookmarkUrl url5 = bookmarkUrlRepository.save(new BookmarkUrl("https://www.youtube.com",10L,5));
+        BookmarkUrl url6 = bookmarkUrlRepository.save(new BookmarkUrl("https://www.daum.net",1L,6));
         // 2. 태그 저장
         Tag tag = tagRepository.save(Tag.create("검색"));
 
@@ -63,21 +63,21 @@ class BookmarkUrlRepositoryTest {
         bookmarkUrlTagRepository.save(TagBookmarkUrl.create(tag,url5));
         bookmarkUrlTagRepository.save(TagBookmarkUrl.create(tag,url6));
 
-        request = new RecommendedUrlByTagRequest("검색",0L,2);
+        request = new RecommendedUrlByTagRequest("검색",0L,4);
     }
 
     @Test
     @DisplayName("태그 기반으로 북마크 URL을 검색하고, 무한 스크롤 방식으로 조회한다.")
     void getBookmarkUrlsByTagNameTest() {
         // When
-        List<RecommendedUrlResponse> result = tagBookmarkUrlRepository.findBookmarkUrlIdsByTagName(request.getTagName(), request.getCursorId(), request.getSize())
-                .stream()
-                .map(JsoupUtil::fetchMetadata)
-                .toList();
-
+        List<RecommendedUrlResponse> result = tagBookmarkUrlRepository.findBookmarkUrlsByTagName(request.getTagName(),request.getCursorId(), request.getSize());
+        result.forEach(response ->
+                response.updateFromPreview(JsoupUtil.fetchMetadata(response.getUrl()))
+        );;
         // Then
-        assertThat(result).hasSize(2); // 2개만 조회해야 함
-        System.out.println(result.get(0).getUrl());
-        System.out.println(result.get(1).getUrl());
+        assertThat(result).hasSize(4); // 2개만 조회해야 함
+        for(RecommendedUrlResponse response : result) {
+            System.out.println(response);
+        }
     }
 }

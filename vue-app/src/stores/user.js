@@ -46,14 +46,22 @@ export const useUserStore = defineStore("user", () => {
   //로그인 함수
   const userLogin = async (email, password) => {
     try {
-      const res = await axios.post(`${REST_API_URL}/users/login`, { email: email, password: password });
+        const res = await axios.post(`${REST_API_URL}/users/login`, { email: email, password: password });
     //세션 스토리지에 jwt 토큰 저장
-      sessionStorage.setItem("access-token", res.data["access-token"]);
+        sessionStorage.setItem("access-token", res.data["access-token"]);
         sessionStorage.setItem("refresh-token", res.data["refresh-token"])
-      const token = res.data["access-token"].split(".");
-    
+        const token = res.data["access-token"].split(".");
+        // 로그인 후에 실행되는 부분
+        const loginData = {
+            username: 'example_user',
+            access_token: 'f8fd7473-a3ca-ff55-bca7-72c738'
+        };
+  
+  // 크롬 익스텐션으로 로그인 정보 보내기
+    window.postMessage({ type: 'FROM_WEBSITE', data: loginData }, window.location.origin);
+            sessionStorage.getItem
 
-      loginUser.value = id;
+    loginUser.value = id;
       sessionStorage.setItem("userId", id); // 세션에도 저장
       router.push({ name: "main" });
     } catch (err) {
@@ -79,6 +87,7 @@ export const useUserStore = defineStore("user", () => {
     router.push({ name: "intro" });
   };
   
+
   // 이메일 인증 함수
   const emailVerification = async (email) => {
     try {

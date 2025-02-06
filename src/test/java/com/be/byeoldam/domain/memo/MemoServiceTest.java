@@ -52,12 +52,15 @@ class MemoServiceTest {
         bookmark = Bookmark.builder()
                 .user(user)
                 .build();
+        ReflectionTestUtils.setField(bookmark, "id", 1L);
 
         memo = Memo.builder()
                 .content("테스트 메모")
                 .user(user)
                 .bookmark(bookmark)
                 .build();
+        ReflectionTestUtils.setField(memo, "id", 1L);
+
         request = new MemoRequest("수정된 메모 내용");
     }
 
@@ -74,7 +77,7 @@ class MemoServiceTest {
 
         // then
         assertThat(response).isNotNull();
-        assertThat(response.getContent()).isEqualTo("테스트 메모");
+        assertThat(response.getContent()).isEqualTo("수정된 메모 내용");
         verify(memoRepository, times(1)).save(any(Memo.class));
     }
 
@@ -108,6 +111,8 @@ class MemoServiceTest {
     void updateMemo_Unauthorized_ThrowsException() {
         // given
         User anotherUser = User.builder().nickname("anotherUser").build();
+        ReflectionTestUtils.setField(anotherUser, "id", 2L);
+
         Memo otherUserMemo = Memo.builder()
                 .content("다른 사용자의 메모")
                 .user(anotherUser)
@@ -140,6 +145,7 @@ class MemoServiceTest {
     void deleteMemo_Unauthorized_ThrowsException() {
         // given
         User anotherUser = User.builder().nickname("anotherUser").build();
+        ReflectionTestUtils.setField(anotherUser, "id", 2L);
 
         Memo otherUserMemo = Memo.builder()
                 .content("다른 사용자의 메모")

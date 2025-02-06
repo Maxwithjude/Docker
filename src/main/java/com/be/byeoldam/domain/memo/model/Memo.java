@@ -35,4 +35,8 @@ public class Memo extends BaseTimeEntity {
         this.user = user;
         this.bookmark = bookmark;
     }
+
+    public void updateContent(String content) {
+        this.content = content;
+    }
 }

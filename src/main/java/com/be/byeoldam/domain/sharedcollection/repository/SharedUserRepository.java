@@ -14,7 +14,6 @@ public interface SharedUserRepository extends JpaRepository<SharedUser, Long> {
     List<SharedUser> findBySharedCollection(SharedCollection sharedCollection);
     Optional<SharedUser> findByUserAndSharedCollection(User user, SharedCollection collection);
     void deleteBySharedCollection(SharedCollection sharedCollection);
-    List<SharedCollection> findByUser(User user);
-    void delete(User ejectedUser);
+    List<SharedUser> findByUser(User user);
     void deleteByCollection(SharedCollection collection);
 }

@@ -35,7 +35,7 @@ public class SharedCollectionService {
                 .orElseThrow(() -> new CustomException(""));
         SharedCollection collection = sharedCollectionRequest.toEntity();
         sharedCollectionRepository.save(collection);
-        sharedCollectionRepository.flush();
+        // sharedCollectionRepository.flush();
 
         SharedUser sharedUser = SharedUser.create(user, collection, Role.OWNER);
         sharedUserRepository.save(sharedUser);
@@ -47,7 +47,10 @@ public class SharedCollectionService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new CustomException(""));
 
-        List<SharedCollection> collections = sharedUserRepository.findByUser(user);
+        List<SharedUser> sharedUsers = sharedUserRepository.findByUser(user);
+        List<SharedCollection> collections = sharedUsers.stream()
+                .map(SharedUser::getSharedCollection)
+                .collect(Collectors.toList());
 
         return collections.stream()
                 .map(collection -> SharedCollectionResponse.of(collection.getId(), collection.getName()))

@@ -54,7 +54,7 @@ export const useUserStore = defineStore("user", () => {
           /// 로그인 성공 시 익스텐션에 보낼 정보보
         window.postMessage({ type: 'LOGIN', data: loginData }, window.location.origin);
 
-        // 로그인 후에 실행되는 부분dddd
+        // 로그인 후에 실행되는 부분ddddd
         const loginData = {
             username: 'example_user',
             access_token: 'f8fd7473-a3ca-ff55-bca7-72c738'

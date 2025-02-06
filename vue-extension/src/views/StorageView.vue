@@ -80,10 +80,35 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'; 
+import { ref, onMounted } from 'vue'
+import { useUserStore } from '@/stores/userStore'
+import axios from 'axios'
 
-onMounted(()=>{
-  
+const userStore = useUserStore()
+const url = ref('')
+
+onMounted(async () => {
+  try {
+    // background.js에서 URL 정보 가져오기
+    chrome.runtime.sendMessage({ action: 'getCurrentUrl' }, async (response) => {
+      if (response && response.url) {
+        url.value = response.url
+        
+        // userId가 있을 때만 서버에 요청
+        if (userStore.userId) {
+          const response = await axios.post('API_URL/storage/init', {
+            userId: userStore.userId,
+            url: url.value
+          })
+          
+          // 응답 데이터 처리
+          // ...
+        }
+      }
+    })
+  } catch (error) {
+    console.error('데이터 로드 실패:', error)
+  }
 })
 
 // 상태 관리

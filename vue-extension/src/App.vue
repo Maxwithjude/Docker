@@ -25,7 +25,20 @@
 </template>
 
 <script setup>
-import { RouterView } from "vue-router";
+import { RouterView } from "vue-router"
+import { onMounted } from 'vue'
+import { useUserStore } from './stores/userStore'
+
+const userStore = useUserStore()
+
+onMounted(() => {
+  // background.js에 userId 요청
+  chrome.runtime.sendMessage({ action: 'getUserId' }, (response) => {
+    if (response && response.userId) {
+      userStore.setUserId(response.userId)
+    }
+  })
+})
 </script>
 
 <style scoped>

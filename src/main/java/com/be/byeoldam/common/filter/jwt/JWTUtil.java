@@ -1,4 +1,4 @@
-package com.be.byeoldam.domain.user.jwt;
+package com.be.byeoldam.common.filter.jwt;
 
 
 import io.jsonwebtoken.Jwts;

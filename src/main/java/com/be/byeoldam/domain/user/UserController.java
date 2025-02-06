@@ -1,68 +1,56 @@
 package com.be.byeoldam.domain.user;
 
-import com.be.byeoldam.common.jwt.JwtUtil;
+import com.be.byeoldam.common.ResponseTemplate;
+import com.be.byeoldam.domain.user.dto.UserLoginRequest;
+import com.be.byeoldam.domain.user.dto.UserLoginResponse;
 import com.be.byeoldam.domain.user.dto.UserRegisterRequest;
+import com.be.byeoldam.domain.user.dto.UserRegisterResponse;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
+@Tag(name = "User", description = "User 관련 API")
 public class UserController {
 
     private final UserService userService;
 
+
+    @Operation(summary = "회원가입", description = "새로운 사용자 등록, 이후 사용자 정의 태그도 입력해야 하기 때문에 로그인과 동일하게 사용자 정보 제공")
     @PostMapping("/register")
-    public ResponseEntity<String> registerUser(@RequestBody UserRegisterRequest request) {
-        JwtUtil jwtUtil = new JwtUtil();
-        String token = jwtUtil.createJwt("1",1,"222","f",10l);
-
-        return ResponseEntity.ok().header("access", token).body("회원 가입 성공");
+    public ResponseTemplate<UserRegisterResponse> registerUser(@RequestBody UserRegisterRequest request) {
+       UserRegisterResponse response = userService.registerUser(request);
+       return ResponseTemplate.ok(response);
     }
 
+    // Filter에서 반환되어, 컨트롤러까지 오지 않지만 혹시 몰라서 추가
+    @Operation(summary = "로그인", description = "혹시 로그인시, 제공하는 아래의 데이터 외에도 별도로 필요한 데이터가 더 있다면 알려주세요")
     @PostMapping("/login")
-    public String login(){
-        return "login";
+    public ResponseTemplate<UserLoginResponse> login(@RequestBody UserLoginRequest request){
+        UserLoginResponse response = userService.login(request);
+        return ResponseTemplate.ok(response);
     }
 
-    @GetMapping("/me")
-    public String getCurrentUser() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-
-        if (authentication == null || !authentication.isAuthenticated()) {
-            return "로그인한 유저가 아닙니다.";
-        }
-
-        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
-        return "현재 로그인한 유저: " + userDetails.getUsername();
+    //해당 컨트롤러에서 이메일 중복 체크등도 함께 구현하기
+    @Operation(summary = "이메일 인증 코드 요청", description = "사용자의 이메일 주소로 인증 코드 전송. Redis가 도커 환경에서 실행되면 실제 구현이 추가될 예정.(아직 구현 X)")
+    @PostMapping("/email/send")
+    public ResponseTemplate<String> sendVerificationEmail(@RequestParam String email){
+        return ResponseTemplate.ok("이메일 인증 코드가 전송되었습니다.");
     }
 
-    @GetMapping("/")
-    public String mainP(){
-        return "/";
+    @Operation(summary = "이메일 인증 코드 검증", description = "사용자가 입력한 인증 코드가 올바른지 검증. Redis가 도커 환경에서 실행되면 실제 구현이 추가될 예정.(아직 구현 X)")
+    @GetMapping("/email/verify")
+    public ResponseTemplate<String> verifyEmailCode(@RequestParam String email, @RequestParam String code) {
+        return ResponseTemplate.ok("인증 완료!");
     }
 
-
-
-    @GetMapping("/signUp")
-    public String signUp(){
-        return "signUp";
-    }
-
-    @GetMapping("/reissue")
-    public String reissue(){
-        return "reissue";
-    }
-
-    @GetMapping("/not")
-    public String not(){
-        return "not";
+    @Operation(summary = "로그아웃", description = "RefreshToken을 서버에서 제거하며, AccessToken은 클라이언트에서 직접 삭제해야 합니다, 아래와 같이 따로 전송해야하는 데이터는 없고 API만 호출해줘!")
+    @PostMapping("/logout")
+    public ResponseTemplate<String> logout(){
+        userService.logout();
+        return ResponseTemplate.ok("로그아웃이 완료되었습니다.");
     }
 
 }

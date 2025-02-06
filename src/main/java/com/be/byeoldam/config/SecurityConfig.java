@@ -46,7 +46,6 @@ public class SecurityConfig {
         //csrf보호를 비활성화.
         http.csrf((auth) -> auth.disable())
         .cors(cors -> cors.configure(http)); // ✅ CORS 설정 추가(swagger 사용 시 필요)
-
         //From 로그인 방식 비활성화  jwt 방식을 사용
         http.formLogin((auth) -> auth.disable());
         //http basic 인증 비활성화

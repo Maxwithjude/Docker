@@ -1,7 +1,8 @@
 package com.be.byeoldam.config;
 
+import com.be.byeoldam.common.filter.JWTFilter;
 import com.be.byeoldam.common.filter.LoginFilter;
-import com.be.byeoldam.common.jwt.JWTUtil;
+import com.be.byeoldam.common.jwt.JwtUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -10,6 +11,7 @@ import org.springframework.security.config.annotation.authentication.configurati
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
@@ -19,21 +21,28 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @RequiredArgsConstructor
 public class SecurityConfig {
     private final AuthenticationConfiguration authenticationConfiguration;
-    private final JWTUtil jwtUtil;
-
+    private final JwtUtil jwtUtil;
+    private UserDetailsService userDetailsService;
 
     // 비밀번호 암호화를 위해 사용(Spring Security에서 제공)
     @Bean
     public BCryptPasswordEncoder bCryptPasswordEncoder() {
         return new BCryptPasswordEncoder();
     }
+
+    // AuthenticationManager 자동 설정 (순환 의존성 해결)
     @Bean
-    public AuthenticationManager authenticationManager(AuthenticationConfiguration configuration) throws Exception {
-        return configuration.getAuthenticationManager();
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
+        return authenticationConfiguration.getAuthenticationManager();
+    }
+
+    // AuthenticationManager 자동 설정 (직접 @Bean 등록 X → Spring이 관리하도록 함)
+    private AuthenticationManager authenticationManager() throws Exception {
+        return authenticationConfiguration.getAuthenticationManager();
     }
 
     @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http, AuthenticationManager authenticationManager) throws Exception{
+    public SecurityFilterChain securityFilterChain(HttpSecurity http, AuthenticationManager authenticationManager) throws Exception {
         //csrf보호를 비활성화.
         http.csrf((auth) -> auth.disable())
         .cors(cors -> cors.configure(http)); // ✅ CORS 설정 추가(swagger 사용 시 필요)
@@ -52,17 +61,15 @@ public class SecurityConfig {
          * */
         http.authorizeHttpRequests((auth) -> auth
                 .requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/v3/api-docs.yaml", "/v3/api-docs/swagger-config").permitAll()
-                .requestMatchers("/login", "/", "/join","/reissue").permitAll() //모든 사용자
+                .requestMatchers("/login", "/register","/reissue").permitAll() //모든 사용자
                 .requestMatchers("/admin").hasRole("ADMIN") //role이 ADMIN인 유저만(추후에 수정하기)
+                .requestMatchers("/").permitAll()
                 .anyRequest().authenticated()); //나머지는 로그인한 유저만
 
-        //필터 추가, 첫번재 인자의 필터를 두번째 인자로 온 필터자리에 대체함
-        http.addFilterAt(new LoginFilter(authenticationManager, jwtUtil), UsernamePasswordAuthenticationFilter.class);
-
-        //        // 해당 필터 사용하니까 /admin에 접속 가능
-//        http.addFilterBefore(new JWTFilter(jwtUtil), LoginFilter.class);
+        http.addFilterAt(new LoginFilter(authenticationManager(), jwtUtil), UsernamePasswordAuthenticationFilter.class);
+        http.addFilterBefore(new JWTFilter(jwtUtil), LoginFilter.class);
 //        // 커스텀한 로그아웃 필터 사용하기
-//        http.addFilterBefore(new CustomLogoutFilter(jwtUtil, refreshRepository), LogoutFilter.class);
+//       http.addFilterBefore(new CustomLogoutFilter(jwtUtil, refreshRepository), LogoutFilter.class);
 
         return http.build();
     }

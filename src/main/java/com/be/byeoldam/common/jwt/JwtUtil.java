@@ -10,14 +10,15 @@ import java.nio.charset.StandardCharsets;
 import java.util.Date;
 
 @Component
-public class JWTUtil {
+public class JwtUtil {
     private String secret = "vmfhaltmskdlstkfkdgodyroqkfwkdbalroqkfwkdb alaaaaaaaaaaaaaaaabbbbb";
     private SecretKey secretKey = new SecretKeySpec(secret.getBytes(StandardCharsets.UTF_8), Jwts.SIG.HS256.key().build().getAlgorithm());
 
     //jwt 생성
-    public String createJwt(long userId, String email, String role, Long expiredMs) {
+    public String createJwt(String category, long userId, String email, String role, Long expiredMs) {
 
         return Jwts.builder()
+                .claim("category",category)
                 .claim("userId",userId)
                 .claim("email", email)
                 .claim("role", role)
@@ -25,6 +26,9 @@ public class JWTUtil {
                 .expiration(new Date(System.currentTimeMillis() + expiredMs)) //토큰 만료시간 설정
                 .signWith(secretKey) // JWT 서명을 위해 비밀 키를 지정
                 .compact(); //compact: JWT를 문자열 형태로 직렬화
+    }
+    public String getCategory(String token){
+        return Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(token).getPayload().get("category", String.class);
     }
 
     public Long getUserId(String token){

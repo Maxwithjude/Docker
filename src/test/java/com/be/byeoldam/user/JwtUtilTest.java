@@ -1,6 +1,6 @@
 package com.be.byeoldam.user;
 
-import com.be.byeoldam.common.jwt.JWTUtil;
+import com.be.byeoldam.common.jwt.JwtUtil;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -9,7 +9,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 
 public class JwtUtilTest {
-    private JWTUtil jwtUtil;
+    private JwtUtil jwtUtil;
     private String token;
     private final long userId = 1L;
     private final String email = "test@example.com";
@@ -18,7 +18,7 @@ public class JwtUtilTest {
 
     @BeforeEach
     void setUp() {
-        jwtUtil = new JWTUtil();
+        jwtUtil = new JwtUtil();
         token = jwtUtil.createJwt(userId, email, role, expirationMs);
     }
 

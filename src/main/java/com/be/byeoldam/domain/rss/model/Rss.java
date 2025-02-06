@@ -1,5 +1,6 @@
 package com.be.byeoldam.domain.rss.model;
 
+import com.be.byeoldam.common.entity.BaseTimeEntity;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -7,7 +8,7 @@ import lombok.NoArgsConstructor;
 @Entity
 @Getter
 @NoArgsConstructor(access = lombok.AccessLevel.PROTECTED)
-public class Rss {
+public class Rss extends BaseTimeEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

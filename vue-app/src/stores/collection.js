@@ -43,6 +43,39 @@ export const useCollectionStore = defineStore("collection", () => {
     }
   };
 
+  const exampleAllCollections = ref([
+    {
+      "collection_id" : 1,
+      "name" : "개발",
+      "isPersonal" : true
+    }, 
+    {
+      "collection_id" : 2,
+      "name" : "자바",
+      "isPersonal" : true
+    },
+    {
+      "collection_id" : 3,
+      "name" : "웹서핑",
+      "isPersonal" : true
+    },
+    {
+      "collection_id" : 4,
+      "name" : "일본여행",
+      "isPersonal" : false
+    }, 
+    {
+      "collection_id" : 5,
+      "name" : "알고리즘스터디",
+      "isPersonal" : false
+    },
+    {
+      "collection_id" : 6,
+      "name" : "영어공부",
+      "isPersonal" : false
+    }
+  ]);
+
     
 
 //     //개인 컬렉션 불러오기
@@ -69,6 +102,7 @@ export const useCollectionStore = defineStore("collection", () => {
         fetchAllCollection,
     //     getPersonalCollection,
     //     getSharedCollection,
+        exampleAllCollections,
     }
 });
     

@@ -1,56 +1,85 @@
 <template>
-  <div class="collection-container" :class="{ 'personal': type === 'personal', 'shared': type === 'shared' }">
+  <div class="collection-card" @click="$emit('click')">
     <div class="collection-header">
-      <h2>{{ title }}</h2>
+      <h3>{{ collection.name }}</h3>
+      <button class="delete-button" @click.stop="$emit('delete', collection.collection_id)">
+        <i class="fas fa-trash"></i>
+      </button>
+    </div>
+    <div class="collection-type">
+      <i :class="['collection-icon', collection.isPersonal ? 'fas fa-user' : 'fas fa-users']"></i>
+      {{ collection.isPersonal ? '개인' : '공유' }} 컬렉션
     </div>
   </div>
 </template>
 
 <script setup>
 defineProps({
-  title: { 
-    type: String,
-    required: true
-  },
-  type: {
-    type: String,
+  collection: {
+    type: Object,
     required: true
   }
 });
+
+defineEmits(['delete', 'click']);
 </script>
 
 <style scoped>
-.collection-container {
-  border: 1px solid #ddd;
+.collection-card {
+  background: white;
   border-radius: 8px;
   padding: 16px;
-  background-color: white;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
   transition: all 0.3s ease;
+  cursor: pointer;
 }
 
-.personal {
-  border-left: 4px solid #4CAF50;  /* 초록색 */
-}
-
-.shared {
-  border-left: 4px solid #2196F3;  /* 파란색 */
+.collection-card:hover {
+  box-shadow: 0 4px 8px rgba(0,0,0,0.3);
 }
 
 .collection-header {
-  margin-bottom: 16px;
   display: flex;
   justify-content: space-between;
   align-items: center;
+  margin-bottom: 8px;
 }
 
-.collection-header h2 {
+.collection-header h3 {
   margin: 0;
-  color: #333;
-  font-size: 1.5rem;
+  font-size: 1.1rem;
 }
 
-.collection-content {
+.delete-button {
+  background: none;
+  border: none;
+  color: #dc3545;
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 4px;
+}
+
+.delete-button:hover {
+  background-color: #ffebee;
+}
+
+.collection-type {
+  font-size: 0.9rem;
   color: #666;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.collection-icon {
+  color: #888;
+}
+
+.fa-user {
+  color: #2196F3;  /* 개인 컬렉션 아이콘 색상 */
+}
+
+.fa-users {
+  color: #4CAF50;  /* 공유 컬렉션 아이콘 색상 */
 }
 </style>

@@ -5,6 +5,15 @@
             <SideBar class="sidebar" />
             <div class="main-content">
                 <div class="body">
+                    <div class="page-header">
+                        <div class="header-content">
+                            <div class="title-section">
+                                <i class="fas fa-users title-icon"></i>
+                                <h2 class="title">공유 컬렉션</h2>
+                            </div>
+                            <p class="description">다른 사용자들과 함께 북마크를 공유하고 협업할 수 있는 공간입니다</p>
+                        </div>
+                    </div>
                     <div class="top-section">
                         <div class="filter-buttons">
                             <button 
@@ -70,7 +79,22 @@ const counterStore = useCounterStore();
 const selectedCollection = ref('all');
 const showCreateModal = ref(false);
 
-const collections = computed(() => counterStore.sharedCollections.results);
+const collections = computed(() => {
+    const collectionList = counterStore.sharedCollections.results;
+    const bookmarks = counterStore.sharedCollectionsBookmarks.results;
+    
+    return collectionList.map(collection => {
+        if (collection.collection_id === bookmarks.collection_id) {
+            return {
+                ...collection,
+                users: bookmarks.users
+            };
+        }
+        return collection;
+    });
+});
+
+const collectionBookmarks = computed(() => counterStore.sharedCollectionsBookmarks.results);
 
 const filteredCollections = computed(() => {
     return collections.value.filter(collection => 
@@ -220,5 +244,41 @@ const createNewCollection = () => {
     max-height: 80vh;
     overflow-y: auto;
 }
-</style>
 
+.page-header {
+    background: linear-gradient(to right, #f8f9fa, #ffffff);
+    padding: 16px 24px;
+    border-radius: 12px;
+    margin-bottom: 24px;
+}
+
+.header-content {
+    max-width: 800px;
+}
+
+.title-section {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 8px;
+}
+
+.title-icon {
+    font-size: 1.5rem;
+    color: #007bff;
+}
+
+.title {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: #2c3e50;
+    margin: 0;
+}
+
+.description {
+    font-size: 0.95rem;
+    color: #666;
+    margin: 0;
+    line-height: 1.4;
+}
+</style>

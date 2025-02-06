@@ -22,21 +22,18 @@ export const useCounterStore = defineStore('counter', () => {
       "results": [
         {
           "collection_id" : 1,
-          "name" : "웹서핑",
-          "created_at" : "2024-01-01",
-          "updated_at" : "2024-01-02"
+          "name" : "개발",
+          "isPersonal" : true
         }, 
         {
           "collection_id" : 2,
           "name" : "자바",
-          "created_at" : "2024-01-01",
-          "updated_at" : "2024-01-02"
+          "isPersonal" : true
         },
         {
           "collection_id" : 3,
-          "name" : "파이썬",
-          "created_at" : "2024-01-01",
-          "updated_at" : "2024-01-02"
+          "name" : "웹서핑",
+          "isPersonal" : true
         }
       ] 
     }
@@ -48,7 +45,7 @@ export const useCounterStore = defineStore('counter', () => {
       "success":true,
       "message":"some message",
       "results": {
-        "name" : "웹서핑",
+        "name" : "개발",
         "bookmarks" : [
           {
             "bookmark_id" : 1,
@@ -87,38 +84,17 @@ export const useCounterStore = defineStore('counter', () => {
         {
           "collection_id" : 1,
           "name" : "일본여행",
-          "users" : [
-            {
-              "user_id" : 1,
-              "email" : "example@naver.com",
-              "nickname" : "홍길동",
-              "profile_img" : "https://example.com/"
-            }, 
-            {
-              "user_id" : 2,
-              "email" : "example222@naver.com",
-              "nickname" : "저팔계",
-              "profile_img" : "https://example.com/"
-            },
-          ]
+          "isPersonal" : false
         }, 
         {
           "collection_id" : 2,
           "name" : "알고리즘스터디",
-          "users" : [
-            {
-              "user_id" : 1,
-              "email" : "example@naver.com",
-              "nickname" : "홍길순",
-              "profile_img" : "https://example.com/"
-            }, 
-            {
-              "user_id" : 2,
-              "email" : "example222@naver.com",
-              "nickname" : "저팔갱",
-              "profile_img" : "https://example.com/"
-            }
-          ]
+          "isPersonal" : false
+        }, 
+        {
+          "collection_id" : 3,
+          "name" : "영어공부",
+          "isPersonal" : false
         }
       ]
     }
@@ -249,75 +225,75 @@ export const useCounterStore = defineStore('counter', () => {
       "result": {
         "userBookmarkList": [
           {
-            "bookmarkId": 1,
+            "bookmark_id": 1,
             "url": "https://naver.com",
-            "image": "https://naver.com/image.jpg",
+            "img": "https://naver.com/image.jpg",
             "title": "네이버 메인 - 검색, 뉴스, 쇼핑",
             "description": "네이버는 다양한 정보를 ...",
             "priority": true,
-            "createdAt": "2024-01-01",
-            "updatedAt": "2024-01-02",
-            "tags": ["서핑", "웹"],
+            "created_at": "2024-01-01",
+            "updated_at": "2024-01-02",
+            "tag": ["서핑", "웹"],
             "isPersonal": true
           },
           {
-            "bookmarkId": 2,
+            "bookmark_id": 2,
             "url": "https://edu.ssafy.com",
-            "image": "https://edu.ssafy.com/image.jpg",
+            "img": "https://edu.ssafy.com/image.jpg",
             "title": "싸피 메인 페이지",
             "description": "대한민국 청년 삼성 ...",
             "priority": true,
-            "createdAt": "2024-01-01",
-            "updatedAt": "2024-01-02",
-            "tags": ["싸피", "IT"],
+            "created_at": "2024-01-01",
+            "updated_at": "2024-01-02",
+            "tag": ["싸피", "IT"],
             "isPersonal": true
           },
           {
-            "bookmarkId": 3,
+            "bookmark_id": 3,
             "url": "https://example.com/some-page-3",
-            "image": "https://example.com/image3.jpg",
+            "img": "https://example.com/image3.jpg",
             "title": "제목 3",
             "description": "설명 3",
             "priority": true,
-            "createdAt": "2024-01-01",
-            "updatedAt": "2024-01-02",
-            "tags": ["싸피", "IT"],
+            "created_at": "2024-01-01",
+            "updated_at": "2024-01-02",
+            "tag": ["싸피", "IT"],
             "isPersonal": true
           },
           {
-            "bookmarkId": 4,
+            "bookmark_id": 4,
             "url": "https://example.com/some-page-4",
-            "image": "https://example.com/image4.jpg",
+            "img": "https://example.com/image4.jpg",
             "title": "제목 4",
             "description": "설명 4",
             "priority": true,
-            "createdAt": "2024-01-01",
-            "updatedAt": "2024-01-02",
-            "tags": ["싸피", "IT"],
+            "created_at": "2024-01-01",
+            "updated_at": "2024-01-02",
+            "tag": ["싸피", "IT"],
             "isPersonal": true
           },
           {
-            "bookmarkId": 5,
+            "bookmark_id": 5,
             "url": "https://example.com/some-page-5",
-            "image": "https://example.com/image5.jpg",
+            "img": "https://example.com/image5.jpg",
             "title": "제목 5",
             "description": "설명 5",
             "priority": true,
-            "createdAt": "2024-01-01",
-            "updatedAt": "2024-01-02",
-            "tags": ["싸피", "IT"],
+            "created_at": "2024-01-01",
+            "updated_at": "2024-01-02",
+            "tag": ["싸피", "IT"],
             "isPersonal": true
           },
           {
-            "bookmarkId": 6,
+            "bookmark_id": 6,
             "url": "https://example.com/some-page-6",
-            "image": "https://example.com/image6.jpg",
+            "img": "https://example.com/image6.jpg",
             "title": "제목 6",
             "description": "설명 6",
             "priority": true,
-            "createdAt": "2024-01-01",
-            "updatedAt": "2024-01-02",
-            "tags": ["싸피", "IT"],
+            "created_at": "2024-01-01",
+            "updated_at": "2024-01-02",
+            "tag": ["싸피", "IT"],
             "isPersonal": true
           }
         ],
@@ -365,7 +341,7 @@ export const useCounterStore = defineStore('counter', () => {
 //검색페이지에서 사용할 검색 함수
   const searchBookmarksByTag = async (tag, cursorId = null, size = 6) => {
     try {
-      // 임시로 searchedBookmarks 데이터 사용
+      // 임의의 검색결과를 searchedBookmarks 라 하자.
       return searchedBookmarks.value;
       
       // 백엔드 준비되면 아래 코드로 교체

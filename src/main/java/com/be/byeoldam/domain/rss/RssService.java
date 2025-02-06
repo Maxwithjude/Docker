@@ -121,9 +121,7 @@ public class RssService {
         UserRss userRss = userRssRepository.findByUserIdAndRssId(userId, rssId)
                 .orElseThrow(() -> new CustomException("구독하지 않은 RSS입니다."));
 
-        String latestTitle = userRss.getLatestTitle();
         String previousTitle = userRss.getPreviousTitle();
-
 
         Page<RssPostResponse> latestArticles = fetchRssPosts(rss.getRssUrl(), previousTitle, pageable);
 

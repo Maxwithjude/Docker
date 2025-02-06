@@ -1,5 +1,6 @@
 package com.be.byeoldam.domain.memo.dto;
 
+import com.be.byeoldam.domain.memo.model.Memo;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -16,14 +17,14 @@ public class MemoResponse {
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
-    public static MemoResponse of(Long memoId, String nickname, String content, String imageUrl, LocalDateTime createdAt, LocalDateTime updatedAt) {
+    public static MemoResponse from(Memo memo) {
         return MemoResponse.builder()
-                .memoId(memoId)
-                .nickname(nickname)
-                .content(content)
-                .imageUrl(imageUrl)
-                .createdAt(createdAt)
-                .updatedAt(updatedAt)
+                .memoId(memo.getId())
+                .nickname(memo.getUser().getNickname())
+                .content(memo.getContent())
+                .imageUrl(memo.getUser().getProfileUrl())
+                .createdAt(memo.getCreatedAt())
+                .updatedAt(memo.getUpdatedAt())
                 .build();
     }
 }

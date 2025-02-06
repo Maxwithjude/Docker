@@ -5,6 +5,15 @@
             <SideBar class="sidebar"/>
             <div class="main-content">
                 <div class="body">
+                    <div class="page-header">
+                        <div class="header-content">
+                            <div class="title-section">
+                                <i class="fas fa-rss title-icon"></i>
+                                <h2 class="title">RSS 피드</h2>
+                            </div>
+                            <p class="description">구독 중인 RSS 피드의 최신 글들을 한눈에 확인하세요</p>
+                        </div>
+                    </div>
                     <div class="rss-container">
                         <FeedTabs 
                             :feeds="rssStore.rssSubscriptions.results"
@@ -120,4 +129,43 @@ const selectPost = (url) => {
   gap: 1rem;
   padding: 1rem;
 }
+
+.page-header {
+    background: linear-gradient(to right, #f8f9fa, #ffffff);
+    padding: 16px 24px;
+    border-radius: 12px;
+    margin-bottom: 24px;
+}
+
+.header-content {
+    max-width: 800px;
+}
+
+.title-section {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 8px;
+}
+
+.title-icon {
+    font-size: 1.5rem;
+    color: #007bff;
+}
+
+.title {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: #2c3e50;
+    margin: 0;
+}
+
+.description {
+    font-size: 0.95rem;
+    color: #666;
+    margin: 0;
+    line-height: 1.4;
+}
+
+
 </style>

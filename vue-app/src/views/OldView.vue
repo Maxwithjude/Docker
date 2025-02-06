@@ -5,7 +5,15 @@
             <SideBar class="sidebar"/>
             <div class="main-content">
                 <div class="body">
-                    <h1 class="page-title">30일 이상 읽지않은 북마크</h1>
+                    <div class="page-header">
+                        <div class="header-content">
+                            <div class="title-section">
+                                <i class="fas fa-clock title-icon"></i>
+                                <h2 class="title">오래된 북마크</h2>
+                            </div>
+                            <p class="description">오랜기간 읽지 않은 북마크들을 모아서 보여드립니다</p>
+                        </div>
+                    </div>
                     
                     <div v-if="!bookmarkResults.length" class="empty-state">
                         <i class="fas fa-star empty-icon"></i>
@@ -134,4 +142,42 @@ const togglePriority = (bookmark) => {
     gap: 24px;
     padding: 20px 0;
 }
+
+.page-header {
+    background: linear-gradient(to right, #f8f9fa, #ffffff);
+    padding: 16px 24px;
+    border-radius: 12px;
+    margin-bottom: 24px;
+}
+
+.header-content {
+    max-width: 800px;
+}
+
+.title-section {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 8px;
+}
+
+.title-icon {
+    font-size: 1.5rem;
+    color: #007bff;
+}
+
+.title {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: #2c3e50;
+    margin: 0;
+}
+
+.description {
+    font-size: 0.95rem;
+    color: #666;
+    margin: 0;
+    line-height: 1.4;
+}
+
 </style>

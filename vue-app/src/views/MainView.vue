@@ -5,25 +5,26 @@
             <SideBar class="sidebar"/>
             <div class="main-content">
                 <div class="body">
+                    <div class="page-header">
+                        <div class="header-content">
+                            <div class="title-section">
+                                <i class="fas fa-home title-icon"></i>
+                                <h2 class="title">모든 컬렉션</h2>
+                            </div>
+                            <p class="description">모든 개인 및 공유 컬렉션을 한눈에 확인할 수 있습니다</p>
+                        </div>
+                    </div>
                     <div class="collection-controls">
-                        <button class="control-button create" @click="showCreateModal = true">
-                            <i class="fas fa-plus"></i>
-                            컬렉션 생성
-                        </button>
-                        <button 
-                            class="control-button delete" 
-                            @click="toggleDeleteMode"
-                            :class="{ 'active': isDeleteMode }"
-                        >
-                            <i class="fas fa-trash"></i>
-                            {{ isDeleteMode ? '삭제 완료' : '컬렉션 삭제' }}
+                        <button class="new-collection-btn" @click="createNewCollection">
+                            <span class="plus-icon">+</span>
+                            새 컬렉션
                         </button>
                     </div>
                     <div v-if="collections.length === 0" class="empty-state">
                         <i class="fas fa-folder-open empty-icon"></i>
                         <p class="empty-text">컬렉션이 존재하지 않습니다.</p>
                         <p class="empty-description">
-                            상단의 '컬렉션 생성' 버튼을 클릭하여<br>
+                            상단의 '새 컬렉션' 버튼을 클릭하여<br>
                             새로운 컬렉션을 만들어보세요!
                         </p>
                     </div>
@@ -31,16 +32,16 @@
                     <div v-else class="collections-grid">
                         <Collection 
                             v-for="collection in collections"
-                            :key="collection.id"
-                            :title="collection.title"
-                            :type="collection.type"
+                            :key="collection.collection_id"
+                            :collection="collection"
+                            @delete="deleteCollection"
+                            @click="navigateToCollection(collection)"
                         />
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- 컬렉션 생성 모달 -->
         <div v-if="showCreateModal" class="modal-overlay" @click="showCreateModal = false">
             <div class="modal-content" @click.stop>
                 <CreateCollection @close="showCreateModal = false" />
@@ -51,58 +52,46 @@
 
 <script setup>
 import { onMounted, ref } from 'vue';
+import { useRouter } from 'vue-router';
 import Header from '@/common/Header.vue';
 import SideBar from '@/common/SideBar.vue';
 import Collection from '@/common/Collection.vue';
 import CreateCollection from '@/modal/CreateCollection.vue';
-import { useCounterStore } from '@/stores/counter';
-
-import { useUserStore } from '@/stores/user';
 import { useCollectionStore } from '@/stores/collection';
 
-const userStore = useUserStore()
+const router = useRouter();
 const collectionStore = useCollectionStore();
-
-//로그인 되어 있으면 정보 다 불러오기기
-// onMounted(()=> {
-//     if(userStore.userId){
-//         collectionStore.fetchAllCollections();
-//     }
-// })
-const store = useCounterStore();
-const isDeleteMode = ref(false);
-const collections = ref([
-    {
-        id: 1,
-        title: "영어 단어장",
-        type: 'personal'
-    },
-    {
-        id: 2,
-        title: "프로그래밍 용어",
-        type: 'shared'
-    },
-    {
-        id: 3,
-        title: "일본어 문법",
-        type: 'personal'
-    },
-    {
-        id: 4,
-        title: "수학 공식",
-        type: 'shared'
-    },
-    {
-        id: 5,
-        title: "한국사 연대표",
-        type: 'personal'
-    }
-]);
 const showCreateModal = ref(false);
+const collections = ref([]);
 
-const toggleDeleteMode = () => {
-    isDeleteMode.value = !isDeleteMode.value;
+const createNewCollection = () => {
+    showCreateModal.value = true;
 };
+
+const deleteCollection = async (collectionId) => {
+    if (confirm('정말로 이 컬렉션을 삭제하시겠습니까?')) {
+        await collectionStore.deleteCollection(collectionId);
+        collections.value = collections.value.filter(c => c.collection_id !== collectionId);
+    }
+};
+
+const navigateToCollection = (collection) => {
+    if (collection.isPersonal) {
+        router.push({
+            name: 'personal',
+            query: { collection: collection.name }
+        });
+    } else {
+        router.push({
+            name: 'shared',
+            query: { collection: collection.name }
+        });
+    }
+};
+
+onMounted(async () => {
+    collections.value = await collectionStore.exampleAllCollections;
+});
 </script>
 
 <style scoped>
@@ -123,24 +112,24 @@ const toggleDeleteMode = () => {
 
 .content-wrapper {
     display: flex;
-    margin-top: 60px; /* 헤더 높이만큼 여백 추가 */
-    height: calc(100vh - 60px); /* 전체 높이에서 헤더 높이를 뺀 만큼 설정 */
+    margin-top: 60px;
+    height: calc(100vh - 60px);
 }
 
 .sidebar {
     position: fixed;
     left: 0;
-    top: 60px; /* 헤더 높이만큼 떨어뜨림 */
+    top: 60px;
     bottom: 0;
-    width: 240px; /* 사이드바 너비 */
+    width: 240px;
     background: white;
     z-index: 99;
 }
 
 .main-content {
     flex: 1;
-    margin-left: 240px; /* 사이드바 너비만큼 여백 */
-    overflow-y: auto; /* 본문 내용만 스크롤 가능하도록 */
+    margin-left: 240px;
+    overflow-y: auto;
     height: 100%;
 }
 
@@ -148,51 +137,33 @@ const toggleDeleteMode = () => {
     padding: 20px;
 }
 
+.new-collection-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 16px;
+    border: none;
+    border-radius: 20px;
+    background: #007bff;
+    color: white;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-weight: 500;
+}
+
+.new-collection-btn:hover {
+    background: #0056b3;
+}
+
+.plus-icon {
+    font-size: 1.2em;
+    font-weight: bold;
+}
+
 .collection-controls {
     display: flex;
     gap: 12px;
     margin-bottom: 24px;
-}
-
-.control-button {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding: 10px 20px;
-    border: none;
-    border-radius: 8px;
-    font-size: 0.95rem;
-    cursor: pointer;
-    transition: all 0.2s;
-}
-
-.control-button i {
-    font-size: 1rem;
-}
-
-.control-button.create {
-    background-color: #4CAF50;
-    color: white;
-}
-
-.control-button.create:hover {
-    background-color: #45a049;
-}
-
-.control-button.delete {
-    background-color: #f8f9fa;
-    color: #dc3545;
-    border: 1px solid #dc3545;
-}
-
-.control-button.delete:hover {
-    background-color: #dc3545;
-    color: white;
-}
-
-.control-button.delete.active {
-    background-color: #dc3545;
-    color: white;
 }
 
 .empty-state {
@@ -253,4 +224,42 @@ const toggleDeleteMode = () => {
     max-height: 90%;
     overflow-y: auto;
 }
+
+.page-header {
+    background: linear-gradient(to right, #f8f9fa, #ffffff);
+    padding: 16px 24px;
+    border-radius: 12px;
+    margin-bottom: 24px;
+}
+
+.header-content {
+    max-width: 800px;
+}
+
+.title-section {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 8px;
+}
+
+.title-icon {
+    font-size: 1.5rem;
+    color: #007bff;
+}
+
+.title {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: #2c3e50;
+    margin: 0;
+}
+
+.description {
+    font-size: 0.95rem;
+    color: #666;
+    margin: 0;
+    line-height: 1.4;
+}
+
 </style>

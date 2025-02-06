@@ -5,6 +5,15 @@
             <SideBar class="sidebar"/>
             <div class="main-content">
                 <div class="body">
+                    <div class="page-header">
+                        <div class="header-content">
+                            <div class="title-section">
+                                <i class="fas fa-search title-icon"></i>
+                                <h2 class="title">북마크 검색</h2>
+                            </div>
+                            <p class="description">태그를 통해 원하는 북마크를 빠르게 찾아보세요</p>
+                        </div>
+                    </div>
                     <div class="search-page">
                         <div class="search-container">
                             <input 
@@ -19,71 +28,64 @@
                         </div>
                         
                         <!-- 검색 전 안내 메시지 -->
-                        <div v-if="!hasSearched" class="initial-message">
+                        <!-- <div v-if="!hasSearched" class="initial-message">
                             <div class="message-box">
                                 <i class="fas fa-search search-icon"></i>
                                 <h3>태그로 북마크를 검색해보세요</h3>
                                 <p>원하는 태그를 입력하고 검색하면 관련된 북마크들을 찾을 수 있습니다.</p>
                             </div>
-                        </div>
+                        </div> -->
                     
                         <!-- 검색 결과 -->
-                        <template v-else>
-                            <div class="search-results-container">
-                                <!-- 왼쪽: 검색 결과 -->
-                                <div class="main-results">
-                                    <h2 class="section-title">검색결과</h2>
-                                    <div class="bookmarks-grid">
-                                        <Card
-                                            v-for="bookmark in bookmarks"
-                                            :key="bookmark.bookmarkId"
-                                            :bookmark-id="bookmark.bookmarkId"
-                                            :img="bookmark.image"
-                                            :title="bookmark.title"
-                                            :description="bookmark.description"
-                                            :url="bookmark.url"
-                                            :tag="bookmark.tags"
-                                            :priority="bookmark.priority"
-                                            :created-at="bookmark.createdAt"
-                                            :updated-at="bookmark.updatedAt"
-                                            :is-personal="true"
-                                            @toggle-priority="() => handleTogglePriority(bookmark.bookmarkId)"
-                                        />
-                                    </div>
-                                    
-                                    <div v-if="loading" class="loading">
-                                        데이터를 불러오는 중...
-                                    </div>
-                                    
-                                    <div v-if="!hasMore && bookmarks.length > 0" class="no-more">
-                                        모든 북마크를 불러왔습니다.
-                                    </div>
-                                    
-                                    <div v-if="hasSearched && bookmarks.length === 0 && !loading" class="no-results">
-                                        검색 결과가 없습니다.
-                                    </div>
+                        <div class="search-results-container">
+                            <!-- 왼쪽: 검색 결과 -->
+                            <div class="main-results">
+                                <h2 v-if="hasSearched" class="section-title">검색결과</h2>
+                                <div v-if="bookmarks.length > 0" class="bookmarks-grid">
+                                    <Card
+                                        v-for="bookmark in bookmarks"
+                                        :key="bookmark.bookmark_id"
+                                        :bookmarkId="bookmark.bookmark_id"
+                                        :url="bookmark.url"
+                                        :img="bookmark.img"
+                                        :title="bookmark.title"
+                                        :description="bookmark.description"
+                                        :tag="bookmark.tag"
+                                        :priority="bookmark.priority"
+                                        :isPersonal="bookmark.isPersonal"
+                                        :createdAt="bookmark.created_at"
+                                        :updatedAt="bookmark.updated_at"
+                                        @togglePriority="togglePriority(bookmark)"
+                                    />
                                 </div>
+                                
+                                <div v-if="loading" class="loading">
+                                    데이터를 불러오는 중...
+                                </div>
+                                
+                                <div v-if="hasSearched && bookmarks.length === 0 && !loading" class="no-results">
+                                    검색 결과가 없습니다.
+                                </div>
+                            </div>
 
-                                <!-- 오른쪽: 추천 북마크 -->
-                                <div v-if="recommendedBookmarks.length > 0" class="recommended-section">
-                                    <h2 class="section-title">관련 북마크</h2>
-                                    <div class="recommended-list">
-                                        <div 
-                                            v-for="bookmark in recommendedBookmarks" 
-                                            :key="bookmark.url"
-                                            class="recommended-item"
-                                            @click="goToUrl(bookmark.url)"
-                                        >
-                                            <img :src="bookmark.image" :alt="bookmark.title" class="recommended-image">
-                                            <div class="recommended-content">
-                                                <h3>{{ bookmark.title }}</h3>
-                                                <button class="save-button">save</button>
-                                            </div>
+                            <!-- 오른쪽: 추천 북마크 -->
+                            <div v-if="recommendedBookmarks.length > 0" class="recommended-section">
+                                <h2 class="section-title">관련 북마크</h2>
+                                <div class="recommended-list">
+                                    <div 
+                                        v-for="bookmark in recommendedBookmarks" 
+                                        :key="bookmark.url"
+                                        class="recommended-item"
+                                        @click="goToUrl(bookmark.url)"
+                                    >
+                                        <img :src="bookmark.image" :alt="bookmark.title" class="recommended-image">
+                                        <div class="recommended-content">
+                                            <h3>{{ bookmark.title }}</h3>
                                         </div>
                                     </div>
                                 </div>
                             </div>
-                        </template>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -107,61 +109,37 @@ const hasMore = ref(true)
 const lastCursorId = ref(null)
 const hasSearched = ref(false)
 
+const togglePriority = (bookmark) => {
+    bookmark.priority = !bookmark.priority;
+}
+
 const handleSearch = async () => {
     if (!searchTag.value.trim()) return
     
-    hasSearched.value = true
-    bookmarks.value = []
-    recommendedBookmarks.value = []
-    lastCursorId.value = null
-    hasMore.value = true
-    await loadMoreBookmarks()
-}
-
-const loadMoreBookmarks = async () => {
-    if (loading.value || !hasMore.value) return
-    
     try {
         loading.value = true
-        const response = await store.searchBookmarksByTag(
-            searchTag.value,
-            lastCursorId.value,
-            6
-        )
-
-        const newBookmarks = response.result.userBookmarkList
+        hasSearched.value = true
+        lastCursorId.value = null // 검색 시 커서 초기화
+        hasMore.value = true // 검색 시 hasMore 초기화
         
-        // 새로운 북마크가 6개 미만이면 더 이상 불러올 데이터가 없음
-        if (newBookmarks.length < 6) {
+        const response = await store.searchBookmarksByTag(searchTag.value)
+        
+        // 검색 결과 업데이트 (초기화 후 설정)
+        bookmarks.value = response.result.userBookmarkList
+        recommendedBookmarks.value = response.result.recommendedBookmarkList
+        
+        // 마지막 북마크의 ID를 커서로 설정
+        if (response.result.userBookmarkList.length > 0) {
+            lastCursorId.value = response.result.userBookmarkList[response.result.userBookmarkList.length - 1].bookmark_id
+        }
+        
+        // 받아온 데이터가 페이지 사이즈보다 작으면 더 이상 데이터가 없음
+        if (response.result.userBookmarkList.length < 6) {
             hasMore.value = false
         }
-
-        if (newBookmarks.length > 0) {
-            // 중복 제거: 이미 있는 bookmarkId는 제외
-            const uniqueNewBookmarks = newBookmarks.filter(newBookmark => 
-                !bookmarks.value.some(existingBookmark => 
-                    existingBookmark.bookmarkId === newBookmark.bookmarkId
-                )
-            );
-
-            // 중복이 제거된 새로운 북마크만 추가
-            if (uniqueNewBookmarks.length > 0) {
-                bookmarks.value.push(...uniqueNewBookmarks)
-                lastCursorId.value = uniqueNewBookmarks[uniqueNewBookmarks.length - 1].bookmarkId
-            } else {
-                // 새로운 고유 북마크가 없다면 더 이상 로드하지 않음
-                hasMore.value = false
-            }
-        } else {
-            hasMore.value = false
-        }
-
-        // 첫 검색 시에만 추천 북마크 설정
-        if (!recommendedBookmarks.value.length) {
-            recommendedBookmarks.value = response.result.recommendedBookmarkList
-        }
+        
     } catch (error) {
-        console.error('북마크 로딩 중 오류 발생:', error)
+        console.error('검색 중 오류 발생:', error)
     } finally {
         loading.value = false
     }
@@ -176,12 +154,42 @@ const goToUrl = (url) => {
     window.open(url, '_blank')
 }
 
+const loadMoreBookmarks = async () => {
+    if (!hasMore.value || loading.value || !lastCursorId.value) return
+    
+    try {
+        loading.value = true
+        const response = await store.searchBookmarksByTag(searchTag.value, lastCursorId.value)
+        
+        // 새로운 북마크들만 기존 목록에 추가
+        const newBookmarks = response.result.userBookmarkList.filter(newBookmark => 
+            !bookmarks.value.some(existingBookmark => 
+                existingBookmark.bookmark_id === newBookmark.bookmark_id
+            )
+        )
+        
+        if (newBookmarks.length > 0) {
+            bookmarks.value = [...bookmarks.value, ...newBookmarks]
+            lastCursorId.value = newBookmarks[newBookmarks.length - 1].bookmark_id
+        }
+        
+        // 받아온 데이터가 페이지 사이즈보다 작으면 더 이상 데이터가 없음
+        if (response.result.userBookmarkList.length < 6) {
+            hasMore.value = false
+        }
+    } catch (error) {
+        console.error('추가 북마크 로딩 중 오류 발생:', error)
+    } finally {
+        loading.value = false
+    }
+}
+
 const handleScroll = () => {
     const mainContent = document.querySelector('.main-content')
     if (!mainContent) return
     
     const { scrollTop, scrollHeight, clientHeight } = mainContent
-    if (scrollTop + clientHeight >= scrollHeight - 300) {
+    if (scrollTop + clientHeight >= scrollHeight - 300 && hasMore.value) {
         loadMoreBookmarks()
     }
 }
@@ -424,6 +432,44 @@ onUnmounted(() => {
     color: #718096;
     font-style: italic;
 }
+
+.page-header {
+    background: linear-gradient(to right, #f8f9fa, #ffffff);
+    padding: 16px 24px;
+    border-radius: 12px;
+    margin-bottom: 24px;
+}
+
+.header-content {
+    max-width: 800px;
+}
+
+.title-section {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 8px;
+}
+
+.title-icon {
+    font-size: 1.5rem;
+    color: #007bff;
+}
+
+.title {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: #2c3e50;
+    margin: 0;
+}
+
+.description {
+    font-size: 0.95rem;
+    color: #666;
+    margin: 0;
+    line-height: 1.4;
+}
+
 </style>
 
 

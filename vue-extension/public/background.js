@@ -1,4 +1,23 @@
 // 0. 북마크 기본 렌더링 데이터
+// background.js
+chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+  if (message.action === 'getUrl') {
+    console.log('받은 URL:', message.url);
+    
+    // 응답 보내기
+    sendResponse({ status: 'success', receivedUrl: message.url });
+  }
+});
+
+
+
+
+
+
+
+
+
+
 chrome.runtime.onInstalled.addListener(() => {
   fetchDataAndStore();
 });

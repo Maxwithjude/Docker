@@ -286,7 +286,7 @@ onMounted(() => {
 .set-tags-button {
     margin-top: 16px;
     padding: 8px 20px;
-    background-color: #4CAF50;
+    background-color: #007bff;
     color: white;
     border: none;
     border-radius: 20px;
@@ -296,6 +296,6 @@ onMounted(() => {
 }
 
 .set-tags-button:hover {
-    background-color: #45a049;
+    background-color: #0056b3;
 }
 </style>

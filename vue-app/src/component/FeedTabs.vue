@@ -30,14 +30,14 @@ defineEmits(['select-feed'])
 <style scoped>
 .feed-tabs {
 display: flex;
-gap: 1rem;
-padding: 1rem;
+gap: 0.5rem;
+padding: 0.5rem;
 background-color: #f5f5f5;
 border-bottom: 1px solid #ddd;
 }
 
 .tab {
-padding: 0.5rem 1rem;
+padding: 0.25rem 0.75rem;
 cursor: pointer;
 border-radius: 4px;
 position: relative;

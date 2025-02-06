@@ -5,8 +5,16 @@
             <SideBar class="sidebar"/>
             <div class="main-content">
                 <div class="body">
-                    <h1 class="page-title">중요 북마크</h1>
-                        
+                    <div class="page-header">
+                        <div class="header-content">
+                            <div class="title-section">
+                                <i class="fas fa-star title-icon"></i>
+                                <h2 class="title">중요 북마크</h2>
+                            </div>
+                            <p class="description">특별히 관심있는 북마크들을 모아둔 공간입니다</p>
+                        </div>
+                    </div>
+                    
                     <div v-if="!bookmarkResults.length" class="empty-state">
                         <i class="fas fa-star empty-icon"></i>
                         <p class="empty-text">중요 표시된 북마크가 없습니다.</p>
@@ -101,11 +109,47 @@ watch(bookmarkResults, (newResults) => {
     padding: 20px;
 }
 
-.page-title {
+.page-header {
+    background: linear-gradient(to right, #f8f9fa, #ffffff);
+    padding: 16px 24px;
+    border-radius: 12px;
+    margin-bottom: 24px;
+}
+
+.header-content {
+    max-width: 800px;
+}
+
+.title-section {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 8px;
+}
+
+.title-icon {
+    font-size: 1.5rem;
+    color: #ffd700;
+}
+
+.title {
     font-size: 1.5rem;
     font-weight: 600;
-    color: #333;
-    margin-bottom: 24px;
+    color: #2c3e50;
+    margin: 0;
+}
+
+.description {
+    font-size: 0.95rem;
+    color: #666;
+    margin: 0;
+    line-height: 1.4;
+}
+
+
+.keyword:hover {
+    background-color: #dee2e6;
+    transform: translateY(-1px);
 }
 
 .empty-state {

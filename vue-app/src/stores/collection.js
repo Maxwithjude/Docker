@@ -3,7 +3,7 @@ import { defineStore } from "pinia";
 import axios from "axios";
 import router from "@/router";
 
-const REST_API_URL = `http://localhost:8080/api/collections`;
+const REST_API_URL_coll = `http://localhost:8080/api/collections`;
 
 
 export const useCollectionStore = defineStore("collection", () => {
@@ -27,8 +27,8 @@ export const useCollectionStore = defineStore("collection", () => {
               };
               // 두 개의 API 요청을 병렬로 처리
       const [personalRes, sharedRes] = await Promise.all([
-        axios.get(`${REST_API_URL}/personal`, { headers }),
-        axios.get(`${REST_API_URL}/shared`, { headers }),
+        axios.get(`${REST_API_URL_coll}/personal`, { headers }),
+        axios.get(`${REST_API_URL_coll}/shared`, { headers }),
       ]);
 
       if (personalRes.data.success && sharedRes.data.success) {

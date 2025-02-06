@@ -2,6 +2,7 @@ import { ref, computed } from "vue";
 import { defineStore } from "pinia";
 import axios from "axios";
 import router from "@/router";
+
 const REST_API_URL = `http://localhost:8080/api`;
 
 export const useUserStore = defineStore("user", () => {
@@ -48,10 +49,9 @@ export const useUserStore = defineStore("user", () => {
       const res = await axios.post(`${REST_API_URL}/users/login`, { email: email, password: password });
     //세션 스토리지에 jwt 토큰 저장
       sessionStorage.setItem("access-token", res.data["access-token"]);
-
+        sessionStorage.setItem("refresh-token", res.data["refresh-token"])
       const token = res.data["access-token"].split(".");
-        //첫 토큰 페이로드에 id가 담겨있으면 1은 언제든 백과 맞추어 변경 가능
-      const id = JSON.parse(atob(token[1]))["id"];
+    
 
       loginUser.value = id;
       sessionStorage.setItem("userId", id); // 세션에도 저장
@@ -62,6 +62,15 @@ export const useUserStore = defineStore("user", () => {
     }
   };
 
+  //로그인 하면 토큰 익스텐션에 보낼 함수
+
+//   const sendInfoExtension = async (params) => {
+//     try {
+        
+//     } catch (error) {
+        
+//     }
+//   }
   // 로그아웃 함수 로그아웃하면 세션 스토리지에서 정보 빼고, 인트로로
   const logout = () => {
     loginUser.value = null;

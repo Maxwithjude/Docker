@@ -1,40 +1,41 @@
 <template>
     <div class="layout">
-        <Header />
+        <Header class="header"/>
         <div class="content-wrapper">
-            <SideBar />
-            <div class="body">
-                <div class="collection-controls">
-                    <button class="control-button create" @click="showCreateModal = true">
-                        <i class="fas fa-plus"></i>
-                        컬렉션 생성
-                    </button>
-                    <button 
-                        class="control-button delete" 
-                        @click="toggleDeleteMode"
-                        :class="{ 'active': isDeleteMode }"
-                    >
-                        <i class="fas fa-trash"></i>
-                        {{ isDeleteMode ? '삭제 완료' : '컬렉션 삭제' }}
-                    </button>
-                </div>
-                
-                <div v-if="collections.length === 0" class="empty-state">
-                    <i class="fas fa-folder-open empty-icon"></i>
-                    <p class="empty-text">컬렉션이 존재하지 않습니다.</p>
-                    <p class="empty-description">
-                        상단의 '컬렉션 생성' 버튼을 클릭하여<br>
-                        새로운 컬렉션을 만들어보세요!
-                    </p>
-                </div>
-                
-                <div v-else class="collections-grid">
-                    <Collection 
-                        v-for="collection in collections"
-                        :key="collection.id"
-                        :title="collection.title"
-                        :type="collection.type"
-                    />
+            <SideBar class="sidebar"/>
+            <div class="main-content">
+                <div class="body">
+                    <div class="collection-controls">
+                        <button class="control-button create" @click="showCreateModal = true">
+                            <i class="fas fa-plus"></i>
+                            컬렉션 생성
+                        </button>
+                        <button 
+                            class="control-button delete" 
+                            @click="toggleDeleteMode"
+                            :class="{ 'active': isDeleteMode }"
+                        >
+                            <i class="fas fa-trash"></i>
+                            {{ isDeleteMode ? '삭제 완료' : '컬렉션 삭제' }}
+                        </button>
+                    </div>
+                    <div v-if="collections.length === 0" class="empty-state">
+                        <i class="fas fa-folder-open empty-icon"></i>
+                        <p class="empty-text">컬렉션이 존재하지 않습니다.</p>
+                        <p class="empty-description">
+                            상단의 '컬렉션 생성' 버튼을 클릭하여<br>
+                            새로운 컬렉션을 만들어보세요!
+                        </p>
+                    </div>
+                    
+                    <div v-else class="collections-grid">
+                        <Collection 
+                            v-for="collection in collections"
+                            :key="collection.id"
+                            :title="collection.title"
+                            :type="collection.type"
+                        />
+                    </div>
                 </div>
             </div>
         </div>
@@ -111,15 +112,40 @@ const toggleDeleteMode = () => {
     min-height: 100vh;
 }
 
+.header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 100;
+    background: white;
+}
+
 .content-wrapper {
     display: flex;
+    margin-top: 60px; /* 헤더 높이만큼 여백 추가 */
+    height: calc(100vh - 60px); /* 전체 높이에서 헤더 높이를 뺀 만큼 설정 */
+}
+
+.sidebar {
+    position: fixed;
+    left: 0;
+    top: 60px; /* 헤더 높이만큼 떨어뜨림 */
+    bottom: 0;
+    width: 240px; /* 사이드바 너비 */
+    background: white;
+    z-index: 99;
+}
+
+.main-content {
     flex: 1;
+    margin-left: 240px; /* 사이드바 너비만큼 여백 */
+    overflow-y: auto; /* 본문 내용만 스크롤 가능하도록 */
+    height: 100%;
 }
 
 .body {
-    flex: 1;
     padding: 20px;
-    overflow-y: auto;
 }
 
 .collection-controls {

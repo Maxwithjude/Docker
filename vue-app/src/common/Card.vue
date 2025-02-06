@@ -1,19 +1,19 @@
 <template>
     <div class="card">
         <div class="card-header">
-            <div class="importance">
-                <span v-if="props.isImportant" class="star-icon">★</span>
+            <div class="priority">
+                <span v-if="props.priority" class="star-icon">★</span>
                 <span v-else class="star-icon empty">☆</span>
             </div>
             <div class="settings">
                 <BookmarkSettings 
-                    :is-important="props.isImportant"
-                    @delete="openDeleteModal"
+                    :priority="props.priority"
+                    @toggle-priority="togglePriority"
                 />
             </div>
         </div>
         <img 
-            :src="props.image || defaultImage" 
+            :src="imageSrc" 
             :alt="props.title" 
             class="card-image"
             @click="handleImageClick"
@@ -43,42 +43,23 @@
                         +{{ remainingTagsCount }}
                     </span>
                 </div>
-                <span class="read-time">
-                    {{ props.readingTime }}분
-                </span>
             </div>
         </div>
     </div>
     
-    <!-- 삭제 모달을 카드 밖으로 이동 -->
-    <el-dialog
-        v-model="isDeleteModalVisible"
-        :show-close="false"
-        :close-on-click-modal="false"
-        width="400px"
-        align-center
-        append-to-body
-    >
-        <BookmarkDel
-            @close="closeDeleteModal"
-            @confirm="handleDeleteConfirm"
-        />
-    </el-dialog>
 </template>
 
 <script setup>
 import { ref, computed } from 'vue';
-import { ElMessage } from 'element-plus';
-import BookmarkDel from '@/modal/BookmarkDel.vue';
 import BookmarkSettings from '@/common/BookmarkSettings.vue';
 import { useRouter } from 'vue-router';
 
-const isDeleteModalVisible = ref(false);
-
-const defaultImage = 'https://images.unsplash.com/photo-1481627834876-b7833e8f5570?q=80&w=2128&auto=format&fit=crop';
-
 const props = defineProps({
-    image: {
+    bookmarkId: {
+        type: Number,
+        required: true
+    },
+    img: {
         type: String,
         required: true
     },
@@ -94,54 +75,45 @@ const props = defineProps({
         type: String,
         required: true
     },
-    hashtags: {
+    tag: {
         type: Array,
         default: () => []
     },
-    readingTime: {
-        type: Number,
-        required: true
-    },
-    isImportant: {
+    priority: {
         type: Boolean,
         default: false
     },
+    createdAt: {
+        type: String,
+        required: true
+    },
+    updatedAt: {
+        type: String,
+        required: true
+    },
     isPersonal: {
         type: Boolean,
-        required: true
-    },
-    bookmarkId: {
-        type: Number,
-        required: true
-    },
-    id: {
-        type: Number,
         required: true
     }
 });
 
 const router = useRouter();
 
-const visibleTags = computed(() => props.hashtags.slice(0, 2));
-const remainingTags = computed(() => props.hashtags.slice(2));
-const remainingTagsCount = computed(() => Math.max(0, props.hashtags.length - 2));
+const visibleTags = computed(() => props.tag.slice(0, 2));
+// const remainingTags = computed(() => props.tag.slice(2));
+const remainingTagsCount = computed(() => Math.max(0, props.tag.length - 2));
 
-const openDeleteModal = () => {
-    isDeleteModalVisible.value = true;
+const emit = defineEmits(['togglePriority']);
+
+const togglePriority = () => {
+    emit('togglePriority');
 };
 
-const closeDeleteModal = () => {
-    isDeleteModalVisible.value = false;
-};
-
-const handleDeleteConfirm = () => {
-    // TODO: 실제 삭제 API 호출
-    ElMessage({
-        type: 'success',
-        message: '북마크가 삭제되었습니다.'
-    });
-    isDeleteModalVisible.value = false;
-};
+const imageSrc = computed(() => {
+    return props.img && props.img.startsWith('http') 
+        ? props.img 
+        : 'https://images.unsplash.com/photo-1481627834876-b7833e8f5570?q=80&w=2128&auto=format&fit=crop';
+});
 
 const handleImageClick = () => {
     const route = props.isPersonal 
@@ -149,8 +121,6 @@ const handleImageClick = () => {
         : `/shared-collection/${props.bookmarkId}`;
     router.push(route);
 };
-
-const emit = defineEmits(['delete', 'manageTags', 'toggleImportant', 'copyToShared', 'move']);
 </script>
 
 <style scoped>
@@ -161,7 +131,7 @@ const emit = defineEmits(['delete', 'manageTags', 'toggleImportant', 'copyToShar
     overflow: hidden;
     transition: transform 0.2s;
     width: 240px;
-    position: relative; /* BookmarkSettings의 절대 위치 기준점 */
+    position: relative;
 }
 
 .card:hover {
@@ -170,43 +140,40 @@ const emit = defineEmits(['delete', 'manageTags', 'toggleImportant', 'copyToShar
 
 .card-image {
     width: 100%;
-    height: 180px;
+    height: 140px;
     object-fit: cover;
 }
 
 .card-content {
-    padding: 16px;
-    height: 200px;
+    padding: 12px;
+    height: 140px;
     display: flex;
     flex-direction: column;
 }
 
 .card-title {
-    margin: 0 0 12px 0;
+    margin: 0 0 8px 0;
     font-size: 1.1rem;
     color: #333;
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
+    white-space: nowrap;
     overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .card-description {
     color: #666;
     font-size: 0.9rem;
-    line-height: 1.5;
-    display: -webkit-box;
-    -webkit-line-clamp: 3;
-    -webkit-box-orient: vertical;
+    line-height: 1.4;
+    white-space: nowrap;
     overflow: hidden;
-    flex: 1;
-    margin-bottom: 8px;
+    text-overflow: ellipsis;
+    margin-bottom: 6px;
 }
 
 .card-url {
     font-size: 0.8rem;
     color: #666;
-    margin-bottom: 8px;
+    margin-bottom: 6px;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -290,7 +257,7 @@ const emit = defineEmits(['delete', 'manageTags', 'toggleImportant', 'copyToShar
     padding: 8px 12px;
 }
 
-.importance {
+.priority {
     display: flex;
     align-items: center;
 }
@@ -298,7 +265,7 @@ const emit = defineEmits(['delete', 'manageTags', 'toggleImportant', 'copyToShar
 .star-icon {
     color: #FFD700;
     font-size: 1.2rem;
-    cursor: pointer;
+    /* cursor: pointer; */
 }
 
 .star-icon.empty {
@@ -309,39 +276,5 @@ const emit = defineEmits(['delete', 'manageTags', 'toggleImportant', 'copyToShar
     position: relative;
 }
 
-.settings-button {
-    background: none;
-    border: none;
-    font-size: 1.2rem;
-    color: #666;
-    cursor: pointer;
-    padding: 4px 8px;
-    border-radius: 4px;
-}
 
-.settings-button:hover {
-    background-color: #f0f0f0;
-}
-
-.settings-menu {
-    width: 100%;
-}
-
-.settings-menu .el-button {
-    justify-content: flex-start;
-    padding: 8px 16px;
-    width: 100%;
-}
-
-.settings-menu .el-button:hover {
-    background-color: #f5f7fa;
-}
-
-.settings-menu .delete-button {
-    color: #f56c6c;
-}
-
-:deep(.bookmark-settings-popover) {
-    padding: 0;
-}
 </style>

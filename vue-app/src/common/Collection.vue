@@ -1,27 +1,65 @@
 <template>
-  <div class="collection-card" @click="$emit('click')">
+  <div class="collection-card" @click="!showSharedSettings && !showPersonalSettings && $emit('click')">
     <div class="collection-header">
       <h3>{{ collection.name }}</h3>
-      <button class="delete-button" @click.stop="$emit('delete', collection.collection_id)">
-        <i class="fas fa-trash"></i>
-      </button>
+      <div class="header-buttons">
+        <button class="settings-button" @click.stop="openSettings">
+          <i class="fas fa-cog"></i>
+        </button>
+        <button class="delete-button" @click.stop="$emit('delete', collection.collection_id)">
+          <i class="fas fa-trash"></i>
+        </button>
+      </div>
     </div>
     <div class="collection-type">
       <i :class="['collection-icon', collection.isPersonal ? 'fas fa-user' : 'fas fa-users']"></i>
       {{ collection.isPersonal ? '개인' : '공유' }} 컬렉션
     </div>
+
+    <SharedCollectionSettings 
+      v-if="showSharedSettings && !collection.isPersonal" 
+      @close="showSharedSettings = false"
+    />
+    <PersonalCollectionSettings 
+      v-if="showPersonalSettings && collection.isPersonal"
+      :currentName="collection.name"
+      @close="showPersonalSettings = false"
+      @update="handleNameUpdate"
+    />
   </div>
 </template>
 
 <script setup>
-defineProps({
+import { ref } from 'vue';
+import SharedCollectionSettings from '../component/SharedCollectionSettings.vue';
+import PersonalCollectionSettings from '../component/PersonalCollectionSettings.vue';
+
+const showSharedSettings = ref(false);
+const showPersonalSettings = ref(false);
+
+const props = defineProps({
   collection: {
     type: Object,
     required: true
   }
 });
 
-defineEmits(['delete', 'click']);
+const emit = defineEmits(['delete', 'click', 'update']);
+
+const openSettings = () => {
+  if (props.collection.isPersonal) {
+    showPersonalSettings.value = true;
+  } else {
+    showSharedSettings.value = true;
+  }
+};
+
+const handleNameUpdate = (newName) => {
+  emit('update', {
+    collectionId: props.collection.collection_id,
+    newName: newName
+  });
+};
 </script>
 
 <style scoped>
@@ -48,6 +86,26 @@ defineEmits(['delete', 'click']);
 .collection-header h3 {
   margin: 0;
   font-size: 1.1rem;
+}
+
+.header-buttons {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.settings-button {
+  background: none;
+  border: none;
+  color: #666;
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 4px;
+}
+
+.settings-button:hover {
+  background-color: #f5f5f5;
+  color: #1a73e8;
 }
 
 .delete-button {

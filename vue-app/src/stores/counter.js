@@ -302,37 +302,37 @@ export const useCounterStore = defineStore('counter', () => {
             "url": "https://example.com/some-page-1",
             "title": "제목 1",
             "description": "설명 1",
-            "image": "https://example.com/image1.jpg"
+            "img": "https://example.com/image1.jpg"
           },
           {
             "url": "https://example.com/some-page-2",
             "title": "제목 2",
             "description": "설명 2",
-            "image": "https://example.com/image2.jpg"
+            "img": "https://example.com/image2.jpg"
           },
           {
             "url": "https://example.com/some-page-3",
             "title": "제목 3",
             "description": "설명 3",
-            "image": "https://example.com/image3.jpg"
+              "img": "https://example.com/image3.jpg"
           },
           {
             "url": "https://example.com/some-page-4",
             "title": "제목 4",
             "description": "설명 4",
-            "image": "https://example.com/image4.jpg"
+            "img": "https://example.com/image4.jpg"
           },
           {
             "url": "https://example.com/some-page-5",
             "title": "제목 5",
             "description": "설명 5",
-            "image": "https://example.com/image5.jpg"
+            "img": "https://example.com/image5.jpg"
           },
           {
             "url": "https://example.com/some-page-6",
             "title": "제목 6",
             "description": "설명 6",
-            "image": "https://example.com/image6.jpg"
+            "img": "https://example.com/image6.jpg"
           }
         ]
       }
@@ -421,6 +421,67 @@ export const useCounterStore = defineStore('counter', () => {
       throw error;
     }
   }
+  // 임의의 사용자 정의 태그 데이터 
+  const userDefineTags = ref({
+    "success":true,
+    "message":"some message",
+    "results": {
+      "tagList": [
+        "서핑",
+        "웹",
+        "싸피",
+        "IT",
+        "프로그래밍",
+        "교육",
+        "Python",
+        "FastAPI",
+        "Spring",
+        "Java"
+      ]
+    }
+  })
+// 사용자 정의 태그 데이터 가져오는 함수  
+  const getUserDefineTags = async () => {
+    try {
+      return userDefineTags.value;
+    } catch (error) {
+      console.error('사용자 정의 태그 조회 중 오류 발생:', error);
+      throw error;
+    }
+  }
+
+  // 임의의 추천 북마크 데이터 
+  const recommendedBookmarks = ref({
+    "success":true,
+    "message":"some message",
+    "result": {
+      "recommendedUrlList": [
+        {
+          "url": "https://example.com/some-page-1",
+          "title": "추천 페이지 제목 1",
+          "description": "추천 페이지 설명 1",
+          "img": "https://example.com/image1.jpg"
+        },
+        {
+          "url": "https://example.com/some-page-2",
+          "title": "추천 페이지 제목 2",
+          "description": "추천 페이지 설명 2",
+          "img": "https://example.com/image2.jpg"
+        }
+      ]
+    }
+  })
+  // 추천 북마크 데이터 가져오는 함수
+  // /api/tags/search?cursorId={cursorId}&size={size}&tag={태그명} 으로 get 요청 보내면 됨 
+  // 무한스크롤 구현 필요
+  const getRecommendedBookmarks = async (tag, size = 10, cursorId = 1) => {
+    try {
+      return recommendedBookmarks.value;
+    } catch (error) {
+      console.error('추천 북마크 조회 중 오류 발생:', error);
+      throw error;
+    }
+  }
 
   return { 
     user, 
@@ -435,6 +496,10 @@ export const useCounterStore = defineStore('counter', () => {
     rssSubscriptions,
     rssSubscriptionsItems,
     getRssSubscriptionItems,
+    userDefineTags,
+    getUserDefineTags,
+    recommendedBookmarks,
+    getRecommendedBookmarks,
   }
 })
 

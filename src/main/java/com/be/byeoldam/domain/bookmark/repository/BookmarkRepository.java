@@ -1,4 +1,5 @@
-package com.be.byeoldam.domain.bookmark;
+package com.be.byeoldam.domain.bookmark.repository;
+
 
 import com.be.byeoldam.domain.bookmark.model.Bookmark;
 import org.springframework.data.jpa.repository.JpaRepository;

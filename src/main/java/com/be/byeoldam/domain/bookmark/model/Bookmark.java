@@ -53,4 +53,8 @@ public class Bookmark extends BaseTimeEntity {
         this.priority = priority;
         this.isRead = isRead;
     }
+
+    public static Bookmark create(User user) {
+        return new Bookmark();
+    }
 }

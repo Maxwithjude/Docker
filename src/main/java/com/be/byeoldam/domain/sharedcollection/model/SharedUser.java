@@ -9,7 +9,7 @@ import lombok.*;
 @Table(name = "shared_user")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class SharedUser extends BaseTimeEntity { // 공유컬렉션-유저 매핑
+public class SharedUser extends BaseTimeEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

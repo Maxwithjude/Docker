@@ -1,9 +1,6 @@
 package com.be.byeoldam.domain.sharedcollection.dto;
 
-import com.be.byeoldam.domain.user.model.User;
 import lombok.*;
-
-import java.util.List;
 
 @Getter
 @Builder

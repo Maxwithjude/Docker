@@ -4,9 +4,6 @@ import com.be.byeoldam.common.entity.BaseTimeEntity;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.util.ArrayList;
-import java.util.List;
-
 @Entity
 @Table(name="shared_collection")
 @Getter

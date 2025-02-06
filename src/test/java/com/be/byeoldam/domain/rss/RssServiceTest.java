@@ -1,5 +1,6 @@
 package com.be.byeoldam.domain.rss;
 
+import com.be.byeoldam.domain.rss.dto.RssLatestPostsResponse;
 import com.be.byeoldam.domain.rss.dto.RssPostResponse;
 import com.be.byeoldam.domain.rss.dto.RssSubscribeRequest;
 import com.be.byeoldam.domain.rss.dto.UserRssResponse;
@@ -18,6 +19,10 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import java.util.List;
@@ -32,6 +37,7 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 class RssServiceTest {
 
+    @Spy
     @InjectMocks
     private RssService rssService;
 
@@ -46,6 +52,7 @@ class RssServiceTest {
 
     private User user;
     private Rss rss;
+    private UserRss userRss;
 
     @BeforeEach
     void setUp() {
@@ -54,6 +61,8 @@ class RssServiceTest {
 
         rss = Rss.createRss("https://blog.naver.com/eunrosophy/223324773246", "Example RSS");
         ReflectionTestUtils.setField(rss, "id", 10L); // ID 설정
+
+        userRss = UserRss.subscribeRss(user, rss);
     }
 
     @Test
@@ -166,6 +175,72 @@ class RssServiceTest {
         assertThatThrownBy(() -> rssService.getUserRssList(1L))
                 .isInstanceOf(CustomException.class)
                 .hasMessage("사용자를 찾을 수 없습니다.");
+    }
+
+    @Test
+    @DisplayName("특정_RSS_최신_글_조회_정상작동")
+    void 특정_RSS_최신_글_조회_정상작동() {
+        // Given
+        Long userId = 1L;
+        Long rssId = 10L;
+        Pageable pageable = PageRequest.of(0, 5);
+
+        List<RssPostResponse> posts = List.of(
+                RssPostResponse.of("New Article 1", "https://example.com/1", false),
+                RssPostResponse.of("New Article 2", "https://example.com/2", false)
+        );
+        Page<RssPostResponse> postPage = new PageImpl<>(posts, pageable, posts.size());
+
+        when(userRepository.existsById(userId)).thenReturn(true);
+        when(rssRepository.findById(rssId)).thenReturn(Optional.of(rss));
+        when(userRssRepository.findByUserIdAndRssId(userId, rssId)).thenReturn(Optional.of(userRss));
+        doReturn(postPage)
+                .when(rssService)
+                .fetchRssPosts(rss.getRssUrl(), userRss.getPreviousTitle(), pageable);
+
+
+        // When
+        RssLatestPostsResponse response = rssService.getRssLatestArticles(userId, rssId, pageable);
+
+        // Then
+        assertThat(response)
+                .isNotNull()
+                .extracting(RssLatestPostsResponse::getRssId, RssLatestPostsResponse::getName)
+                .containsExactly(rssId, "Example RSS");
+
+        assertThat(response.getLatestPosts())
+                .isNotEmpty()
+                .hasSize(2)
+                .allSatisfy(post -> {
+                    assertThat(post.getTitle()).isNotBlank();
+                    assertThat(post.getUrl()).isNotBlank();
+                });
+
+        // 첫 페이지 요청일 때만 latestTitle 업데이트 확인
+        assertThat(userRss.getLatestTitle()).isEqualTo("New Article 1");
+    }
+
+    @Test
+    void 최신글이_없으면_빈_리스트_반환() {
+        // Given
+        Long userId = 1L;
+        Long rssId = 10L;
+        Pageable pageable = PageRequest.of(0, 5);
+        Page<RssPostResponse> emptyPage = Page.empty(pageable);
+
+        when(userRepository.existsById(userId)).thenReturn(true);
+        when(rssRepository.findById(rssId)).thenReturn(Optional.of(rss));
+        when(userRssRepository.findByUserIdAndRssId(userId, rssId)).thenReturn(Optional.of(userRss));
+        doReturn(emptyPage)
+                .when(rssService)
+                .fetchRssPosts(rss.getRssUrl(), userRss.getPreviousTitle(), pageable);
+
+        // When
+        RssLatestPostsResponse response = rssService.getRssLatestArticles(userId, rssId, pageable);
+
+        // Then
+        assertThat(response).isNotNull();
+        assertThat(response.getLatestPosts()).isEmpty();
     }
 
 }

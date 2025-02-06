@@ -51,15 +51,15 @@ export const useUserStore = defineStore("user", () => {
         sessionStorage.setItem("access-token", res.data["access-token"]);
         sessionStorage.setItem("refresh-token", res.data["refresh-token"])
         const token = res.data["access-token"].split(".");
+          /// 로그인 성공 시 익스텐션에 보낼 정보보
+        window.postMessage({ type: 'LOGIN', data: loginData }, window.location.origin);
+
         // 로그인 후에 실행되는 부분
         const loginData = {
             username: 'example_user',
             access_token: 'f8fd7473-a3ca-ff55-bca7-72c738'
         };
   
-  // 크롬 익스텐션으로 로그인 정보 보내기
-    window.postMessage({ type: 'FROM_WEBSITE', data: loginData }, window.location.origin);
-            sessionStorage.getItem
 
     loginUser.value = id;
       sessionStorage.setItem("userId", id); // 세션에도 저장
@@ -81,12 +81,17 @@ export const useUserStore = defineStore("user", () => {
 //   }
   // 로그아웃 함수 로그아웃하면 세션 스토리지에서 정보 빼고, 인트로로
   const logout = () => {
+
+    // 로그아웃 시 익스텐션에 송신
+    window.postMessage({ type: 'LOGOUT' }, window.location.origin);
     loginUser.value = null;
     sessionStorage.removeItem("access-token");
     alert("정상적으로 로그아웃 처리되었습니다.");
     router.push({ name: "intro" });
   };
   
+
+
 
   // 이메일 인증 함수
   const emailVerification = async (email) => {

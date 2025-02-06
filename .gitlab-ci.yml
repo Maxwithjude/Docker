@@ -1,0 +1,36 @@
+stages:
+  - build
+  - test
+
+build-fe:
+  stage: build
+  image: node:22
+  script:
+    - cd vue-app
+    - npm install
+    - npm run build
+  rules:
+    - if: '$CI_COMMIT_REF_NAME == "dev/fe"'  # dev/fe 브랜치에서만 실행
+
+test-fe:
+  stage: test
+  image: node:22
+  script:
+    - cd vue-app
+    - npm run test
+  rules:
+    - if: '$CI_COMMIT_REF_NAME == "dev/fe"'  # dev/fe 브랜치에서만 실행
+
+build-be:
+  stage: build
+  script:
+    - ./gradlew build  # 예시로 gradle 사용
+  rules:
+    - if: '$CI_COMMIT_REF_NAME == "dev/be"'  # dev/be 브랜치에서만 실행
+
+test-be:
+  stage: test
+  script:
+    - ./gradlew test  # 예시로 gradle 테스트 사용
+  rules:
+    - if: '$CI_COMMIT_REF_NAME == "dev/be"'  # dev/be 브랜치에서만 실행

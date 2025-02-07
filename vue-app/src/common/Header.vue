@@ -12,7 +12,7 @@
         
         <div class="auth-section">
             <div>
-                <p>{{ userStore.userId }}</p>
+                <p>{{ usernickname }} 님 환영합니다</p>
             </div>
             <img 
                 :src="userProfile || defaultProfileImage" 
@@ -25,10 +25,11 @@
 
 <script setup>
 import { ref } from 'vue';
-
 import { useUserStore } from '@/stores/user';
 
+
 const userStore = useUserStore();
+const usernickname = ref(userStore.user?.nickname || '');
 const defaultProfileImage = 'https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png';
 const userProfile = ref(null);
 </script>

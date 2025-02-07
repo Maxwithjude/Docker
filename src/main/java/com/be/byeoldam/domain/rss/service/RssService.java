@@ -99,7 +99,6 @@ public class RssService {
                 String currentTitle = extractLatestTitle(userRss.getRss().getRssUrl());
 
                 if (currentTitle != null && !currentTitle.equals(userRss.getLatestTitle())) {
-                    userRss.updateTitles(currentTitle);
                     userRss.updateIsRead(false);
                 }
             } catch (Exception e) {

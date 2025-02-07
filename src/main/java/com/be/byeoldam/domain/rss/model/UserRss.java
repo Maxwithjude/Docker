@@ -24,21 +24,28 @@ public class UserRss {
     private Rss rss;
 
     private String latestTitle;
+    private String previousTitle; // 이전 요청에서의 latestTitle
     private boolean isRead;
 
-    private UserRss(User user, Rss rss, String latestTitle, boolean isRead) {
+    private UserRss(User user, Rss rss, String latestTitle, String previousTitle, boolean isRead) {
         this.user = user;
         this.rss = rss;
         this.latestTitle = latestTitle;
+        this.previousTitle = previousTitle;
         this.isRead = isRead;
     }
 
     public static UserRss subscribeRss(User user, Rss rss) {
-        return new UserRss(user, rss, null, false);
+        return new UserRss(user, rss, null, null, false);
     }
 
-    public void updateRss(String latestTitle) {
-        this.latestTitle = latestTitle;
-        this.isRead = true;
+    public void updateTitles(String newLatestTitle) {
+        this.previousTitle = this.latestTitle; // 기존 latestTitle을 previousTitle로 이동
+        this.latestTitle = newLatestTitle;    // 새로운 최신글 제목 업데이트
+        this.isRead = true;  // 새로운 글이 있기 때문에 읽음 상태 변경
+    }
+
+    public void updateIsRead(boolean isRead) {
+        this.isRead = isRead;
     }
 }

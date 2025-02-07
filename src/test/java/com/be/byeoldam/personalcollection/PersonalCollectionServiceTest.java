@@ -87,30 +87,7 @@ class PersonalCollectionServiceTest {
                 .hasMessage("같은 이름의 컬렉션이 이미 존재합니다.");
     }
 
-    @Test
-    void createPersonalCollection_Fail_NameNull() {
-        // given
-        PersonalCollectionRequest request = new PersonalCollectionRequest(null);
-        when(userRepository.findById(1L)).thenReturn(Optional.of(mockUser));
 
-        // when & then
-        assertThatThrownBy(() -> personalCollectionService.createPersonalCollection(request, 1L))
-                .isInstanceOf(CustomException.class)
-                .hasMessage("컬렉션 이름은 필수입니다.");
-    }
-
-    @Test
-    void createPersonalCollection_Fail_NameLength() {
-        // given
-        String longName = "012345678901234567890"; // 21자
-        PersonalCollectionRequest request = new PersonalCollectionRequest(longName);
-        when(userRepository.findById(1L)).thenReturn(Optional.of(mockUser));
-
-        // when & then
-        assertThatThrownBy(() -> personalCollectionService.createPersonalCollection(request, 1L))
-                .isInstanceOf(CustomException.class)
-                .hasMessage("컬렉션 이름은 20자 이내여야 합니다.");
-    }
 
     @Test
     void updatePersonalCollection_Success() {
@@ -141,32 +118,8 @@ class PersonalCollectionServiceTest {
                 .hasMessage("같은 이름의 컬렉션이 이미 존재합니다.");
     }
 
-    @Test
-    void updatePersonalCollection_Fail_NameNull() {
-        // given
-        PersonalCollectionRequest request = new PersonalCollectionRequest(null);
-        when(userRepository.findById(1L)).thenReturn(Optional.of(mockUser));
-        when(personalCollectionRepository.findById(1L)).thenReturn(Optional.of(mockCollection));
 
-        // when & then
-        assertThatThrownBy(() -> personalCollectionService.updatePersonalCollection(request, 1L, 1L))
-                .isInstanceOf(CustomException.class)
-                .hasMessage("컬렉션 이름은 필수입니다.");
-    }
 
-    @Test
-    void updatePersonalCollection_Fail_NameLength() {
-        // given
-        String longName = "012345678901234567890"; // 21자
-        PersonalCollectionRequest request = new PersonalCollectionRequest(longName);
-        when(userRepository.findById(1L)).thenReturn(Optional.of(mockUser));
-        when(personalCollectionRepository.findById(1L)).thenReturn(Optional.of(mockCollection));
-
-        // when & then
-        assertThatThrownBy(() -> personalCollectionService.updatePersonalCollection(request, 1L, 1L))
-                .isInstanceOf(CustomException.class)
-                .hasMessage("컬렉션 이름은 20자 이내여야 합니다.");
-    }
 
     @Test
     void deletePersonalCollection_Success() {

@@ -8,6 +8,7 @@ import com.be.byeoldam.domain.rss.model.Rss;
 import com.be.byeoldam.domain.rss.model.UserRss;
 import com.be.byeoldam.domain.rss.repository.RssRepository;
 import com.be.byeoldam.domain.rss.repository.UserRssRepository;
+import com.be.byeoldam.domain.rss.service.RssService;
 import com.be.byeoldam.domain.user.model.User;
 import com.be.byeoldam.domain.user.repository.UserRepository;
 import com.be.byeoldam.exception.CustomException;

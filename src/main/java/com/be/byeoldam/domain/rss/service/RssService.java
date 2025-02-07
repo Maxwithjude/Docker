@@ -1,4 +1,4 @@
-package com.be.byeoldam.domain.rss;
+package com.be.byeoldam.domain.rss.service;
 
 import com.be.byeoldam.domain.rss.dto.RssLatestPostsResponse;
 import com.be.byeoldam.domain.rss.dto.RssPostResponse;
@@ -80,7 +80,7 @@ public class RssService {
     }
 
     /**
-     * 사용자의 RSS 구독 목록을 조회하는 메서드
+     * 사용자의 RSS 구독 목록 조회 (새 글 확인)
      * @param userId
      * @return
      */
@@ -92,6 +92,20 @@ public class RssService {
         }
 
         List<UserRss> userRssList = userRssRepository.findByUserId(userId);
+
+        for (UserRss userRss : userRssList) {
+            try {
+                // RSS 링크의 최신 글 제목 추출
+                String currentTitle = extractLatestTitle(userRss.getRss().getRssUrl());
+
+                if (currentTitle != null && !currentTitle.equals(userRss.getLatestTitle())) {
+                    userRss.updateTitles(currentTitle);
+                    userRss.updateIsRead(false);
+                }
+            } catch (Exception e) {
+                throw new CustomException("RSS 피드를 가져오는 중 오류가 발생했습니다.");
+            }
+        }
 
         return userRssList.stream()
                 .map(userRss -> UserRssResponse.of(
@@ -194,6 +208,21 @@ public class RssService {
     }
 
     /**
+     * RSS 피드의 가장 최근 게시물 제목을 가져오는 메서드
+     */
+    public String extractLatestTitle(String rssUrl) {
+        try {
+            URL feedSource = new URL(rssUrl);
+            SyndFeedInput input = new SyndFeedInput();
+            SyndFeed feed = input.build(new XmlReader(feedSource));
+
+            return feed.getEntries().isEmpty() ? null : feed.getEntries().get(0).getTitle();
+        } catch (Exception e) {
+            throw new CustomException("RSS 피드를 가져오는 중 오류가 발생했습니다.");
+        }
+    }
+
+    /**
      * RSS 구독 가능한 URL인지 확인하는 메서드
      */
     public boolean isSubscribed(String url) {
@@ -205,6 +234,7 @@ public class RssService {
             return false;
         }
     }
+
 
     /**
      * RSS URL 추출 메서드

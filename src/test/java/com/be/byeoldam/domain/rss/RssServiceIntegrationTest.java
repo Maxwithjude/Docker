@@ -1,6 +1,7 @@
 package com.be.byeoldam.domain.rss;
 
 import com.be.byeoldam.domain.rss.dto.RssPostResponse;
+import com.be.byeoldam.domain.rss.service.RssService;
 import org.junit.jupiter.api.Test;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;

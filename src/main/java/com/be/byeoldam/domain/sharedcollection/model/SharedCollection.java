@@ -4,9 +4,6 @@ import com.be.byeoldam.common.entity.BaseTimeEntity;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.util.ArrayList;
-import java.util.List;
-
 @Entity
 @Table(name="shared_collection")
 @Getter
@@ -17,16 +14,20 @@ public class SharedCollection extends BaseTimeEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    // nullable false
-    @Column(nullable = false, length = 10)
+    // nullable false, length = 20
+    @Column(nullable = false, length = 20)
     private String name;
 
     private SharedCollection(String name) {
         this.name = name;
     }
 
-    public static SharedCollection createSharedCollection(String name) {
+    public static SharedCollection create(String name) {
         return new SharedCollection(name);
+    }
+
+    public void updateName(String updatedName) {
+        this.name = updatedName;
     }
 
 }

@@ -46,7 +46,7 @@
             user = request.toEntity();
             userRepository.save(user);
 
-            SharedCollection sharedCollection = SharedCollection.createSharedCollection("컬렉션 이름");
+            SharedCollection sharedCollection = SharedCollection.create("컬렉션 이름");
             entityManager.persist(sharedCollection);  // 컬렉션을 먼저 저장
             entityManager.flush();
 

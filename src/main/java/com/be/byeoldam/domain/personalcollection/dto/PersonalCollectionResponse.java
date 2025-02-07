@@ -9,11 +9,13 @@ public class PersonalCollectionResponse {
 
     private Long collectionId;
     private String name;
+    private boolean isPersonal;
 
     public static PersonalCollectionResponse of(Long collectionId, String name) {
         return PersonalCollectionResponse.builder()
                 .collectionId(collectionId)
                 .name(name)
+                .isPersonal(true)
                 .build();
     }
 }

@@ -59,6 +59,8 @@
 <script setup>
 import { ref } from "vue";
 import { RouterLink} from "vue-router";
+import { useErrorStore } from "@/stores/error";
+const errorStore = useErrorStore();
 const recommendedTags = ref([
     "BackEnd", "오징어게임2", "연말정산", "설연휴", 
     "반려동물", "정보처리기사", "미국여행", "양식", "캐나다 워홀"

@@ -117,10 +117,13 @@
   </template>
   
   <script setup>
-  import { useUserStore } from "@/stores/user";
+  import { useErrorStore } from "@/stores/error";
+import { useUserStore } from "@/stores/user";
+import { useErrorStore } from "@/stores/error";
 import { ref } from "vue";
   
   const userStore = useUserStore();
+  
 
   const email = ref("");
   const verificationCode = ref("");
@@ -133,15 +136,6 @@ import { ref } from "vue";
     success: false,
     message: "",
   });
-  
-  //로그인 핸들러
-  const handleLogin = async () => {
-    try {
-        await userstore.userLogin(email.value, password.value)
-        router.push({ name: 'main' })
-    } catch (error) {
-        alert('로그인 실패: ' + error.message)
-    }}
 
 
   // 인증번호 발송

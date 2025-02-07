@@ -1,5 +1,6 @@
 import { ref, computed } from "vue";
 import { defineStore } from "pinia";
+import api from "@/utils/api";
 import axios from "axios";
 import router from "@/router";
 
@@ -51,7 +52,7 @@ export const useUserStore = defineStore("user", () => {
         sessionStorage.setItem("access-token", res.data["access-token"]);
         sessionStorage.setItem("refresh-token", res.data["refresh-token"])
         const token = res.data["access-token"].split(".");
-          /// 로그인 성공 시 익스텐션에 보낼 정보보
+          /// 로그인 성공 시 익스텐션에 보낼 정보
         window.postMessage({ type: 'LOGIN', data: loginData }, window.location.origin);
 
         // 로그인 후에 실행되는 부분dddddddddd
@@ -123,13 +124,15 @@ export const useUserStore = defineStore("user", () => {
   };
 
   //마이페이지 조회 밑에 리턴 함수명 주석 해제해야 사용 가능능
-  const getMyPage = async () => {
-    try {
-        const res = await axios.get(`${REST_API_URL}/users/mypage`)
-    } catch (error) {
-        
-    }
+const getMyPage = async () => {
+  try {
+    const res = await api.get("/users/mypage"); // `api` 인스턴스로 요청 보내기
+    return res.data; // 필요하면 데이터 반환
+  } catch (error) {
+    console.error("🚨 마이페이지 조회 실패:", error);
   }
+};
+
 
   //마이페이지 수정
   const putMyPage = async (params) => {

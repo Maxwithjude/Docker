@@ -80,4 +80,13 @@ clean.doLast {
 
 tasks.named('test') {
     useJUnitPlatform()
+
+    testLogging {
+        events "passed", "failed", "skipped"  // 테스트 결과 로깅
+    }
+
+    reports {
+        junitXml.required.set(true)  // XML 보고서 활성화 (Gradle 최신 문법)
+        junitXml.outputLocation.set(file("$buildDir/test-outputs/test"))  // XML 저장 경로
+    }
 }

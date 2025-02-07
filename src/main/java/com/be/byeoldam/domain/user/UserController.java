@@ -65,7 +65,7 @@ public class UserController {
 
     @Operation(summary = "filter test용", description = "올바른 accessToken을 넣고 요청을 한번 해보세요!")
     @GetMapping("/me")
-    public ResponseTemplate<String> me(@UserId long userId){
+    public ResponseTemplate<String> me(@UserId Long userId){
         System.out.println("UserController.me");
         System.out.println("userId:" + userId);
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();

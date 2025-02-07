@@ -84,6 +84,15 @@ public class UserService {
         userRepository.save(user);
     }
 
+    // JWT필터에서 refreshToken 업데이트 하기
+    @Transactional
+    public void updateRefreshToken(Long userId, String refreshToken) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        user.updateRefreshToken(refreshToken);
+        userRepository.save(user);
+    }
+
     private Map<String, String> generateTokens(User user) {
         String accessToken = jwtUtil.createJwt("access", user.getId(), user.getEmail(), user.getRole(), 6000000L); // 10시간(추후개선)
         String refreshToken = jwtUtil.createJwt("refresh", user.getId(), user.getEmail(), user.getRole(), 86400000L); //24시간

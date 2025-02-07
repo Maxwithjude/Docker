@@ -1,6 +1,7 @@
 package com.be.byeoldam.domain.user;
 
 import com.be.byeoldam.common.ResponseTemplate;
+import com.be.byeoldam.common.filter.CustomUserDetails;
 import com.be.byeoldam.domain.user.dto.UserLoginRequest;
 import com.be.byeoldam.domain.user.dto.UserLoginResponse;
 import com.be.byeoldam.domain.user.dto.UserRegisterRequest;
@@ -8,6 +9,8 @@ import com.be.byeoldam.domain.user.dto.UserRegisterResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -51,6 +54,15 @@ public class UserController {
     public ResponseTemplate<String> logout(){
         userService.logout();
         return ResponseTemplate.ok("로그아웃이 완료되었습니다.");
+    }
+
+    @GetMapping("/me")
+    public ResponseTemplate<String> me(){
+        System.out.println("UserController.me");
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        CustomUserDetails customUserDetails = (CustomUserDetails) authentication.getPrincipal();
+        System.out.println(customUserDetails);
+        return ResponseTemplate.ok("고생했어!");
     }
 
 }

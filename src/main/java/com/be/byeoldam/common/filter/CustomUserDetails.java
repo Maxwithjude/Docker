@@ -10,18 +10,28 @@ import java.util.List;
 
 @ToString
 public class CustomUserDetails implements UserDetails {
+    private long userId;
     private String email;
     private String password;
     private String nickname;
 
-    private CustomUserDetails(String email, String password, String nickname) {
+    private CustomUserDetails(long userId, String email, String password, String nickname) {
+        this.userId = userId;
         this.email = email;
         this.password = password;
         this.nickname = nickname;
     }
 
     public static CustomUserDetails fromEntity(User user) {
-        return new CustomUserDetails(user.getEmail(), user.getPassword(), user.getNickname());
+        return new CustomUserDetails(user.getId(), user.getEmail(), user.getPassword(), user.getNickname());
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public long getUserId() {
+        return userId;
     }
 
     public String getNickname() {

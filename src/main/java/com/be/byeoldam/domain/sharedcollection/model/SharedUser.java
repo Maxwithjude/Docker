@@ -9,7 +9,7 @@ import lombok.*;
 @Table(name = "shared_user")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class SharedUser extends BaseTimeEntity { // 공유컬렉션-유저 매핑
+public class SharedUser extends BaseTimeEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -28,4 +28,14 @@ public class SharedUser extends BaseTimeEntity { // 공유컬렉션-유저 매�
     @Enumerated(EnumType.STRING)
     @Column(name = "role", nullable = false)
     private Role role;
+
+    private SharedUser(User user, SharedCollection collection, Role role) {
+        this.user = user;
+        this.sharedCollection = collection;
+        this.role = role;
+    }
+
+    public static SharedUser create(User user, SharedCollection collection, Role role) {
+        return new SharedUser(user, collection, role);
+    }
 }

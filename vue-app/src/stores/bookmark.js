@@ -3,8 +3,20 @@ import api from "@/utils/api";
 
 //북마크에 관한 함수 store
 export const useBookmarkStore = defineStore("bookmark", () => {
-    
     //북마크 모달들에 대한 함수 store
+
+    //북마크 생성(저장)에 대한 함수(미완성)
+    // const saveBookmark = async (bookmarkUrl, collectionId, isPersonal, tags) => {
+    //     const request = {
+    //         bookmark_url: bookmarkUrl,
+    //         collectionId: collectionId,
+    //         isPersonal: isPersonal,
+    //         tags: tags
+    //     };
+    //     const response = await api.post("/bookmarks", request);
+    //     console.log(response.data);
+    // };
+
     //북마크 중요도 수정 함수
     const changePiority = async (bookmarkId, currentPiority) => {
         try {
@@ -81,5 +93,6 @@ export const useBookmarkStore = defineStore("bookmark", () => {
         createMemo,
         updateMemo,
         deleteMemo,
+        // saveBookmark
     };
 });

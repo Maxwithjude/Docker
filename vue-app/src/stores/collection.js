@@ -2,6 +2,7 @@ import { ref, computed } from "vue";
 import { defineStore } from "pinia";
 import axios from "axios";
 import router from "@/router";
+import api from "@/utils/api";
 
 const REST_API_URL_coll = `http://localhost:8080/api/collections`;
 
@@ -95,15 +96,66 @@ export const useCollectionStore = defineStore("collection", () => {
             
 //         }
 //     }
-    return{
-        personalCollections,
-        sharedCollections,
-        allCollections,
-        fetchAllCollection,
-    //     getPersonalCollection,
-    //     getSharedCollection,
-        exampleAllCollections,
-    }
+  // 개인컬렉션 생성
+  const createPersonalCollection = async (collectionName) => {
+    const response = await api.post("/collections/personal", { name: collectionName });
+    console.log(response.data);
+  };
+
+  // 개인컬렉션 이름변경
+  const updatePersonalCollectionName = async (collectionId, newName) => {
+    const response = await api.put(`/collections/personal/${collectionId}`, { newName: newName });
+    console.log(response.data);
+  };
+
+  // 개인컬렉션 삭제
+  const deletePersonalCollection = async (collectionId) => {
+    const response = await api.delete(`/collections/personal/${collectionId}`);
+    console.log(response.data);
+  };
+  //공유컬렉션 생성
+  const createSharedCollection = async (collectionName) => {
+    const response = await api.post("/collections/shared", { sharedCollectionName: collectionName });
+    console.log(response.data);
+  };
+  //공유컬렉션 이름변경
+  const updateSharedCollectionName = async (collectionId, name) => {
+    const response = await api.put(`/collections/shared/${collectionId}`, { name: name });
+    console.log(response.data);
+  };
+  //공유컬렉션 삭제
+  const deleteSharedCollection = async (collectionId) => {
+    const response = await api.delete(`/collections/shared/${collectionId}`);
+    console.log(response.data);
+  };
+  //공유 컬렉션에서 유저 강퇴
+  const kickUserFromSharedCollection = async (collectionId, userId) => {
+    const response = await api.delete(`/collections/shared/${collectionId}/members/${userId}`);
+    console.log(response.data);
+  };
+  //공유 컬렉션 유저 초대 
+  const inviteUserToSharedCollection = async (collectionId, email) => {
+    const response = await api.post(`/collections/shared/${collectionId}/invite`, { email: email });
+    console.log(response.data);
+  };
+
+  return{
+      personalCollections,
+      sharedCollections,
+      allCollections,
+      fetchAllCollection,
+      createPersonalCollection,
+      updatePersonalCollectionName,
+      deletePersonalCollection,
+      createSharedCollection,
+      updateSharedCollectionName,
+      deleteSharedCollection,
+  //     getPersonalCollection,
+  //     getSharedCollection,
+      exampleAllCollections,
+      kickUserFromSharedCollection,
+      inviteUserToSharedCollection,
+  }
 });
     
 

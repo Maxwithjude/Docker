@@ -1,6 +1,7 @@
 package com.be.byeoldam.domain.user;
 
 import com.be.byeoldam.common.ResponseTemplate;
+import com.be.byeoldam.common.annotation.UserId;
 import com.be.byeoldam.common.filter.CustomUserDetails;
 import com.be.byeoldam.domain.user.dto.*;
 import io.swagger.v3.oas.annotations.Operation;
@@ -61,9 +62,12 @@ public class UserController {
         UserTokenResponse response = userService.refreshToken(userTokenRequest.getRefreshToken());
         return ResponseTemplate.ok(response);
     }
+
+    @Operation(summary = "filter test용", description = "올바른 accessToken을 넣고 요청을 한번 해보세요!")
     @GetMapping("/me")
-    public ResponseTemplate<String> me(){
+    public ResponseTemplate<String> me(@UserId long userId){
         System.out.println("UserController.me");
+        System.out.println("userId:" + userId);
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         CustomUserDetails customUserDetails = (CustomUserDetails) authentication.getPrincipal();
         System.out.println(customUserDetails);

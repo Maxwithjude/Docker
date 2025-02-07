@@ -51,6 +51,16 @@ dependencies {
     // HTML 파싱 및 메타데이터 추출에 필요
     // HTML 또는 XML 문서를 파싱해서 DOM 트리로 변환
     implementation 'org.jsoup:jsoup:1.16.1'
+
+    // JWT를 생성하고 관리하기 위한 라이브러리
+    implementation 'io.jsonwebtoken:jjwt-api:0.12.3'
+    implementation 'io.jsonwebtoken:jjwt-impl:0.12.3'
+    implementation 'io.jsonwebtoken:jjwt-jackson:0.12.3'
+
+    // Spring Security
+    implementation 'org.springframework.boot:spring-boot-starter-security'
+    testImplementation 'org.springframework.security:spring-security-test'
+
 }
 
 // === ⭐ QueryDsl 빌드 옵션 (선택) ===

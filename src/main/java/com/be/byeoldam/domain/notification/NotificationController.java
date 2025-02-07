@@ -2,6 +2,7 @@ package com.be.byeoldam.domain.notification;
 
 import com.be.byeoldam.common.ResponseTemplate;
 import com.be.byeoldam.domain.notification.dto.NotificationResponse;
+import com.be.byeoldam.domain.notification.service.NotificationService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;

@@ -1,5 +1,6 @@
-package com.be.byeoldam.domain.notification;
+package com.be.byeoldam.domain.notification.service;
 
+import com.be.byeoldam.domain.notification.NotificationRepository;
 import com.be.byeoldam.domain.notification.dto.NotificationResponse;
 import com.be.byeoldam.domain.notification.model.BookmarkNotification;
 import com.be.byeoldam.domain.notification.model.InviteNotification;

@@ -5,7 +5,7 @@ import com.be.byeoldam.domain.common.model.BookmarkUrl;
 import com.be.byeoldam.domain.notification.dto.NotificationResponse;
 import com.be.byeoldam.domain.notification.model.BookmarkNotification;
 import com.be.byeoldam.domain.notification.model.InviteNotification;
-import com.be.byeoldam.domain.notification.model.Notification;
+import com.be.byeoldam.domain.notification.service.NotificationService;
 import com.be.byeoldam.domain.sharedcollection.model.SharedCollection;
 import com.be.byeoldam.domain.user.model.User;
 import com.be.byeoldam.domain.user.repository.UserRepository;

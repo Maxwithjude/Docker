@@ -4,24 +4,14 @@ import api from "@/utils/api";
 import axios from "axios";
 import router from "@/router";
 
-const REST_API_URL = `http://localhost:8080/api`;
+const REST_API_URL = import.meta.env.VITE_API_BASE_URL;
 //testtest
 export const useUserStore = defineStore("user", () => {
-  const loginUser = ref(null);
-//   const currentUser = ref(null);
+    const loginUser = ref(null);
     const userId = computed(() => loginUser.value);
-  const user = ref({
-    "success": true,
-    "message": "some message",
-    "results": {
-      "userId": 123,
-      "email": "user@example.com",
-      "nickname": "userNickname",
-      "createdAt": "2025-01-01T12:00:00",
-      "accessToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
-      "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
-  }
-  })
+    const errorStore = useErrorStore();
+  
+    const user = ref(null);
 
     // const username = ref(null)
     // const password1 = ref(null)
@@ -44,30 +34,29 @@ export const useUserStore = defineStore("user", () => {
     //api 경로 : `http:localhost:8080/api/users/login`
 //   임시 로그인 함수
 
-  //로그인 함수
+  //로그인 함수 헤더가 필요없어 직접 axios 요청
   const userLogin = async (email, password) => {
     try {
-        const res = await axios.post(`${REST_API_URL}/users/login`, { email: email, password: password });
-    //세션 스토리지에 jwt 토큰 저장
-        sessionStorage.setItem("access-token", res.data["access-token"]);
-        sessionStorage.setItem("refresh-token", res.data["refresh-token"])
-        const token = res.data["access-token"].split(".");
-          /// 로그인 성공 시 익스텐션에 보낼 정보
-        window.postMessage({ type: 'LOGIN', data: loginData }, window.location.origin);
-
-        // 로그인 후에 실행되는 부분dddddddddd
-        const loginData = {
-            username: 'example_user',
-            access_token: 'f8fd7473-a3ca-ff55-bca7-72c738'
-        };
+      const res = await axios.post(`${REST_API_URL}/users/login`, { email, password });
   
-
-    loginUser.value = id;
-      sessionStorage.setItem("userId", id); // 세션에도 저장
-      router.push({ name: "main" });
+      if (res.data.success) {
+        const { userId, email, nickname, accessToken, refreshToken } = res.data.results;
+  
+        // JWT 토큰 저장
+        sessionStorage.setItem("accessToken", accessToken);
+        sessionStorage.setItem("refreshToken", refreshToken);
+  
+        // 사용자 정보 업데이트
+        user.value = { userId, email, nickname };
+  
+        // 로그인 성공 시 main 페이지로 이동
+        router.push({ name: "main" });
+      } else {
+        throw new Error(res.data.message || "로그인 실패");
+      }
     } catch (err) {
-      console.error(err);
-      throw new Error(err.response?.data?.message || "ID/PW 정보가 맞지 않습니다.");
+      console.error("🚨 로그인 실패:", err);
+      useErrorStore().setError(err.response?.data?.message || "ID/PW 정보가 맞지 않습니다.");
     }
   };
 
@@ -80,24 +69,34 @@ export const useUserStore = defineStore("user", () => {
         
 //     }
 //   }
-  // 로그아웃 함수 로그아웃하면 세션 스토리지에서 정보 빼고, 인트로로
-  const logout = () => {
-
-    // 로그아웃 시 익스텐션에 송신
-    window.postMessage({ type: 'LOGOUT' }, window.location.origin);
-    loginUser.value = null;
-    sessionStorage.removeItem("access-token");
-    alert("정상적으로 로그아웃 처리되었습니다.");
-    router.push({ name: "intro" });
+const logout = async () => {
+    try {
+      await api.post(`${REST_API_URL}/users/logout`); // 백엔드에 로그아웃 요청
+  
+      // 익스텐션에 로그아웃 알림
+      window.postMessage({ type: "LOGOUT" }, window.location.origin);
+  
+      // 세션 스토리지 및 유저 상태 초기화
+      sessionStorage.removeItem("accessToken");
+      sessionStorage.removeItem("refreshToken");
+      user.value = null;
+  
+      alert("정상적으로 로그아웃 처리되었습니다.");
+      router.push({ name: "intro" });
+    } catch (error) {
+      console.error("🚨 로그아웃 실패:", error);
+      useErrorStore().setError("로그아웃에 실패했습니다. 다시 시도해주세요.");
+    }
   };
+  
   
 
 
 
-  // 이메일 인증 함수
+  // 이메일 인증 요청 함수
   const emailVerification = async (email) => {
     try {
-        await axios.post(`${REST_API_URL}/users/send-verification-code`, {
+        await axios.post(`${REST_API_URL}/users/email/send`, {
             email: email
         })
     } catch (error) {
@@ -105,18 +104,35 @@ export const useUserStore = defineStore("user", () => {
     }
   }
 
+  //이메일 응답코드 검증 함수
+  // userStore.js
+const checkCode = async (params) => {
+    try {
+      // API 호출 부분 (실제 엔드포인트와 메서드는 백엔드 명세에 맞게 수정 필요)
+      const response = await axios.post(`${REST_API_URL}/users/email/verify`, {
+        verifyCode: params
+      });
+      
+      return response.data; // {success: true/false, message: string, results: null} 형태로 반환
+    } catch (error) {
+      throw error;
+    }
+  };
   // 회원가입 함수
   const signup = async (form) => {
     try {
-      await axios.post(`${REST_API_URL}/users/register`, {
-        userId: form.id,
-        userPassword: form.password,
-        userName: form.name,
-        userNickname: form.nickname,
-        userEmail: form.email,
+      const response = await axios.post(`${REST_API_URL}/users/register`, {
+        email: form.email,
+        password: form.password,
+        nickname: form.nickname,
       });
-      alert("회원가입이 성공적으로 완료되었습니다.");
-      router.push({ name: "login" });
+  
+      if (response.data.success) {
+        alert("회원가입이 성공적으로 완료되었습니다.");
+        router.push({ name: "login" });
+      } else {
+        alert(response.data.message || "회원가입에 실패했습니다.");
+      }
     } catch (err) {
       console.error("회원가입 요청 실패:", err);
       alert(err.response?.data?.message || "회원가입에 실패했습니다. 다시 시도해주세요.");
@@ -158,11 +174,12 @@ const getMyPage = async () => {
     
     loginUser,
     // currentUser, // 사용자 정보 추가
-    // userLogin,
+    userLogin,
     emailVerification,
     logout,
     signup,
     userId,
+    checkCode,
 //     getMyPage,
 //     withdrawalOfMembership,
 //     putMyPage,

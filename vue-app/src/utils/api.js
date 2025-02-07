@@ -2,7 +2,7 @@
 //만듬 axios 인터셉터라고 보면 된다
 
 import axios from "axios";
-import { useErrorStore } from "@/store/errorStore";
+import { useErrorStore } from "@/stores/error";
 
 const api = axios.create({
   baseURL: import.meta.env.VITE_API_BASE_URL,

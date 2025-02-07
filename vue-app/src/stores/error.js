@@ -1,18 +1,18 @@
 // store/errorStore.js
 import { defineStore } from "pinia";
 import axios from "axios";
-import { useUserStore } from "./userStore";
+
 
 export const useErrorStore = defineStore("error", {
   actions: {
     async throwRefreshToken() {
       try {
-        const token = sessionStorage.getItem("refresh-token");
+        const refreshToken = sessionStorage.getItem("refreshToken");
         
-        const res = await axios.post("/api/auth/refresh", { token });
+        const res = await axios.post("/api/auth/refresh", { refreshToken });
 
-        sessionStorage.setItem("access-token", res.data["access-token"]);
-        sessionStorage.setItem("refresh-token", res.data["refresh-token"]);
+        sessionStorage.setItem("accessToken", res.data["accessToken"]);
+        sessionStorage.setItem("refreshToken", res.data["refreshToken"]);
         
         return res.data["access-token"];
       } catch (error) {

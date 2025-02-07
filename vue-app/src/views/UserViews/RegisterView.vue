@@ -35,7 +35,10 @@
                 type="text"
                 id="verificationCode"
                 class="flex-1 p-2 border border-gray-300 rounded-l-md focus:ring focus:ring-blue-200"
-                placeholder="인증코드"
+                placeholder="6자리 숫자를 입력하세요"
+                maxlength="6"
+                pattern="[0-9]{6}"
+                inputmode="numeric"
                 required
               />
               <button
@@ -117,9 +120,7 @@
   </template>
   
   <script setup>
-  import { useErrorStore } from "@/stores/error";
-import { useUserStore } from "@/stores/user";
-import { useErrorStore } from "@/stores/error";
+import { useUserStore } from "@/stores/user";;
 import { ref } from "vue";
   
   const userStore = useUserStore();
@@ -148,32 +149,44 @@ import { ref } from "vue";
     }};
   
   // 인증 코드 확인
-  const verifyCode = async () => {
-    const isSuccess = Math.random() > 0.5; // 랜덤 성공/실패 처리 (실제 API 로직 필요)
-    userStore.ve
+  // RegisterView.vue의 verifyCode 함수
+const verifyCode = async () => {
+  try {
+    const response = await userStore.checkCode(parseInt(verificationCode.value));
     modal.value = {
       visible: true,
-      success: isSuccess,
-      message: "인증이",
+      success: response.success,
+      message: response.message || "이메일 인증이"
     };
-  };
+  } catch (error) {
+    modal.value = {
+      visible: true,
+      success: false,
+      message: "이메일 인증이"
+    };
+  }
+};
   
   // 회원가입
-  const handleRegister = () => {
-    if (password.value !== confirmPassword.value) {
-      modal.value = { visible: true, success: false, message: "비밀번호 확인이" };
-    //   const payload ={
-    //     nickname: nickname.value,
-    //     email: email.value;
-    //     password: password.value;
-    //   }
-        // userStore.signup(payload);
-      return;
-    }
-  
-    console.log("회원가입 시도:", email.value, nickname.value);
-    modal.value = { visible: true, success: true, message: "회원가입이" };
+  const handleRegister = async () => {
+  if (password.value !== confirmPassword.value) {
+    modal.value = { visible: true, success: false, message: "비밀번호가 일치하지 않습니다." };
+    return;
+  }
+
+  const payload = {
+    email: email.value,
+    password: password.value,
+    nickname: nickname.value,
   };
+
+  try {
+    await userStore.signup(payload);
+    modal.value = { visible: true, success: true, message: "회원가입이 완료되었습니다." };
+  } catch (error) {
+    modal.value = { visible: true, success: false, message: "회원가입에 실패했습니다." };
+  }
+};
   </script>
   
   <style scoped>

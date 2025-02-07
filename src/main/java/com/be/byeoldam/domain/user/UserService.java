@@ -1,10 +1,7 @@
 package com.be.byeoldam.domain.user;
 
 import com.be.byeoldam.common.jwt.JwtUtil;
-import com.be.byeoldam.domain.user.dto.UserLoginRequest;
-import com.be.byeoldam.domain.user.dto.UserLoginResponse;
-import com.be.byeoldam.domain.user.dto.UserRegisterRequest;
-import com.be.byeoldam.domain.user.dto.UserRegisterResponse;
+import com.be.byeoldam.domain.user.dto.*;
 import com.be.byeoldam.domain.user.model.User;
 import com.be.byeoldam.domain.user.repository.UserRepository;
 import com.be.byeoldam.exception.CustomException;
@@ -82,6 +79,24 @@ public class UserService {
 
         user.updateRefreshToken(null);
         userRepository.save(user);
+    }
+
+    // refreshToken을 통해 access토큰 재발급
+    @Transactional
+    public UserTokenResponse refreshToken(String refreshToken) {
+        Long userId = jwtUtil.getUserId(refreshToken);
+
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new CustomException("올바르지 않은 RefreshToken입니다."));
+
+        if(!user.getRefreshToken().equals(refreshToken)){
+            throw new CustomException("올바르지 않은 RefreshToken입니다.");
+        }
+
+        Map<String, String> tokens = generateTokens(user);
+        user.updateRefreshToken(tokens.get("refresh"));
+
+        return UserTokenResponse.of(tokens.get("access"), tokens.get("refresh"));
     }
 
     // JWT필터에서 refreshToken 업데이트 하기

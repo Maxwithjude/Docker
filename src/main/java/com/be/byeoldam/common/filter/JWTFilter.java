@@ -28,7 +28,7 @@ public class JWTFilter extends OncePerRequestFilter {
         System.out.println("JWTFilter.doFilterInternal");
 
         // 헤더에서 access키에 담긴 토큰을 꺼냄
-        String token = request.getHeader("token");
+        String token = request.getHeader("accessToken");
 
         // 1. 토큰이 없다면 다음 필터(로그인 필터)로 넘김
         if (token == null) {
@@ -46,15 +46,8 @@ public class JWTFilter extends OncePerRequestFilter {
             return;
         }
 
-        // 3. 토큰이 refreshToken 일 경우
-        String category = jwtUtil.getCategory(token);
-        if (!category.equals("access")) {
-            //refreshToken 로직 작성하기.
-            return;
-        }
 
-
-        // 4. access 토큰이 있는 경우
+        // 3. access 토큰이 있는 경우
         String email = jwtUtil.getUserEmail(token);
         // UserDetails 객체 생성
         UserDetails userDetails = userDetailsService.loadUserByUsername(email);

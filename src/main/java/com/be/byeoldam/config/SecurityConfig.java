@@ -61,7 +61,7 @@ public class SecurityConfig {
          * */
         http.authorizeHttpRequests((auth) -> auth
                 .requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/v3/api-docs.yaml", "/v3/api-docs/swagger-config").permitAll()
-                .requestMatchers("/login", "/register","/reissue").permitAll() //모든 사용자
+                .requestMatchers("/login", "/register","/reissue","/refresh").permitAll() //모든 사용자
                 .requestMatchers("/admin").hasRole("ADMIN") //role이 ADMIN인 유저만(추후에 수정하기)
                 .requestMatchers("/").permitAll()
                 .anyRequest().authenticated()); //나머지는 로그인한 유저만

@@ -2,10 +2,7 @@ package com.be.byeoldam.domain.user;
 
 import com.be.byeoldam.common.ResponseTemplate;
 import com.be.byeoldam.common.filter.CustomUserDetails;
-import com.be.byeoldam.domain.user.dto.UserLoginRequest;
-import com.be.byeoldam.domain.user.dto.UserLoginResponse;
-import com.be.byeoldam.domain.user.dto.UserRegisterRequest;
-import com.be.byeoldam.domain.user.dto.UserRegisterResponse;
+import com.be.byeoldam.domain.user.dto.*;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -56,6 +53,14 @@ public class UserController {
         return ResponseTemplate.ok("로그아웃이 완료되었습니다.");
     }
 
+    @Operation(summary = "refreshToken을 통해 Access토큰 재발급", description = "아래 형식에 맞게 RefreshToken을 던져주면, 토큰을 재발급!")
+    @PostMapping("/refresh")
+    public ResponseTemplate<UserTokenResponse> refreshToken(@RequestBody UserTokenRequest userTokenRequest){
+        System.out.println("UserController.refreshToken");
+        System.out.println(userTokenRequest.getRefreshToken());
+        UserTokenResponse response = userService.refreshToken(userTokenRequest.getRefreshToken());
+        return ResponseTemplate.ok(response);
+    }
     @GetMapping("/me")
     public ResponseTemplate<String> me(){
         System.out.println("UserController.me");

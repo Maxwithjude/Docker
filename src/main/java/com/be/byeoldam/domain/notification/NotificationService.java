@@ -52,7 +52,7 @@ public class NotificationService {
         Notification notification = notificationRepository.findByIdAndUser(notificationId, user)
                 .orElseThrow(() -> new CustomException("해당 알림이 존재하지 않습니다."));
 
-        if (notification.getUser().getId() != userId) {
+        if (!notification.getUser().getId().equals(userId)) {
             throw new CustomException("해당 알림에 대한 권한이 없습니다.");
         }
 
@@ -69,7 +69,7 @@ public class NotificationService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new CustomException("사용자를 찾을 수 없습니다."));
 
-        if (user.getId() != userId) {
+        if (!user.getId().equals(userId)) {
             throw new CustomException("해당 알림에 대한 권한이 없습니다.");
         }
 

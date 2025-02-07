@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class RssSubscribeRequest {
 
-    private String rssUrl;
+    private String siteUrl;
 
     /**
      * 유저가 RSS를 구독할 때 UserRss 엔티티를 생성하는 메서드

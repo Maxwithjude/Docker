@@ -33,7 +33,7 @@ public class UserRepositoryTest {
 
         User retrievedUser = userRepository.findById(user.getId()).orElse(null);
         assertThat(retrievedUser).isNotNull();
-        assertThat(retrievedUser.getEmail()).isEqualTo("test111@example.com");
+        assertThat(retrievedUser.getEmail()).isEqualTo("test1@example.com");
         assertThat(retrievedUser.getNickname()).isEqualTo("testNickname");
     }
 }

@@ -40,11 +40,12 @@ class NotificationServiceTest {
 
     private BookmarkNotification bookmarkNotification;
     private InviteNotification inviteNotification;
+
     private User user;
 
     @BeforeEach
     void setUp() {
-        user = mock(User.class);
+        user = User.builder().build();
         ReflectionTestUtils.setField(user, "id", 100L);
 
         BookmarkUrl bookmarkUrl = BookmarkUrl.builder().url("https://www.example.com").build();

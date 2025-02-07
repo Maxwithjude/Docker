@@ -51,7 +51,7 @@ class NotificationServiceTest {
         BookmarkUrl bookmarkUrl = BookmarkUrl.builder().url("https://www.example.com").build();
         Bookmark bookmark = Bookmark.builder().bookmarkUrl(bookmarkUrl).build();
 
-        SharedCollection sharedCollection = SharedCollection.createSharedCollection("컬렉션 이름");
+        SharedCollection sharedCollection = SharedCollection.create("컬렉션 이름");
 
         bookmarkNotification = new BookmarkNotification(user, "이 포스트를 추가한 지 7일 경과되었습니다.", bookmark);
         ReflectionTestUtils.setField(bookmarkNotification, "id", 1L);

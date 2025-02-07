@@ -44,4 +44,8 @@ public class UserRss {
         this.latestTitle = newLatestTitle;    // 새로운 최신글 제목 업데이트
         this.isRead = true;  // 새로운 글이 있기 때문에 읽음 상태 변경
     }
+
+    public void updateIsRead(boolean isRead) {
+        this.isRead = isRead;
+    }
 }

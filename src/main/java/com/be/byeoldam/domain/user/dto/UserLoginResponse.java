@@ -1,9 +1,13 @@
 package com.be.byeoldam.domain.user.dto;
 
 import com.be.byeoldam.domain.user.model.User;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 
 @Getter
+@AllArgsConstructor
+@Builder
 public class UserLoginResponse {
     private Long userId;
     private String email;

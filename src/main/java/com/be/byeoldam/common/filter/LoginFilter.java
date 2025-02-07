@@ -2,6 +2,7 @@ package com.be.byeoldam.common.filter;
 
 import com.be.byeoldam.common.jwt.JwtUtil;
 import com.be.byeoldam.domain.user.UserService;
+import com.be.byeoldam.domain.user.dto.UserLoginResponse;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -64,13 +65,20 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
         String refreshToken = jwtUtil.createJwt("refresh", userDetails.getUserId(), userDetails.getEmail(),"ROLE_USER",6000000L); ;
         userService.updateRefreshToken(userDetails.getUserId(), refreshToken);
 
-        Map<String, Object> results = new HashMap<>();
-        results.put("userId", userDetails.getUserId());
-        results.put("email", userDetails.getEmail());
-        results.put("nickname", userDetails.getNickname());
-        results.put("accessToken", accessToken);
-        results.put("refreshToken", refreshToken);
-        responseData.put("results", results);
+        UserLoginResponse userLoginResponse = UserLoginResponse.builder()
+                .userId(userDetails.getUserId())
+                .email(userDetails.getEmail())
+                .nickname(userDetails.getNickname())
+                .accessToken(accessToken)
+                .refreshToken(refreshToken)
+                .build();
+//        Map<String, Object> results = new HashMap<>();
+//        results.put("userId", userDetails.getUserId());
+//        results.put("email", userDetails.getEmail());
+//        results.put("nickname", userDetails.getNickname());
+//        results.put("accessToken", accessToken);
+//        results.put("refreshToken", refreshToken);
+        responseData.put("results", userLoginResponse);
 
         // JSON 문자열로 변환
         ObjectMapper objectMapper = new ObjectMapper();

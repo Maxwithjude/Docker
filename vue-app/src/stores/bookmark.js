@@ -81,6 +81,5 @@ export const useBookmarkStore = defineStore("bookmark", () => {
         createMemo,
         updateMemo,
         deleteMemo,
-        
     };
 });

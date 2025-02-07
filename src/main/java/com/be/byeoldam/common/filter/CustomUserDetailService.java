@@ -17,12 +17,13 @@ public class CustomUserDetailService implements UserDetailsService {
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
         System.out.println("-----CustomUserDetailService.loadUserByUsername-----");
 
-        User userData = userRepository.findByEmail(email)
+        User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> {
-                    System.out.println("데이터 없음");
+                    System.out.println("이메일에 대응된 아이디 없음");
                     return new UsernameNotFoundException("User not found with email: " + email);
                 });
 
-        return new CustomUserDetails(userData);
+        System.out.println("이메일에 대응된 아이디 있음");
+        return CustomUserDetails.fromEntity(user);
     }
 }

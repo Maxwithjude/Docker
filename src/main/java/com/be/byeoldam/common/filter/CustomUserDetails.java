@@ -1,17 +1,31 @@
 package com.be.byeoldam.common.filter;
 
 import com.be.byeoldam.domain.user.model.User;
+import lombok.ToString;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
 import java.util.List;
 
+@ToString
 public class CustomUserDetails implements UserDetails {
-    private final User user;
+    private String email;
+    private String password;
+    private String nickname;
 
-    public CustomUserDetails(User user) {
-        this.user = user;
+    private CustomUserDetails(String email, String password, String nickname) {
+        this.email = email;
+        this.password = password;
+        this.nickname = nickname;
+    }
+
+    public static CustomUserDetails fromEntity(User user) {
+        return new CustomUserDetails(user.getEmail(), user.getPassword(), user.getNickname());
+    }
+
+    public String getNickname() {
+        return nickname;
     }
 
     @Override
@@ -21,12 +35,12 @@ public class CustomUserDetails implements UserDetails {
 
     @Override
     public String getPassword() {
-        return user.getPassword();
+        return this.password;
     }
 
     @Override
     public String getUsername() {
-        return user.getEmail();
+        return this.email;
     }
 
     @Override

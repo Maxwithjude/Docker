@@ -24,7 +24,7 @@ public class SecurityConfig {
     private final JwtUtil jwtUtil;
     private UserDetailsService userDetailsService;
 
-    // 비밀번호 암호화를 위해 사용(Spring Security에서 제공)
+    // 비밀번호 암호화를 위해 사용 (Security에서 제공)
     @Bean
     public BCryptPasswordEncoder bCryptPasswordEncoder() {
         return new BCryptPasswordEncoder();
@@ -56,7 +56,7 @@ public class SecurityConfig {
 
         /*
          * 경로별 인가 작업. 모든 요청은 인증된 사용자만 접근 가능하며, 인증되지 않은 사용자가 접근하면 401에러를 발생.
-         * Spring Security는 역할 이름 앞에 "ROLE_"라는 접두사를 자동으로 붙임 -> hasRole("ADMIN")은 ROLE_ADMIN을 검사
+         * 역할 이름 앞에 "ROLE_"라는 접두사를 자동으로 붙임 -> hasRole("ADMIN")은 ROLE_ADMIN을 검사
          * */
         http.authorizeHttpRequests((auth) -> auth
                 .requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/v3/api-docs.yaml", "/v3/api-docs/swagger-config").permitAll()

@@ -26,7 +26,7 @@ public class UserController {
     }
 
     // Filter에서 반환되어, 컨트롤러까지 오지 않지만 혹시 몰라서 추가
-    @Operation(summary = "로그인", description = "혹시 로그인시, 제공하는 아래의 데이터 외에도 별도로 필요한 데이터가 더 있다면 알려주세요")
+    @Operation(summary = "로그인", description = "json이 아닌 form-data로 전달해주세요! 아래의 데이터 외에도 별도로 필요한 데이터가 더 있다면 알려주세요")
     @PostMapping("/login")
     public ResponseTemplate<UserLoginResponse> login(@RequestBody UserLoginRequest request){
         UserLoginResponse response = userService.login(request);

@@ -1,6 +1,7 @@
 package com.be.byeoldam.common.filter;
 
 import com.be.byeoldam.common.jwt.JwtUtil;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -12,6 +13,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 public class LoginFilter extends UsernamePasswordAuthenticationFilter {
     private final AuthenticationManager authenticationManager;
@@ -23,11 +26,9 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
     }
 
 
-
     @Override
     public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response) {
         System.out.println("-----LoginFilter.attemptAuthentication-----");
-
         //클라이언트 요청에서 email, password 추출(form-data로 던져줘야 함..)
         String email = obtainEmail(request);
         String password = obtainPassword(request);
@@ -35,7 +36,7 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
         //스프링 시큐리티에서 email과 password를 검증하기 위해서는 token에 담아야 함, 세번째 인자는 ROLE.
         UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(email, password, null);
 
-        //token에 담은 후 검증을 위해 AuthenticationManager에 전달
+        //사용자 정보를 담은 token을 AuthenticationManager에 전달
         return authenticationManager.authenticate(authToken);
     }
 
@@ -58,5 +59,16 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
     @Override
     protected void unsuccessfulAuthentication(HttpServletRequest request, HttpServletResponse response, org.springframework.security.core.AuthenticationException failed) throws IOException, ServletException {
         System.out.println("-----LoginFilter.unsuccessfulAuthentication-----");
+
+        // JSON형태로 응답 생성
+        response.setContentType("application/json");
+        response.setCharacterEncoding("UTF-8");
+        response.setStatus(HttpStatus.UNAUTHORIZED.value());
+
+        Map<String, String> responseData = new HashMap<>();
+        responseData.put("error", "Unauthorized");
+        responseData.put("message", "이메일과 비밀번호를 확인해주세요.");
+        ObjectMapper objectMapper = new ObjectMapper();
+        response.getWriter().write(objectMapper.writeValueAsString(responseData));
     }
 }

@@ -2,6 +2,7 @@ package com.be.byeoldam.common.filter;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationProvider;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
@@ -28,10 +29,10 @@ public class CustomAuthenticationProvider implements AuthenticationProvider {
         UserDetails userDetails = userDetailsService.loadUserByUsername(email);
         System.out.println(userDetails);
 
-//        if (!passwordEncoder.matches(password, userDetails.getPassword())) {
-//            System.out.println("Invalid email or password");
-//            throw new BadCredentialsException("Invalid email or password");
-//        }
+        if (!passwordEncoder.matches(password, userDetails.getPassword())) {
+            System.out.println("이메일과 비밀번호 불일치");
+            throw new BadCredentialsException("이메일과 비밀번호 불일치");
+        }
 
         System.out.println("Success");
         return new UsernamePasswordAuthenticationToken(userDetails, password, userDetails.getAuthorities());

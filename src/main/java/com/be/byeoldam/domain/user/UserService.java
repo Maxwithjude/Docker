@@ -30,7 +30,7 @@ public class UserService {
 
     // 인증코드 확인
 
-    //회원 가입
+    // 회원 가입
     @Transactional
     UserRegisterResponse registerUser(UserRegisterRequest registerRequest) {
         User user = registerRequest.toEntity();
@@ -47,7 +47,7 @@ public class UserService {
         return userRegisterResponse;
     }
 
-    //로그인
+    // 로그인
     @Transactional
     UserLoginResponse login(UserLoginRequest userLoginRequest){
         User user = userRepository.findByEmail(userLoginRequest.getEmail())
@@ -67,6 +67,7 @@ public class UserService {
         return userLoginResponse;
     }
 
+    // 로그아웃
     @Transactional
     public void logout() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();

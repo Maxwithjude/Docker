@@ -36,8 +36,17 @@ public class Tag {
         return new Tag(name);
     }
 
+    public static Tag createTag(String name, Color color) {
+        return new Tag(name, color);
+    }
+
     private Tag(String name){
         this.name = name;
+    }
+
+    private Tag(String name, Color color) {
+        this.name = name;
+        this.color = color;
     }
 
 

@@ -28,7 +28,7 @@ public class Bookmark extends BaseTimeEntity {
     // 북마크가 N
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="personal_collection_id")
-    private PersonalCollection personalcollection;
+    private PersonalCollection personalCollection;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="shared_collection_id")
@@ -45,16 +45,56 @@ public class Bookmark extends BaseTimeEntity {
     private boolean isRead;
 
     @Builder
-    public Bookmark(BookmarkUrl bookmarkUrl, PersonalCollection personalcollection, SharedCollection sharedCollection, User user, boolean priority, boolean isRead) {
+    private Bookmark(BookmarkUrl bookmarkUrl, PersonalCollection personalCollection, SharedCollection sharedCollection, User user, boolean priority, boolean isRead) {
         this.bookmarkUrl = bookmarkUrl;
-        this.personalcollection = personalcollection;
+        this.personalCollection = personalCollection;
         this.sharedCollection = sharedCollection;
         this.user = user;
         this.priority = priority;
         this.isRead = isRead;
     }
 
-    public static Bookmark create(User user) {
-        return new Bookmark();
+    // 개인컬렉션에 추가하는 북마크
+    public static Bookmark createPersonalBookmark(BookmarkUrl url, User user, PersonalCollection collection) {
+        return Bookmark.builder()
+                .bookmarkUrl(url)
+                .personalCollection(collection)
+                .sharedCollection(null)
+                .user(user)
+                .priority(false)
+                .isRead(false)
+                .build();
+    }
+
+    // 공유컬렉션에 추가하는 북마크
+    public static Bookmark createSharedBookmark(BookmarkUrl url, User user, SharedCollection collection) {
+        return Bookmark.builder()
+                .bookmarkUrl(url)
+                .personalCollection(null)
+                .sharedCollection(collection)
+                .user(user)
+                .priority(false)
+                .isRead(false)
+                .build();
+    }
+
+    public void updatePersonalCollection(PersonalCollection collection) {
+        this.personalCollection = collection;
+    }
+
+    public void updateSharedCollection(SharedCollection collection) {
+        this.sharedCollection = collection;
+    }
+
+    // 복사 메서드
+    public Bookmark copy() {
+        Bookmark newBookmark = new Bookmark();
+        newBookmark.id = this.id;
+        newBookmark.personalCollection = this.personalCollection;
+        newBookmark.sharedCollection = this.sharedCollection;
+        newBookmark.user = this.user;
+        newBookmark.priority = this.priority;
+        newBookmark.isRead = this.isRead;
+        return newBookmark;
     }
 }

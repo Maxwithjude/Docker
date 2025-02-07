@@ -20,6 +20,10 @@ public enum Color {
         return hex;
     }
 
+    public static Color fromHex(String hex) {
+        return Color.valueOf(hex.toUpperCase());
+    }
+
     // enum 항목을 문자열로 출력할 때 HEX 값을 반환하도록 오버라이드
     @Override
     public String toString() {

@@ -82,7 +82,8 @@ class NotificationServiceTest {
 
         assertThat(responses.get(1).getNotificationId()).isEqualTo(2L);
         assertThat(responses.get(1).getType()).isEqualTo("INVITE");
-        assertThat(responses.get(1).getMessage()).isEqualTo("초대자닉네임님이 컬렉션에 초대했습니다.");
+        assertThat(responses.get(1).getTitle()).isEqualTo("컬렉션 이름");
+        assertThat(responses.get(1).getMessage()).isEqualTo("공유컬렉션에 사용자가 초대되었습니다.");
         assertThat(responses.get(1).getCreatedAt()).isEqualTo(LocalDateTime.of(2025, 1, 17, 12, 34, 56));
 
         verify(userRepository, times(1)).findById(userId);

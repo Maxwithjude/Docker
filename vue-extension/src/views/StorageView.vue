@@ -89,14 +89,14 @@ const url = ref('')
 
 onMounted(async () => {
   try {
-    // background.js에서 URL 정보 가져오기
     chrome.runtime.sendMessage({ action: 'getCurrentUrl' }, async (response) => {
       if (response && response.url) {
+        console.log('StorageView에서 url 불러오기 성공: ',response.url);
         url.value = response.url
         
         // userId가 있을 때만 서버에 요청
         if (userStore.userId) {
-          const response = await axios.post('API_URL/storage/init', {
+          const response = await axios.post('북마크 추가 탭 데이터 로드 URI', {
             userId: userStore.userId,
             url: url.value
           })

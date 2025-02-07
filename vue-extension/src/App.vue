@@ -32,9 +32,9 @@ import { useUserStore } from './stores/userStore'
 const userStore = useUserStore()
 
 onMounted(() => {
-  // background.js에 userId 요청
   chrome.runtime.sendMessage({ action: 'getUserId' }, (response) => {
     if (response && response.userId) {
+      console.log('App.vue에서 userId 불러오기 성공: ',response.userId)
       userStore.setUserId(response.userId)
     }
   })

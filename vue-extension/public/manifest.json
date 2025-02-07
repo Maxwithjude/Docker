@@ -8,11 +8,10 @@
     "default_icon" : "favicon.ico"
   },
   "permissions": [
-    "windows",
+    "storage",
     "activeTab",
     "tabs",
-    "contextMenus",
-    "storage"
+    "contextMenus"
   ],
   "background": {
     "service_worker": "background.js"
@@ -22,9 +21,6 @@
       "matches": ["<all_urls>"],
       "js": ["contentScript.js"]
     }
-  ],
-  "host_permissions": [
-    "https://api.example.com/*"
   ],
   "icons": {
     

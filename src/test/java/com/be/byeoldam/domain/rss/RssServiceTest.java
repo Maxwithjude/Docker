@@ -147,23 +147,26 @@ class RssServiceTest {
     @DisplayName("사용자의_RSS_구독목록_정상조회")
     void getUserRssList_success() {
         // Given
-        UserRss userRss = UserRss.subscribeRss(user, rss);
-
         when(userRepository.existsById(1L)).thenReturn(true);
         when(userRssRepository.findByUserId(1L)).thenReturn(List.of(userRss));
 
+        // 기존 latestTitle 설정
+        userRss.updateTitles("Old Title");
+
+        // 최신 RSS 제목이 다름 (새로운 글이 있음)
+        doReturn("New Title").when(rssService).extractLatestTitle(userRss.getRss().getRssUrl());
+
         // When
-        List<UserRssResponse> result = rssService.getUserRssList(1L);
+        List<UserRssResponse> response = rssService.getUserRssList(1L);
 
         // Then
-        assertThat(result)
-                .isNotEmpty()
-                .hasSize(1)
-                .allSatisfy(response -> {
-                    assertThat(response.getRssId()).isEqualTo(10L);
-                    assertThat(response.getName()).isEqualTo("Example RSS");
-                    assertThat(response.isRead()).isFalse();
-                });
+        assertThat(response).isNotEmpty();
+        assertThat(response.get(0).getRssId()).isEqualTo(10L);
+        assertThat(response.get(0).getName()).isEqualTo("Example RSS");
+        assertThat(response.get(0).isRead()).isFalse(); // 새로운 글이 있어서 false로 변경되었어야 함
+
+        verify(userRssRepository).findByUserId(1L);
+        verify(rssService).extractLatestTitle(userRss.getRss().getRssUrl());
     }
 
     @Test
@@ -176,6 +179,22 @@ class RssServiceTest {
         assertThatThrownBy(() -> rssService.getUserRssList(1L))
                 .isInstanceOf(CustomException.class)
                 .hasMessage("사용자를 찾을 수 없습니다.");
+    }
+
+    @Test
+    @DisplayName("RSS_피드에서_제목_가져오는_중_오류발생시_예외처리")
+    void getUserRssList_error_extracting_title() {
+        // Given
+        when(userRepository.existsById(1L)).thenReturn(true);
+        when(userRssRepository.findByUserId(1L)).thenReturn(List.of(userRss));
+
+        doThrow(new CustomException("RSS 피드를 가져오는 중 오류가 발생했습니다."))
+                .when(rssService).extractLatestTitle(userRss.getRss().getRssUrl());
+
+        // When & Then
+        assertThatThrownBy(() -> rssService.getUserRssList(1L))
+                .isInstanceOf(CustomException.class)
+                .hasMessage("RSS 피드를 가져오는 중 오류가 발생했습니다.");
     }
 
     @Test

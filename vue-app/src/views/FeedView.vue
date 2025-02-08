@@ -16,13 +16,13 @@
                     </div>
                     <div class="rss-container">
                         <FeedTabs 
-                            :feeds="rssStore.rssSubscriptions.results"
+                            :feeds="rssStore.rssList.results"
                             :selected-feed="selectedFeed"
                             @select-feed="selectFeed"
                         />
                         <div class="content-container">
                             <FeedPostList 
-                                :posts="currentRssItems?.latest_posts"
+                                :posts="rssStore.rssArticles.results?.latest_posts"
                                 @select-post="selectPost"
                             />
                             <FeedPostContent :url="selectedPostUrl" />
@@ -41,18 +41,16 @@ import FeedTabs from '@/component/FeedTabs.vue'
 import FeedPostList from '@/component/FeedPostList.vue'
 import FeedPostContent from '@/component/FeedPostContent.vue'
 import { ref, onMounted } from 'vue'
-import { useCounterStore } from '@/stores/counter'
+import { useRssStore } from '@/stores/rss'
 
-const rssStore = useCounterStore()
+const rssStore = useRssStore()
 const selectedFeed = ref(1)
 const selectedPostUrl = ref(null)
-const currentRssItems = ref(null)
 
 // RSS 피드 아이템 로드
 const loadRssItems = async (rssId) => {
   try {
-    const data = await rssStore.getRssSubscriptionItems(rssId)
-    currentRssItems.value = data.results
+    await rssStore.getRssArticles(rssId)
   } catch (error) {
     console.error('RSS 아이템 로드 실패:', error)
   }
@@ -66,6 +64,7 @@ const selectFeed = async (rssId) => {
 
 // 컴포넌트 마운트 시 초기 데이터 로드
 onMounted(async () => {
+  await rssStore.getRss()
   await loadRssItems(selectedFeed.value)
 })
 

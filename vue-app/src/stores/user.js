@@ -9,7 +9,7 @@ const REST_API_URL = import.meta.env.VITE_API_BASE_URL;
 export const useUserStore = defineStore("user", () => {
     const loginUser = ref(null);
     const userId = computed(() => loginUser.value);
-    const collectionStore = useCollectionStore();
+    const errorStore = useErrorStore();
   
     const user = ref(null);
 

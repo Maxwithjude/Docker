@@ -1,8 +1,10 @@
 import { ref, computed } from "vue";
 import { defineStore } from "pinia";
-import api from "@/utils/api";  // 인터셉터가 적용된 axios 인스턴스
-import { useErrorStore } from "@/stores/error";
-const REST_API_URL = import.meta.env.VITE_API_BASE_URL;
+import axios from "axios";
+import router from "@/router";
+
+const REST_API_URL_coll = `http://localhost:8080/api/collections`;
+
 
 export const useCollectionStore = defineStore("collection", () => {
   const personalCollections = ref([]); // 개인 컬렉션
@@ -49,11 +51,32 @@ export const useCollectionStore = defineStore("collection", () => {
     { "collection_id": 6, "name": "영어공부", "isPersonal": false }
   ]);
 
-  return {
-    personalCollections,
-    sharedCollections,
-    allCollections,
-    fetchAllCollection,
-    exampleAllCollections
-  };
+    
+
+//     //개인 컬렉션 불러오기
+//     const getPersonalCollection = async (params) => {
+//         try {
+//             const res = await axios.get(`${REST_API_URL}/personal`)
+//         } catch (error) {
+            
+//         }
+//     }
+
+//     //공유컬렉션
+//     const getSharedCollection = async (id) => {
+//         try {
+//             const res = await axios.get(`${REST_API_URL}/shared`), params: { id: id }
+//         } catch (error) {
+            
+//         }
+//     }
+    return{
+        personalCollections,
+        sharedCollections,
+        allCollections,
+        fetchAllCollection,
+    //     getPersonalCollection,
+    //     getSharedCollection,
+        exampleAllCollections,
+    }
 });

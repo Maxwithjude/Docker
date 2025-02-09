@@ -49,5 +49,12 @@ public class Tag {
         this.color = color;
     }
 
+    public void increment() {
+        this.referenceCount += 1;
+    }
+
+    public void decrement() {
+        this.referenceCount -= 1;
+    }
 
 }

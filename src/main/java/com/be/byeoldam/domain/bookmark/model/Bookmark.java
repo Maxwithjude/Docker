@@ -97,4 +97,8 @@ public class Bookmark extends BaseTimeEntity {
         newBookmark.isRead = this.isRead;
         return newBookmark;
     }
+
+    public void updatePriority(boolean changedPriority) {
+        this.priority = changedPriority;
+    }
 }

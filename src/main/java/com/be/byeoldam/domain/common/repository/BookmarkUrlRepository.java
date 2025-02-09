@@ -7,5 +7,5 @@ import java.util.List;
 import java.util.Optional;
 
 public interface BookmarkUrlRepository extends JpaRepository<BookmarkUrl, Long>, BookmarkUrlRepositoryCustom {
-    boolean existsByUrl(String url);
+    Optional<BookmarkUrl> findByUrl(String url);
 }

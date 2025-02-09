@@ -1,13 +1,17 @@
 package com.be.byeoldam.domain.bookmark.dto;
 
-import com.be.byeoldam.domain.tag.model.Tag;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import java.util.List;
 
 @Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor
 public class UpdateBookmarkRequest {
 
-    private List<Tag> tags;
+    private List<String> tags;
 
 }

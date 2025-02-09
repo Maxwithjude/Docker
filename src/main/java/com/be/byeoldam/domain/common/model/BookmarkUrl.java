@@ -37,4 +37,11 @@ public class BookmarkUrl {
                         .build();
     }
 
+    public void decrement() {
+        this.referenceCount -= 1;
+    }
+
+    public void increment() {
+        this.referenceCount += 1;
+    }
 }

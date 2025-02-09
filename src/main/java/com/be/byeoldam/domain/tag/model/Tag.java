@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+
+import java.util.Objects;
 import java.util.Random;
 
 
@@ -49,5 +51,24 @@ public class Tag {
         this.color = color;
     }
 
+    public void increment() {
+        this.referenceCount += 1;
+    }
 
+    public void decrement() {
+        this.referenceCount -= 1;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Tag tag = (Tag) o;
+        return Objects.equals(id, tag.id);  // id를 기준으로 비교
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);  // id를 기준으로 hashCode 생성
+    }
 }

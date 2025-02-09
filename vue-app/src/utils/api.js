@@ -6,33 +6,43 @@ import { useErrorStore } from "@/stores/error";
 
 const api = axios.create({
   baseURL: import.meta.env.VITE_API_BASE_URL,
+  headers: {
+    'Content-Type': 'application/json',
+  }
 });
 
-// 요청 인터셉터 (Access Token 자동 추가)
+// 요청 인터셉터
 api.interceptors.request.use(
   (config) => {
-    const accessToken = sessionStorage.getItem("access-token");
+    const accessToken = sessionStorage.getItem("accessToken");
     if (accessToken) {
-      config.headers.Authorization = `Bearer ${accessToken}`;
+      config.headers['accessToken'] = accessToken;
+      console.log('요청 URL:', config.baseURL + config.url);
+      console.log('요청 헤더:', config.headers);
+    } else {
+      console.log('토큰이 없습니다!');
     }
     return config;
   },
-  (error) => Promise.reject(error)
+  (error) => {
+    console.error('요청 인터셉터 에러:', error);
+    return Promise.reject(error);
+  }
 );
 
-// 응답 인터셉터 (Access Token 만료 시 처리)
+// 응답 인터셉터에서 헤더 이름을 수정해야 합니다
 api.interceptors.response.use(
   (response) => response,
   async (error) => {
-    if (error.response && error.response.status === 404) {
+    if (error.response && error.response.status === 401) {
       console.log("🔄 Access Token 만료됨! Refresh Token 시도");
-
+      
       const errorStore = useErrorStore();
       const newAccessToken = await errorStore.throwRefreshToken();
-
+      
       if (newAccessToken) {
-        // 새 토큰을 헤더에 설정 후 실패한 요청 재시도
-        error.config.headers.Authorization = `Bearer ${newAccessToken}`;
+        // 여기를 수정: ac -> accessToken
+        error.config.headers.accessToken = newAccessToken;  // Bearer prefix 없이
         return api.request(error.config);
       } else {
         console.log("🚨 재로그인 필요!");

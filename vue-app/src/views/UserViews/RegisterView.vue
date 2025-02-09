@@ -183,8 +183,12 @@ const verifyCode = async () => {
   try {
     await userStore.signup(payload);
     modal.value = { visible: true, success: true, message: "회원가입이 완료되었습니다." };
+    console.log("성공");
+    
   } catch (error) {
     modal.value = { visible: true, success: false, message: "회원가입에 실패했습니다." };
+    console.log("실패");
+    
   }
 };
   </script>

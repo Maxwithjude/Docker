@@ -39,20 +39,20 @@ const router = createRouter({
     // 컬렉션 선택 페이지 : 최초 로그인일 때만
     {
       // 추후 유저 로그인 개발하면 /user/:id 추가하기
-      path: '/user/:id/collectionSelect',
+      path: '/collectionSelect',
       name: 'collectionSelect',
       component: CollectionSelectView,
     },
     // 태그 선택 페이지 : 최초 로그인일 때만
     {
       // 추후 유저 로그인 개발하면 /user/:id 추가
-      path: '/user/:id/tagSelect',
+      path: '/tagSelect',
       name: 'tagSelect',
       component: TagSelectView,
     },
     // 메인 페이지 : 로그인 후 개인의 메인 페이지
     {
-      path: '/user/:id/main',
+      path: '/main',
       name: 'main',
       component: MainView,
     },

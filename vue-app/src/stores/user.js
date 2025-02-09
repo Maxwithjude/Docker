@@ -3,13 +3,13 @@ import { defineStore } from "pinia";
 import api from "@/utils/api";
 import axios from "axios";
 import router from "@/router";
-
+import { useCollectionStore } from "./collection";
 const REST_API_URL = import.meta.env.VITE_API_BASE_URL;
 //testtest
 export const useUserStore = defineStore("user", () => {
     const loginUser = ref(null);
     const userId = computed(() => loginUser.value);
-
+    const collectionStore = useCollectionStore();
   
     const user = ref(null);
 
@@ -34,41 +34,63 @@ export const useUserStore = defineStore("user", () => {
     //api 경로 : `http:localhost:8080/api/users/login`
 //   임시 로그인 함수
 
-  //로그인 함수 헤더가 필요없어 직접 axios 요청
-  const userLogin = async (email, password) => {
-    try {
-      const res = await axios.post(`${REST_API_URL}/users/login`, { email, password });
-  
-      if (res.data.success) {
-        const { userId, email, nickname, accessToken, refreshToken } = res.data.results;
-  
-        // JWT 토큰 저장
-        sessionStorage.setItem("accessToken", accessToken);
-        sessionStorage.setItem("refreshToken", refreshToken);
-  
-        // 사용자 정보 업데이트
-        user.value = { userId, email, nickname };
-  
-        // 로그인 성공 시 main 페이지로 이동
-        router.push({ name: "main" });
-      } else {
-        throw new Error(res.data.message || "로그인 실패");
+const userLogin = async (email, password) => {
+  try {
+    const formData = new URLSearchParams();
+    formData.append("email", email);
+    formData.append("password", password);
+
+    // 로그인 요청
+    const res = await axios.post(`${REST_API_URL}/login`, formData, {
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded",
+      },
+    });
+    
+    if (res.data.success) {
+      const { userId, email, nickname, accessToken, refreshToken } = res.data.results;
+
+      // JWT 토큰 저장
+      sessionStorage.setItem("accessToken", accessToken);
+      sessionStorage.setItem("refreshToken", refreshToken);
+
+      // 사용자 정보 업데이트
+      user.value = { userId, email, nickname };
+
+      // /me 엔드포인트로 테스트 요청
+      try {
+        const meResponse = await api.get('/me');
+        console.log('내 정보 요청 성공:', meResponse.data);
+      } catch (meError) {
+        console.error('내 정보 요청 실패:', meError);
       }
-    } catch (err) {
-      console.error("🚨 로그인 실패:", err);
-      useErrorStore().setError(err.response?.data?.message || "ID/PW 정보가 맞지 않습니다.");
+      // api 인스턴스에 토큰 직접 설정
+      api.defaults.headers.common['accessToken'] = accessToken;
+      //컬렉션 정보 가져오는 컨트롤러 아직 백엔드 준비 안됨
+      // try {
+      //   // 컬렉션 데이터 가져오기
+      //   await collectionStore.fetchAllCollection();
+        
+      //   // 라우팅 처리
+      //   if (collectionStore.allCollections.length === 0) {
+      //     router.push({ name: "collectionSelect" });
+      //   } else {
+      //     router.push({ name: "main" });
+      //   }
+      // } catch (collectionError) {
+      //   console.error("컬렉션 로드 중 오류:", collectionError);
+      //   // 컬렉션 로드 실패해도 로그인은 성공으로 처리
+      //   router.push({ name: "collectionSelect" });
+      // }
+    } else {
+      throw new Error(res.data.message || "로그인 실패");
     }
-  };
+  } catch (err) {
+    console.error("🚨 로그인 실패:", err);
+    console.log(err.response?.data?.message || "ID/PW 정보가 맞지 않습니다.");
+  }
+};
 
-  //로그인 하면 토큰 익스텐션에 보낼 함수
-
-//   const sendInfoExtension = async (params) => {
-//     try {
-        
-//     } catch (error) {
-        
-//     }
-//   }
 const logout = async () => {
     try {
       await api.post(`${REST_API_URL}/users/logout`); // 백엔드에 로그아웃 요청
@@ -121,7 +143,7 @@ const checkCode = async (params) => {
   // 회원가입 함수
   const signup = async (form) => {
     try {
-      const response = await axios.post(`${REST_API_URL}/users/register`, {
+      const response = await axios.post(`${REST_API_URL}/api/users/register`, {
         email: form.email,
         password: form.password,
         nickname: form.nickname,

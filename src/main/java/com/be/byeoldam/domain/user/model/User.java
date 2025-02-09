@@ -29,6 +29,9 @@ public class User extends BaseTimeEntity{
     private String password;
 
     @Column(length = 20, nullable = false)
+    private String role;
+
+    @Column(length = 20, nullable = false)
     private String nickname;
 
     @Column(name = "alert_day", nullable = false)
@@ -58,6 +61,18 @@ public class User extends BaseTimeEntity{
     @Column(name = "profile_url", length = 500, nullable = false)
     private String profileUrl;
 
+    // 비밀번호 암호화 메서드 추가
+    public void encodePassword(String encodedPassword) {
+        this.password = encodedPassword;
+    }
+
+    public void updateRefreshToken(String refreshToken){
+        this.refreshToken = refreshToken;
+    }
+
+    public void updateProfileImage(String profileUrl){
+        this.profileUrl = profileUrl;
+    }
     @Builder
     public User(String email, String password, String nickname, Provider provider, Integer alertDay, Boolean isVerified, AccountStatus isActive, String profileUrl, String providerId) {
         this.email = email;
@@ -88,6 +103,9 @@ public class User extends BaseTimeEntity{
         }
         if(this.profileUrl == null) {
             profileUrl ="*";
+        }
+        if(this.role == null){
+            role = "ROLE_USER";
         }
     }
 

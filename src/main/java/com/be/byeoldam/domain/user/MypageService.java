@@ -40,8 +40,8 @@ public class MypageService {
         S3UploadResponse s3UploadResponse = s3Util.imageUpload(multipartFile,"mypage");
 
         // 새로운 이미지 DB에 추가하기
-        user.updateProfileImage(s3UploadResponse.getS3Url());
         S3Image s3Image = s3UploadResponse.toEntity();
+        user.updateProfileImage(s3Image.getFileUrl());
         s3ImageRepository.save(s3Image);
 
         return MypageImageResponse.of(s3UploadResponse.getS3Url());

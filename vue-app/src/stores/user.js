@@ -7,9 +7,7 @@ import { useCollectionStore } from "./collection";
 const REST_API_URL = import.meta.env.VITE_API_BASE_URL;
 //testtest
 export const useUserStore = defineStore("user", () => {
-    const loginUser = ref(null);
-    const userId = computed(() => loginUser.value);
-    const errorStore = useErrorStore();
+
   
     const user = ref(null);
 
@@ -107,7 +105,6 @@ const logout = async () => {
       router.push({ name: "intro" });
     } catch (error) {
       console.error("🚨 로그아웃 실패:", error);
-      useErrorStore().setError("로그아웃에 실패했습니다. 다시 시도해주세요.");
     }
   };
   
@@ -194,13 +191,13 @@ const getMyPage = async () => {
     user,
     // payload,
     
-    loginUser,
+    // loginUser,
     // currentUser, // 사용자 정보 추가
     userLogin,
     emailVerification,
     logout,
     signup,
-    userId,
+    // userId,
     checkCode,
 //     getMyPage,
 //     withdrawalOfMembership,

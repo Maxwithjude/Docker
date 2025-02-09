@@ -69,6 +69,10 @@ public class User extends BaseTimeEntity{
     public void updateRefreshToken(String refreshToken){
         this.refreshToken = refreshToken;
     }
+
+    public void updateProfileImage(String profileUrl){
+        this.profileUrl = profileUrl;
+    }
     @Builder
     public User(String email, String password, String nickname, Provider provider, Integer alertDay, Boolean isVerified, AccountStatus isActive, String profileUrl, String providerId) {
         this.email = email;

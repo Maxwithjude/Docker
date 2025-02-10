@@ -16,13 +16,13 @@
                     </div>
                     <div class="rss-container">
                         <FeedTabs 
-                            :feeds="exRssList.results"
+                            :feeds="rssList.results"
                             :selected-feed="selectedFeed"
                             @select-feed="selectFeed"
                         />
                         <div class="content-container">
                             <FeedPostList 
-                                :posts="exRssArticles.results?.latest_posts"
+                                :posts="rssArticles.results?.latest_posts"
                                 @select-post="selectPost"
                             />
                             <FeedPostContent :url="selectedPostUrl" />
@@ -45,7 +45,7 @@ import { useRssStore } from '@/stores/rss'
 import { storeToRefs } from 'pinia'
 
 const rssStore = useRssStore()
-const { exRssList, exRssArticles } = storeToRefs(rssStore)
+const { rssList, rssArticles } = storeToRefs(rssStore)
 const selectedFeed = ref(1)
 const selectedPostUrl = ref(null)
 
@@ -66,8 +66,12 @@ const selectFeed = async (rssId) => {
 
 // 컴포넌트 마운트 시 초기 데이터 로드
 onMounted(async () => {
-  await rssStore.getRss()
-  await loadRssItems(selectedFeed.value)
+  try {
+    await rssStore.getRss()
+    await loadRssItems(selectedFeed.value)
+  } catch (error) {
+    console.error('RSS 데이터 로드 실패:', error)
+  }
 })
 
 const selectPost = (url) => {

@@ -70,20 +70,22 @@
 <script setup>
 import Header from '@/common/Header.vue'
 import SideBar from '@/common/SideBar.vue'
-import { computed, ref } from 'vue';
+import { computed, ref, onMounted } from 'vue';
 import SharedCollectionList from '@/component/SharedCollectionList.vue';
 import CreateCollection from '@/modal/CreateCollection.vue';
 import { useCollectionStore } from '@/stores/collection';
 import { storeToRefs } from 'pinia';
 
 const collectionStore = useCollectionStore();
-const { exampleSharedCollections } = storeToRefs(collectionStore);
+const { sharedCollections } = storeToRefs(collectionStore);
 const selectedCollection = ref('all');
 const showCreateModal = ref(false);
 
+
 const collections = computed(() => {
-    return exampleSharedCollections.value.results;
+    return sharedCollections.value.results;
 });
+
 
 const filteredCollections = computed(() => {
     return collections.value.filter(collection => 
@@ -94,6 +96,14 @@ const filteredCollections = computed(() => {
 const createNewCollection = () => {
     showCreateModal.value = true;
 };
+
+onMounted(async () => {
+    try {
+        await collectionStore.fetchAllCollection();
+    } catch (error) {
+        console.error('컬렉션 데이터 로딩 실패:', error);
+    }
+});
 </script>
 
 <style scoped>

@@ -35,7 +35,6 @@
                             :isPersonal="bookmark.isPersonal"
                             :createdAt="bookmark.created_at"
                             :updatedAt="bookmark.updated_at"
-                            @togglePriority="togglePriority(bookmark)"
                         />
                     </div>
                 </div>
@@ -53,21 +52,12 @@ import { useBookmarkStore } from '@/stores/bookmark';
 import { storeToRefs } from 'pinia';
 
 const bookmarkStore = useBookmarkStore();
-const { exampleOldBookmarks } = storeToRefs(bookmarkStore);
+const { oldBookmarks } = storeToRefs(bookmarkStore);
 
 // 오래된 북마크 데이터 가져오기
 const bookmarkResults = computed(() => {
-    return exampleOldBookmarks.value?.results || [];
+    return oldBookmarks.value?.results || [];
 });
-
-const togglePriority = async (bookmark) => {
-    try {
-        await bookmarkStore.changePiority(bookmark.bookmark_id, !bookmark.priority);
-        bookmark.priority = !bookmark.priority;
-    } catch (error) {
-        console.error('북마크 중요도 변경 실패:', error);
-    }
-};
 
 onMounted(async () => {
     try {

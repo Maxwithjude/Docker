@@ -44,19 +44,33 @@
     <div class="mb-4">
       <label class="block text-sm font-medium mb-2">태그</label>
       <div class="flex flex-wrap gap-2 mb-2" id="tag-container">
+        <!-- GPT 태그 표시 -->
         <span
-          v-for="(tag, index) in tags"
-          :key="index"
-          :class="
-            tagColors[index % tagColors.length] +
-            ' px-3 py-1 rounded-full text-sm flex items-center'
-          "
+          v-for="(tag, index) in gptTags"
+          :key="'gpt-' + index"
+          :style="{backgroundColor: tag.tagColor,borderColor: tag.tagBorderColor}"
+          class="border border-black text-black px-3 py-1 rounded-full text-sm flex items-center"
         >
-          {{ "# " + tag }}
-          <!-- '#' 기호 추가 -->
+          {{ "# " + tag.tagName }}
           <button
             class="ml-2 text-gray-600 hover:text-gray-800"
-            @click="removeTag(index)"
+            @click="removeTag(index, 'gpt')"
+          >
+            &times;
+          </button>
+        </span>
+
+        <!-- 사용자 추가 태그 표시 -->
+        <span
+          v-for="(tag, index) in newTags"
+          :key="'new-' + index"
+          :style="{ backgroundColor: tag.tagColor,borderColor: tag.tagBorderColor}"
+           class="border border-black text-black px-3 py-1 rounded-full text-sm flex items-center"
+        >
+          {{ "# " + tag.tagName }}
+          <button
+            class="ml-2 text-gray-600 hover:text-gray-800"
+            @click="removeTag(index, 'custom')"
           >
             &times;
           </button>
@@ -66,6 +80,7 @@
         <input
           type="text"
           v-model="newTag"
+          @keyup.enter="addTag"
           placeholder="북마크를 설명할 태그를 입력해보세요."
           class="flex-1 p-2 border rounded-md focus:outline-none focus:border-gray-400"
         />
@@ -131,77 +146,149 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from "vue";
-import axios from "axios";
+import { ref, onMounted, computed } from "vue";
+import api from "@/utils/api";
+
+// HSL을 HEX로 변환하는 함수
+const hslToHex = (h, s, l) => {
+  s /= 100;
+  l /= 100;
+
+  const c = (1 - Math.abs(2 * l - 1)) * s;
+  const x = c * (1 - Math.abs((h / 60) % 2 - 1));
+  const m = l - c/2;
+  let r = 0, g = 0, b = 0;
+
+  if (0 <= h && h < 60) {
+    r = c; g = x; b = 0;
+  } else if (60 <= h && h < 120) {
+    r = x; g = c; b = 0;
+  } else if (120 <= h && h < 180) {
+    r = 0; g = c; b = x;
+  } else if (180 <= h && h < 240) {
+    r = 0; g = x; b = c;
+  } else if (240 <= h && h < 300) {
+    r = x; g = 0; b = c;
+  } else if (300 <= h && h < 360) {
+    r = c; g = 0; b = x;
+  }
+
+  // 각 색상값에 m을 더하고 255를 곱한 후 16진수로 변환
+  const toHex = (value) => {
+    const hex = Math.round((value + m) * 255).toString(16);
+    return hex.length === 1 ? '0' + hex : hex;
+  };
+
+  return `#${toHex(r)}${toHex(g)}${toHex(b)}`;
+};
+
+// 랜덤 색상 생성 함수
+const generatePastelColors = () => {
+  const hue = Math.floor(Math.random() * 359); // 0-359 범위의 색조
+  const saturation = 65 + Math.random() * 15;  // 65-80% 채도 (더 부드러운 파스텔)
+  const lightness = 75 + Math.random() * 15;   // 75-90% 명도 (더 밝은 색상)
+
+  // 배경색 (더 밝은 색상)
+  const tagColor = hslToHex(hue, saturation, lightness);
+  
+  // 테두리색 (더 진한 색상)
+  const tagBorderColor = hslToHex(hue, saturation + 10, lightness - 15);
+
+  return { tagColor, tagBorderColor };
+};
 
 const url = ref("");
-const userId = ref("");
+const accessToken = ref("");
+const gptTags = ref([ // GPT 생성 태그 배열
+{ tagName: "태그1", ...generatePastelColors()  },
+  { tagName: "태그2", ...generatePastelColors()  },
+  { tagName: "태그3", ...generatePastelColors()  },
+]); 
+const newTag = ref(""); // 사용자 입력 태그
+const newTags = ref([]); // 사용자 입력 태그 배열
+const finalTags = computed(() => {
+  return [...gptTags.value, ...newTags.value];
+});
 
-onMounted(() => {
+onMounted(async () => {
+  // try {
+  //   // 초기 데이터 로드 API 요청
+  //   const response = await axios.get("API_URL");  
+  //   if (response.data) {
+  //     gptTags.value = response.data.tags; 
+  //   }
+  // } catch (error) {
+  //   console.error("데이터 로딩 실패:", error);
+  // }
+
   chrome.runtime.sendMessage({ action: "getCurrentUrl" }, (response) => {
     if (response && response.url) {
       url.value = response.url;
     }
-    chrome.storage.local.get(["userId"], (response) => {
-      if (response.userId) {
-        userId.value = response.userId;
+    chrome.storage.local.get(["access_token"], (response) => {
+      if (response && response.access_token) {
+        accessToken.value = response.access_token;
       }
-      console.log(
-        "StorageView.vue로 데이터로드 성공 : ",
-        url.value,
-        userId.value
-      );
     });
   });
 });
 
-// 북마크 저장 버튼 클릭 시 호출될 함수
+// 북마크 저장 API 요청
 const saveBookmark = async () => {
-  if (userStore.userId && url.value) {
+  if (accessToken.value && url.value) {
     try {
-      console.log(
-        "북마크저장버튼 누른후 : ",
-        userStore.userId.value,
-        url.value
+      const response = await api.post(
+        "/bookmarks/extension", 
+        {
+          bookmark_url: url,
+          collectionId: collectionId,         
+          isPersonal: true,    
+          tags: finalTags.value.map((finalTag) => ({
+            tagName: finalTag.tagName,
+            tagColor: `${finalTag.tagColor} ${finalTag.tagBorderColor}`,
+          })),
+        },                
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+            "Content-Type": "application/json"
+          },
+        }
       );
-
-      const response = await axios.post("북마크 추가 탭 데이터 로드 URI", {
-        userId: userStore.userId, // userId
-        url: url.value, // URL
-      });
-      // 응답 데이터 처리...
-      console.log("북마크 저장 성공:", response);
+      if (response.status === 201) {
+        // 크롬 익스텐션 창에 저장완료 표시 뜨도록!
+        
+      } else {
+        console.log("북마크 저장 실패, 다시 시도해주세요.");
+      }
     } catch (error) {
       console.error("API 요청 실패:", error);
     }
   } else {
-    console.log("userId 또는 url이 없습니다.");
+    console.log("accessToken 또는 url이 없습니다.");
   }
 };
 
-// 상태 관리
-const newTag = ref("");
-const tags = ref(["Spring", "Redis"]); // GPT 태그 배열
-
-// 태그 색상 배열
-const tagColors = [
-  "border border-green-500 bg-green-50 text-green-800",
-  "border border-yellow-500 bg-yellow-50 text-yellow-800",
-  "border border-blue-500 bg-blue-50 text-blue-800",
-  "border border-red-500 bg-red-50 text-red-800",
-  "border border-purple-500 bg-purple-50 text-purple-800",
-];
-
-// 메서드
+// 사용자 태그 생성
 const addTag = () => {
   if (newTag.value.trim()) {
-    tags.value.push(newTag.value.trim());
-    newTag.value = "";
+    const color = generatePastelColors();
+    newTags.value.push({ 
+      tagName: newTag.value.trim(), 
+      tagColor: color.tagColor,
+      tagBorderColor: color.tagBorderColor
+    });
+    newTag.value = "";  
   }
 };
 
-const removeTag = (index) => {
-  tags.value.splice(index, 1);
+// 태그 삭제
+const removeTag = (index, type) => {
+  if (type === "gpt") {
+    gptTags.value.splice(index, 1);
+  } else {
+    newTags.value.splice(index, 1);
+  }
 };
 </script>
 

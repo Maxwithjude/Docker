@@ -71,9 +71,9 @@ import { ref, onMounted } from "vue";
 import { useUserStore } from "@/stores/userStore";
 
 const userStore = useUserStore();
-const userId = userStore.userId;
+const access_token = userStore.accessToken;
 onMounted(() => {
-  console.log("현재 사용자 ID:", userId);
+  console.log("access_token :", access_token);
 });
 
 const alarms = ref([

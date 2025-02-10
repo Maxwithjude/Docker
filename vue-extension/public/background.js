@@ -41,18 +41,18 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   }
 
   // getUserInfo 요청에 대한 응답
-  if (message.action === "getUserInfo") {
-    chrome.storage.local.get(["userId", "access_token"], (result) => {
-      sendResponse({
-        userId: result.userId,
-        access_token: result.access_token,
-      });
-    });
-    return true; // 비동기 응답을 보내기 위해 true를 반환
-  }
+  // if (message.action === "getUserInfo") {
+  //   chrome.storage.local.get(["userId", "access_token"], (result) => {
+  //     sendResponse({
+  //       userId: result.userId,
+  //       access_token: result.access_token,
+  //     });
+  //   });
+  //   return true; // 비동기 응답을 보내기 위해 true를 반환
+  // }
 });
 
-// 로그인 정보 저장 함수
+// 로그인 정보를 Extension local Storage에 저장하는 함수
 function saveLoginData(userLoginInfo) {
   if (!userLoginInfo) {
     console.warn("userLoginInfo가 null이어서 저장을 건너뜁니다.");

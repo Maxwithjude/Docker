@@ -20,7 +20,7 @@ class RssServiceIntegrationTest {
         Pageable pageable = PageRequest.of(0, 5); // 첫 페이지에서 5개만 가져오기
 
         // when
-        Page<RssPostResponse> result = rssService.fetchRssPosts(rssUrl, null, pageable);
+        Page<RssPostResponse> result = rssService.fetchRssPosts(rssUrl, null, null, pageable);
 
         // then
         assertThat(result).isNotEmpty(); // 적어도 한 개 이상의 RSS 글이 있어야 함

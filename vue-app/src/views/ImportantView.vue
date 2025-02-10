@@ -24,17 +24,17 @@
                     <div v-else class="cards-grid">
                         <Card
                             v-for="bookmark in bookmarkResults"
+                            :key="bookmark.bookmark_id"
+                            v-model:priority="bookmark.priority"
                             :bookmarkId="bookmark.bookmark_id"
                             :url="bookmark.url"
                             :img="bookmark.img"
                             :title="bookmark.title"
                             :description="bookmark.description"
                             :tag="bookmark.tag"
-                            :priority="bookmark.priority"
                             :isPersonal="bookmark.isPersonal"
                             :createdAt="bookmark.created_at"
                             :updatedAt="bookmark.updated_at"
-                            @togglePriority="togglePriority(bookmark)"
                         />
                     </div>
                 </div>
@@ -44,24 +44,33 @@
 </template>
 
 <script setup>
-import { ref, computed, watch } from 'vue';
+import { ref, computed, watch, onMounted } from 'vue';
 import { storeToRefs } from 'pinia';
 import Header from '@/common/Header.vue';
 import SideBar from '@/common/SideBar.vue';
 import Card from '@/common/Card.vue';
-import { useCounterStore } from '@/stores/counter';
+import { useBookmarkStore } from '@/stores/bookmark';
+
+const bookmarkStore = useBookmarkStore();
+const { exampleImportantBookmarks } = storeToRefs(bookmarkStore);
+const { getImportantBookmarks } = bookmarkStore;
 
 
-const togglePriority = (bookmark) => {
-    bookmark.priority = !bookmark.priority;
-}
+// exampleImportantBookmarks 대신 실제 데이터인 importantBookmarks 사용
+const bookmarkResults = computed(() => exampleImportantBookmarks.value.results || []);
 
-const { importantBookmarks } = storeToRefs(useCounterStore());
-const bookmarkResults = computed(() => importantBookmarks.value.results || []);
 
-// bookmarkResults의 변화를 감지하여 콘솔에 출력
+onMounted(async () => {
+    try {
+        await getImportantBookmarks();
+    } catch (error) {
+        console.error('중요 북마크를 불러오는데 실패했습니다:', error);
+    }
+});
+
+// 북마크 변경 시 자동으로 목록 새로고침
 watch(bookmarkResults, (newResults) => {
-    console.log('북마크 결과:', newResults);
+    console.log('북마크 결과 업데이트:', newResults);
 });
 </script>
 

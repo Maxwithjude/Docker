@@ -19,10 +19,11 @@
 
 <script setup>
 defineProps({
-posts: {
-    type: Array,
-    default: () => []
-}
+    posts: {
+        type: Array,
+        default: () => [],
+        required: false
+    }
 })
 
 defineEmits(['select-post'])

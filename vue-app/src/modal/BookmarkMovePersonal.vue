@@ -12,8 +12,8 @@
         <option value="" selected>컬렉션을 선택해주세요</option>
         <option 
           v-for="collection in personalCollections" 
-          :key="collection.id" 
-          :value="collection.id"
+          :key="collection.collection_id"
+          :value="collection.collection_id"
         >
           {{ collection.name }}
         </option>
@@ -21,7 +21,6 @@
     </div>
 
     <div class="modal-actions">
-      <button @click="$emit('close')" class="btn-cancel">취소</button>
       <button 
         @click="moveBookmark" 
         :disabled="!selectedCollectionId"
@@ -29,12 +28,17 @@
       >
         이동
       </button>
+      <button @click="$emit('close')" class="btn-cancel">취소</button>
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, computed, onMounted } from 'vue'
+import { useCollectionStore } from '@/stores/collection'
+import { useBookmarkStore } from '@/stores/bookmark'
+import { storeToRefs } from 'pinia'
+import { ElMessage } from 'element-plus'
 
 const props = defineProps({
   bookmarkId: {
@@ -44,22 +48,35 @@ const props = defineProps({
 })
 
 const emit = defineEmits(['close', 'moveComplete'])
+const collectionStore = useCollectionStore()
+const bookmarkStore = useBookmarkStore()
+const { personalCollections } = storeToRefs(collectionStore)
 
-const personalCollections = ref([]) // API로부터 받아올 개인 컬렉션 목록
 const selectedCollectionId = ref('')
 
-const selectCollection = (collectionId) => {
-  selectedCollectionId.value = collectionId
-}
+onMounted(async () => {
+  try {
+    // 개인 컬렉션 목록 불러오기
+    await collectionStore.fetchPersonalCollections()
+  } catch (error) {
+    console.error('개인 컬렉션 로드 실패:', error)
+    ElMessage.error('개인 컬렉션 목록을 불러오는데 실패했습니다')
+  }
+})
 
 const moveBookmark = async () => {
   try {
-    // TODO: API 호출하여 북마크 이동 처리
-    // await moveBookmarkToCollection(props.bookmarkId, selectedCollectionId.value)
+    await bookmarkStore.moveToOtherCollection(
+      props.bookmarkId,
+      true,
+      selectedCollectionId.value
+    )
     emit('moveComplete')
     emit('close')
+    ElMessage.success('북마크가 이동되었습니다')
   } catch (error) {
     console.error('북마크 이동 중 오류 발생:', error)
+    ElMessage.error('북마크 이동에 실패했습니다')
   }
 }
 </script>

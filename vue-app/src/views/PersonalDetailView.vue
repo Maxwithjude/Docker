@@ -57,30 +57,40 @@
 <script setup>
 import { ref, onMounted } from 'vue';
 import { useRoute } from 'vue-router';
-import { useCounterStore } from '@/stores/counter';
+import { useBookmarkStore } from '@/stores/bookmark';
 import Header from '@/common/Header.vue';
 import SideBar from '@/common/SideBar.vue';
 
 const route = useRoute();
-const store = useCounterStore();
+const bookmarkStore = useBookmarkStore();
 const bookmark = ref(null);
 const newMemo = ref('');
 const memos = ref([]);
 const iframeError = ref(false);
 
-const addMemo = () => {
+const addMemo = async () => {
     if (newMemo.value.trim()) {
-        memos.value.push({
-            id: Date.now(),
-            content: newMemo.value,
-            date: new Date().toLocaleString()
-        });
-        newMemo.value = '';
+        try {
+            await bookmarkStore.createMemo(bookmark.value.id, newMemo.value);
+            memos.value.push({
+                id: Date.now(),
+                content: newMemo.value,
+                date: new Date().toLocaleString()
+            });
+            newMemo.value = '';
+        } catch (error) {
+            console.error('메모 추가 실패:', error);
+        }
     }
 };
 
-const deleteMemo = (id) => {
-    memos.value = memos.value.filter(memo => memo.id !== id);
+const deleteMemo = async (id) => {
+    try {
+        await bookmarkStore.deleteMemo(bookmark.value.id, id);
+        memos.value = memos.value.filter(memo => memo.id !== id);
+    } catch (error) {
+        console.error('메모 삭제 실패:', error);
+    }
 };
 
 // iframe 로드 실패 시 처리
@@ -88,12 +98,11 @@ const handleIframeError = () => {
     iframeError.value = true;
 };
 
-onMounted(() => {
+onMounted(async () => {
     const bookmarkId = parseInt(route.params.id);
-    // store의 personalCollectionsBookmarks에서 북마크 찾기
-    const foundBookmark = store.personalCollectionsBookmarks.results.bookmarks.find(
-        b => b.bookmark_id === bookmarkId
-    );
+    // 북마크 정보 가져오기
+    const bookmarksData = bookmarkStore.examplePersonalCollectionBookmarks.value.results;
+    const foundBookmark = bookmarksData.bookmarks.find(b => b.bookmark_id === bookmarkId);
     
     if (foundBookmark) {
         bookmark.value = {
@@ -103,8 +112,14 @@ onMounted(() => {
             description: foundBookmark.description,
             url: foundBookmark.url,
             hashtags: foundBookmark.tag,
-            // readingTime: 15, // 이 값은 API에 없는 것 같습니다
         };
+        
+        // 메모 가져오기
+        try {
+            await bookmarkStore.getMemo(bookmarkId);
+        } catch (error) {
+            console.error('메모 로딩 실패:', error);
+        }
     }
 });
 </script>

@@ -28,9 +28,11 @@
 <script setup>
 import Card from '@/common/Card.vue';
 import { computed } from 'vue';
-import { useCounterStore } from '@/stores/counter';
+import { storeToRefs } from 'pinia';
+import { useBookmarkStore } from '@/stores/bookmark';
 
-const counterStore = useCounterStore();
+const bookmarkStore = useBookmarkStore();
+const { examplePersonalCollectionBookmarks } = storeToRefs(bookmarkStore);
 
 const props = defineProps({
     collectionInfo: {
@@ -41,12 +43,18 @@ const props = defineProps({
 
 // collection_id에 해당하는 북마크들을 찾아서 반환
 const bookmarks = computed(() => {
-    const bookmarksData = counterStore.personalCollectionsBookmarks.results;
+    const bookmarksData = examplePersonalCollectionBookmarks.value?.results;
+    if (!bookmarksData) return [];
     return bookmarksData.name === props.collectionInfo.name ? bookmarksData.bookmarks : [];
 });
 
-const togglePriority = (bookmark) => {
-    bookmark.priority = !bookmark.priority;
+const togglePriority = async (bookmark) => {
+    try {
+        await bookmarkStore.changePiority(bookmark.bookmark_id, !bookmark.priority);
+        bookmark.priority = !bookmark.priority;
+    } catch (error) {
+        console.error('북마크 중요도 변경 실패:', error);
+    }
 }
 </script>
 

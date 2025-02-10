@@ -56,6 +56,7 @@ const router = createRouter({
       name: 'main',
       component: MainView,
     },
+
     // 중요페이지
     {
       path: '/user/:id/important',

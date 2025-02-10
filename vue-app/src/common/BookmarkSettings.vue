@@ -56,6 +56,7 @@
     class="bookmark-move-dialog"
   >
     <BookmarkMovePersonal 
+      :bookmark-id="props.bookmarkId"
       @close="showMoveModal = false"
       @move-complete="handleMoveComplete"
     />
@@ -69,7 +70,12 @@
     append-to-body
     class="bookmark-tag-dialog"
   >
-    <BookmarkTagSetting @close="showTagModal = false" />
+    <BookmarkTagSetting 
+      v-if="isTagSettingOpen"
+      :bookmark-id="props.bookmarkId"
+      :initial-tags="props.tag"
+      @close="isTagSettingOpen = false"
+    />
   </el-dialog>
 
   <el-dialog
@@ -91,16 +97,26 @@
 <script setup>
 import { ref } from 'vue'
 import { ElMessage } from 'element-plus'
+import { useBookmarkStore } from '@/stores/bookmark'
 import BookmarkCopyShared from '@/modal/BookmarkCopyShared.vue'
 import BookmarkMovePersonal from '@/modal/BookmarkMovePersonal.vue'
 import BookmarkTagSetting from '@/modal/BookmarkTagSetting.vue'
 import BookmarkDel from '@/modal/BookmarkDel.vue'
 
+const bookmarkStore = useBookmarkStore()
 const emit = defineEmits(['togglePriority'])
 const props = defineProps({
   priority: {
     type: Boolean,
     default: false
+  },
+  bookmarkId: {
+    type: Number,
+    required: true
+  },
+  tag: {
+    type: Array,
+    required: true
   }
 })
 
@@ -109,9 +125,22 @@ const showCopyModal = ref(false)
 const showMoveModal = ref(false)
 const showTagModal = ref(false)
 const showDeleteModal = ref(false)
+const isTagSettingOpen = ref(false)
 
-const togglePriority = () => {
-  emit('togglePriority')
+const togglePriority = async () => {
+  try {
+    const success = await bookmarkStore.changePriority(props.bookmarkId, !props.priority)
+    if (success) {
+      ElMessage.success(props.priority ? '중요 북마크가 해제되었습니다.' : '중요 북마크로 설정되었습니다.')
+      emit('togglePriority')
+      isVisible.value = false
+    } else {
+      ElMessage.error('중요도 변경에 실패했습니다.')
+    }
+  } catch (error) {
+    console.error('중요도 변경 중 오류 발생:', error)
+    ElMessage.error('중요도 변경 중 오류가 발생했습니다.')
+  }
 }
 
 const copyToSharedCollection = () => {
@@ -126,8 +155,9 @@ const showMoveDialog = () => {
 
 const showTagManagement = () => {
   isVisible.value = false
-  showTagModal.value = true
+  isTagSettingOpen.value = true
 }
+
 
 const openDeleteModal = () => {
   isVisible.value = false

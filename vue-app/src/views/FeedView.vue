@@ -16,13 +16,13 @@
                     </div>
                     <div class="rss-container">
                         <FeedTabs 
-                            :feeds="rssStore.rssList.results"
+                            :feeds="exRssList.results"
                             :selected-feed="selectedFeed"
                             @select-feed="selectFeed"
                         />
                         <div class="content-container">
                             <FeedPostList 
-                                :posts="rssStore.rssArticles.results?.latest_posts"
+                                :posts="exRssArticles.results?.latest_posts"
                                 @select-post="selectPost"
                             />
                             <FeedPostContent :url="selectedPostUrl" />
@@ -42,8 +42,10 @@ import FeedPostList from '@/component/FeedPostList.vue'
 import FeedPostContent from '@/component/FeedPostContent.vue'
 import { ref, onMounted } from 'vue'
 import { useRssStore } from '@/stores/rss'
+import { storeToRefs } from 'pinia'
 
 const rssStore = useRssStore()
+const { exRssList, exRssArticles } = storeToRefs(rssStore)
 const selectedFeed = ref(1)
 const selectedPostUrl = ref(null)
 

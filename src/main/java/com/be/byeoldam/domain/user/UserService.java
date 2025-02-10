@@ -4,6 +4,7 @@ import com.be.byeoldam.common.jwt.JwtUtil;
 import com.be.byeoldam.domain.user.dto.*;
 import com.be.byeoldam.domain.user.model.User;
 import com.be.byeoldam.domain.user.repository.UserRepository;
+import com.be.byeoldam.domain.user.util.S3Util;
 import com.be.byeoldam.exception.CustomException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -22,6 +23,7 @@ public class UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtUtil jwtUtil;
+    private final S3Util s3Util;
 
     // 이메일 인증번호 발송(이메일 중복 확인 + 유효 코드 보내기)
 
@@ -32,6 +34,7 @@ public class UserService {
     UserRegisterResponse registerUser(UserRegisterRequest registerRequest) {
         User user = registerRequest.toEntity();
         user.encodePassword(passwordEncoder.encode(user.getPassword()));
+        user.updateProfileImage(s3Util.getDefaultProfileImageUrl());
         user = userRepository.save(user);
 
         Map<String, String> tokens = generateTokens(user);

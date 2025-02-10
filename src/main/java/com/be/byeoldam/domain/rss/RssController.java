@@ -2,9 +2,11 @@ package com.be.byeoldam.domain.rss;
 
 
 import com.be.byeoldam.common.ResponseTemplate;
+import com.be.byeoldam.common.annotation.UserId;
 import com.be.byeoldam.domain.rss.dto.RssLatestPostsResponse;
 import com.be.byeoldam.domain.rss.dto.RssSubscribeRequest;
 import com.be.byeoldam.domain.rss.dto.UserRssResponse;
+import com.be.byeoldam.domain.rss.service.RssService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -22,8 +24,6 @@ public class RssController {
 
     private final RssService rssService;
 
-    // 임시 userId
-    private final Long userId = 1L;
 
         /**
          * 사용자의 RSS 구독 목록 조회
@@ -36,28 +36,28 @@ public class RssController {
         )
         @GetMapping
         public ResponseTemplate<List<UserRssResponse>> getUserRssList(
-//                @RequestParam Long userId
+                @UserId Long userId
         ) {
             return ResponseTemplate.ok(rssService.getUserRssList(userId));
         }
 
-//        /**
-//         * 특정 RSS 최신 글 목록 조회
-//         */
-//        @Operation(summary = "특정 RSS 최신 글 조회", description = "사용자가 구독한 특정 RSS의 최신 글 목록을 조회합니다.")
-//        @ApiResponse(
-//                responseCode = "200",
-//                description = "RSS 최신 글 조회 성공",
-//                useReturnTypeSchema = true
-//        )
-//        @GetMapping("/{rssId}/latest")
-//        public ResponseTemplate<RssLatestPostsResponse> getRssLatestArticles(
-////                @RequestParam Long userId,
-//                @PathVariable Long rssId,
-//                Pageable pageable
-//        ) {
-//            return ResponseTemplate.ok(rssService.getRssLatestArticles(userId, rssId, pageable));
-//        }
+        /**
+         * 특정 RSS 최신 글 목록 조회
+         */
+        @Operation(summary = "특정 RSS 최신 글 조회", description = "사용자가 구독한 특정 RSS의 최신 글 목록을 조회합니다.")
+        @ApiResponse(
+                responseCode = "200",
+                description = "RSS 최신 글 조회 성공",
+                useReturnTypeSchema = true
+        )
+        @GetMapping("/{rssId}/latest")
+        public ResponseTemplate<RssLatestPostsResponse> getRssLatestArticles(
+                @UserId Long userId,
+                @PathVariable Long rssId,
+                Pageable pageable
+        ) {
+            return ResponseTemplate.ok(rssService.getRssLatestArticles(userId, rssId, pageable));
+        }
 
         /**
          * RSS 구독
@@ -70,7 +70,7 @@ public class RssController {
         )
         @PostMapping
         public ResponseTemplate<Void> subscribeRss(
-//                @RequestParam Long userId,
+                @UserId Long userId,
                 @RequestBody RssSubscribeRequest request
         ) {
             rssService.subscribeRss(userId, request);
@@ -88,7 +88,7 @@ public class RssController {
         )
         @DeleteMapping("/{rssId}")
         public ResponseTemplate<Void> unsubscribeRss(
-//                @RequestParam Long userId,
+                @UserId Long userId,
                 @PathVariable Long rssId
         ) {
             rssService.unsubscribeRss(userId, rssId);

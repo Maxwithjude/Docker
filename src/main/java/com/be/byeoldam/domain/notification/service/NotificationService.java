@@ -1,5 +1,6 @@
-package com.be.byeoldam.domain.notification;
+package com.be.byeoldam.domain.notification.service;
 
+import com.be.byeoldam.domain.notification.NotificationRepository;
 import com.be.byeoldam.domain.notification.dto.NotificationResponse;
 import com.be.byeoldam.domain.notification.model.BookmarkNotification;
 import com.be.byeoldam.domain.notification.model.InviteNotification;
@@ -8,9 +9,12 @@ import com.be.byeoldam.domain.user.model.User;
 import com.be.byeoldam.domain.user.repository.UserRepository;
 import com.be.byeoldam.exception.CustomException;
 import lombok.RequiredArgsConstructor;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.net.URLEncoder;
 import java.util.List;
 
 @Service
@@ -52,7 +56,7 @@ public class NotificationService {
         Notification notification = notificationRepository.findByIdAndUser(notificationId, user)
                 .orElseThrow(() -> new CustomException("해당 알림이 존재하지 않습니다."));
 
-        if (notification.getUser().getId() != userId) {
+        if (!notification.getUser().getId().equals(userId)) {
             throw new CustomException("해당 알림에 대한 권한이 없습니다.");
         }
 
@@ -69,7 +73,7 @@ public class NotificationService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new CustomException("사용자를 찾을 수 없습니다."));
 
-        if (user.getId() != userId) {
+        if (!user.getId().equals(userId)) {
             throw new CustomException("해당 알림에 대한 권한이 없습니다.");
         }
 
@@ -87,13 +91,11 @@ public class NotificationService {
         String message = "";
         String url = null;
 
-        if (notification instanceof InviteNotification) { // 초대 알림일 경우
-            InviteNotification inviteNotification = (InviteNotification) notification;
+        if (notification instanceof InviteNotification inviteNotification) { // 초대 알림일 경우
             title = inviteNotification.getCollection().getName();
-            message = inviteNotification.getNickname() + "님이 컬렉션에 초대했습니다.";
+            message = inviteNotification.getMessage();
             // 초대 알림은 url이 없음 (null)
-        } else if (notification instanceof BookmarkNotification) { // 북마크 알림일 경우
-            BookmarkNotification bookmarkNotification = (BookmarkNotification) notification;
+        } else if (notification instanceof BookmarkNotification bookmarkNotification) { // 북마크 알림일 경우
             url = bookmarkNotification.getBookmark().getBookmarkUrl().getUrl();
             message = bookmarkNotification.getMessage();
             title = getTitleFromUrl(url);
@@ -110,9 +112,17 @@ public class NotificationService {
         );
     }
 
-    //todo: url을 통해 title을 가져오는 로직
     private String getTitleFromUrl(String url) {
-        return url;
+        try {
+            Document document = Jsoup.connect(url)
+                    .timeout(5000)
+                    .get();
+
+            // 페이지의 title 태그 값 가져오기
+            return document.title();
+        } catch (Exception e) {
+            throw new CustomException("URL에서 제목을 가져오는데 실패하였습니다.");
+        }
     }
 
 }

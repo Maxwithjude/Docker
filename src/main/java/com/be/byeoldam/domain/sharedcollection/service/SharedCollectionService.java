@@ -1,4 +1,4 @@
-package com.be.byeoldam.domain.sharedcollection;
+package com.be.byeoldam.domain.sharedcollection.service;
 
 import com.be.byeoldam.domain.sharedcollection.dto.SharedCollectionRequest;
 import com.be.byeoldam.domain.sharedcollection.dto.SharedCollectionResponse;

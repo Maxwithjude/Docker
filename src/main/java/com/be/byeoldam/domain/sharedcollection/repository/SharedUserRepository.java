@@ -17,5 +17,5 @@ public interface SharedUserRepository extends JpaRepository<SharedUser, Long> {
     List<SharedUser> findByUser(User user);
     void deleteAllBySharedCollection(SharedCollection collection);
 
-    boolean existsByUserAndSharedCollection(User user, SharedCollection collection);
+    boolean existsBySharedCollectionIdAndUserId(Long collectionId, Long inviterId);
 }

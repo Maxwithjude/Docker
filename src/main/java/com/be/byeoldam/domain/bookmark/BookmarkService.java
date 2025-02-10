@@ -11,6 +11,7 @@ import com.be.byeoldam.domain.common.repository.TagBookmarkUrlRepository;
 import com.be.byeoldam.domain.personalcollection.model.PersonalCollection;
 import com.be.byeoldam.domain.personalcollection.repository.PersonalCollectionRepository;
 import com.be.byeoldam.domain.sharedcollection.model.SharedCollection;
+import com.be.byeoldam.domain.sharedcollection.model.SharedUser;
 import com.be.byeoldam.domain.sharedcollection.repository.SharedCollectionRepository;
 import com.be.byeoldam.domain.sharedcollection.repository.SharedUserRepository;
 import com.be.byeoldam.domain.tag.model.Color;

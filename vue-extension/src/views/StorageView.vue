@@ -48,7 +48,10 @@
         <span
           v-for="(tag, index) in gptTags"
           :key="'gpt-' + index"
-          :style="{backgroundColor: tag.tagColor,borderColor: tag.tagBorderColor}"
+          :style="{
+            backgroundColor: tag.tagColor,
+            borderColor: tag.tagBorderColor,
+          }"
           class="border border-black text-black px-3 py-1 rounded-full text-sm flex items-center"
         >
           {{ "# " + tag.tagName }}
@@ -64,8 +67,11 @@
         <span
           v-for="(tag, index) in newTags"
           :key="'new-' + index"
-          :style="{ backgroundColor: tag.tagColor,borderColor: tag.tagBorderColor}"
-           class="border border-black text-black px-3 py-1 rounded-full text-sm flex items-center"
+          :style="{
+            backgroundColor: tag.tagColor,
+            borderColor: tag.tagBorderColor,
+          }"
+          class="border border-black text-black px-3 py-1 rounded-full text-sm flex items-center"
         >
           {{ "# " + tag.tagName }}
           <button
@@ -155,28 +161,42 @@ const hslToHex = (h, s, l) => {
   l /= 100;
 
   const c = (1 - Math.abs(2 * l - 1)) * s;
-  const x = c * (1 - Math.abs((h / 60) % 2 - 1));
-  const m = l - c/2;
-  let r = 0, g = 0, b = 0;
+  const x = c * (1 - Math.abs(((h / 60) % 2) - 1));
+  const m = l - c / 2;
+  let r = 0,
+    g = 0,
+    b = 0;
 
   if (0 <= h && h < 60) {
-    r = c; g = x; b = 0;
+    r = c;
+    g = x;
+    b = 0;
   } else if (60 <= h && h < 120) {
-    r = x; g = c; b = 0;
+    r = x;
+    g = c;
+    b = 0;
   } else if (120 <= h && h < 180) {
-    r = 0; g = c; b = x;
+    r = 0;
+    g = c;
+    b = x;
   } else if (180 <= h && h < 240) {
-    r = 0; g = x; b = c;
+    r = 0;
+    g = x;
+    b = c;
   } else if (240 <= h && h < 300) {
-    r = x; g = 0; b = c;
+    r = x;
+    g = 0;
+    b = c;
   } else if (300 <= h && h < 360) {
-    r = c; g = 0; b = x;
+    r = c;
+    g = 0;
+    b = x;
   }
 
   // 각 색상값에 m을 더하고 255를 곱한 후 16진수로 변환
   const toHex = (value) => {
     const hex = Math.round((value + m) * 255).toString(16);
-    return hex.length === 1 ? '0' + hex : hex;
+    return hex.length === 1 ? "0" + hex : hex;
   };
 
   return `#${toHex(r)}${toHex(g)}${toHex(b)}`;
@@ -184,26 +204,27 @@ const hslToHex = (h, s, l) => {
 
 // 랜덤 색상 생성 함수
 const generatePastelColors = () => {
-  const hue = Math.floor(Math.random() * 359); // 0-359 범위의 색조
-  const saturation = 65 + Math.random() * 15;  // 65-80% 채도 (더 부드러운 파스텔)
-  const lightness = 75 + Math.random() * 15;   // 75-90% 명도 (더 밝은 색상)
+  const hue = Math.floor(Math.random() * 350);
+  const saturation = 75 + Math.random() * 15; // 65-80% 채도 (더 부드러운 파스텔)
+  const lightness = 82 + Math.random() * 20; // 75-90% 명도 (더 밝은 색상)
 
   // 배경색 (더 밝은 색상)
   const tagColor = hslToHex(hue, saturation, lightness);
-  
+
   // 테두리색 (더 진한 색상)
-  const tagBorderColor = hslToHex(hue, saturation + 10, lightness - 15);
+  const tagBorderColor = hslToHex(hue, saturation + 5, lightness - 15);
 
   return { tagColor, tagBorderColor };
 };
 
 const url = ref("");
 const accessToken = ref("");
-const gptTags = ref([ // GPT 생성 태그 배열
-{ tagName: "태그1", ...generatePastelColors()  },
-  { tagName: "태그2", ...generatePastelColors()  },
-  { tagName: "태그3", ...generatePastelColors()  },
-]); 
+const gptTags = ref([
+  // GPT 생성 태그 배열
+  { tagName: "태그1", ...generatePastelColors() },
+  { tagName: "태그2", ...generatePastelColors() },
+  { tagName: "태그3", ...generatePastelColors() },
+]);
 const newTag = ref(""); // 사용자 입력 태그
 const newTags = ref([]); // 사용자 입력 태그 배열
 const finalTags = computed(() => {
@@ -213,9 +234,9 @@ const finalTags = computed(() => {
 onMounted(async () => {
   // try {
   //   // 초기 데이터 로드 API 요청
-  //   const response = await axios.get("API_URL");  
+  //   const response = await axios.get("API_URL");
   //   if (response.data) {
-  //     gptTags.value = response.data.tags; 
+  //     gptTags.value = response.data.tags;
   //   }
   // } catch (error) {
   //   console.error("데이터 로딩 실패:", error);
@@ -238,26 +259,25 @@ const saveBookmark = async () => {
   if (accessToken.value && url.value) {
     try {
       const response = await api.post(
-        "/bookmarks/extension", 
+        "/bookmarks/extension",
         {
           bookmark_url: url,
-          collectionId: collectionId,         
-          isPersonal: true,    
+          collectionId: collectionId,
+          isPersonal: true,
           tags: finalTags.value.map((finalTag) => ({
             tagName: finalTag.tagName,
             tagColor: `${finalTag.tagColor} ${finalTag.tagBorderColor}`,
           })),
-        },                
+        },
         {
           headers: {
             Authorization: `Bearer ${accessToken}`,
-            "Content-Type": "application/json"
+            "Content-Type": "application/json",
           },
         }
       );
       if (response.status === 201) {
         // 크롬 익스텐션 창에 저장완료 표시 뜨도록!
-        
       } else {
         console.log("북마크 저장 실패, 다시 시도해주세요.");
       }
@@ -273,12 +293,12 @@ const saveBookmark = async () => {
 const addTag = () => {
   if (newTag.value.trim()) {
     const color = generatePastelColors();
-    newTags.value.push({ 
-      tagName: newTag.value.trim(), 
+    newTags.value.push({
+      tagName: newTag.value.trim(),
       tagColor: color.tagColor,
-      tagBorderColor: color.tagBorderColor
+      tagBorderColor: color.tagBorderColor,
     });
-    newTag.value = "";  
+    newTag.value = "";
   }
 };
 

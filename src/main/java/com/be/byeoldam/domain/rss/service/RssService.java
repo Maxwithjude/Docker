@@ -11,11 +11,13 @@ import com.be.byeoldam.domain.rss.repository.UserRssRepository;
 import com.be.byeoldam.domain.user.model.User;
 import com.be.byeoldam.domain.user.repository.UserRepository;
 import com.be.byeoldam.exception.CustomException;
+import com.rometools.rome.feed.synd.SyndEntry;
 import com.rometools.rome.feed.synd.SyndFeed;
 import com.rometools.rome.io.SyndFeedInput;
 import com.rometools.rome.io.XmlReader;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -27,10 +29,14 @@ import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.net.URL;
+import java.time.*;
+import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class RssService {
 
     private final RssRepository rssRepository;
@@ -134,15 +140,20 @@ public class RssService {
         UserRss userRss = userRssRepository.findByUserIdAndRssId(userId, rssId)
                 .orElseThrow(() -> new CustomException("구독하지 않은 RSS입니다."));
 
-        String previousTitle = userRss.getPreviousTitle();
+        String latestTitleBeforeUpdate = userRss.getLatestTitle();
 
-        Page<RssPostResponse> latestArticles = fetchRssPosts(rss.getRssUrl(), previousTitle, pageable);
+        Page<RssPostResponse> latestArticles = fetchRssPosts(rss.getRssUrl(), latestTitleBeforeUpdate, pageable);
 
         // 첫 페이지 요청 시에만 latestTitle 업데이트
         if (pageable.getPageNumber() == 0 && !latestArticles.isEmpty()) {
             String newestTitle = latestArticles.getContent().get(0).getTitle();
-            userRss.updateTitles(newestTitle);
+
+            // 최신 글이 존재하면, previousTitle과 latestTitle 업데이트
+            if (!Objects.equals(newestTitle, latestTitleBeforeUpdate)) {
+                userRss.updateTitles(newestTitle);
+            }
         }
+
 
         return RssLatestPostsResponse.of(
                 rss.getId(),
@@ -152,19 +163,42 @@ public class RssService {
     }
 
     // RSS의 최신 글 목록을 가져오는 메서드
-    public Page<RssPostResponse> fetchRssPosts(String rssUrl, String previousTitle, Pageable pageable) {
+    public Page<RssPostResponse> fetchRssPosts(String rssUrl, String latestTitle, Pageable pageable) {
         try {
             // RSS 피드 가져오기
             URL feedSource = new URL(rssUrl);
             SyndFeedInput input = new SyndFeedInput();
             SyndFeed feed = input.build(new XmlReader(feedSource));
 
-            int totalSize = feed.getEntries().size(); // 전체 글 개수
+            List<SyndEntry> entries = feed.getEntries();
 
-            // 글이 없는 경우
-            if (feed.getEntries().isEmpty()) {
+            if (entries.isEmpty()) {
                 return Page.empty(pageable);
             }
+
+            if (latestTitle == null) {
+                return new PageImpl<>(
+                        entries.stream()
+                                .map(entry -> RssPostResponse.builder()
+                                        .title(entry.getTitle())
+                                        .url(entry.getLink())
+                                        .isRead(false) // 첫 구독 시, 모든 글을 새 글로 처리
+                                        .build()
+                                )
+                                .skip(pageable.getOffset())
+                                .limit(pageable.getPageSize())
+                                .toList(),
+                        pageable,
+                        entries.size()
+                );
+            }
+
+            // previousTitle에 해당하는 글의 publishedDate 가져오기
+            LocalDateTime latestDateTime = entries.stream()
+                    .filter(entry -> Objects.equals(entry.getTitle(), latestTitle))
+                    .map(entry -> convertToLocalDateTime(entry.getPublishedDate()))
+                    .findFirst()  // Optional로 반환됨
+                    .orElse(null); // 없으면 null
 
             // 페이징 처리
             List<RssPostResponse> pagedArticles = feed.getEntries().stream()
@@ -174,8 +208,9 @@ public class RssService {
                         String title = entry.getTitle();
                         String link = entry.getLink();
 
-                        // previousTitle과 비교하여 is_read 판별
-                        boolean isRead = previousTitle != null && title.compareTo(previousTitle) <= 0;
+                        LocalDateTime publishedDate = convertToLocalDateTime(entry.getPublishedDate());
+
+                        boolean isRead = (latestDateTime != null && publishedDate.isBefore(latestDateTime) || publishedDate.isEqual(latestDateTime));
 
                         return RssPostResponse.builder()
                                 .title(title)
@@ -184,11 +219,15 @@ public class RssService {
                                 .build();
                     }).toList();
 
-            return new PageImpl<>(pagedArticles, pageable, totalSize);
+            return new PageImpl<>(pagedArticles, pageable, entries.size());
 
         } catch (Exception e) {
             throw new CustomException("RSS 피드를 가져오는 중 오류가 발생했습니다.");
         }
+    }
+
+    private LocalDateTime convertToLocalDateTime(Date date) {
+        return date.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
     }
 
     /**

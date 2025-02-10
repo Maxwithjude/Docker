@@ -44,7 +44,7 @@ public class MypageController {
     }
 
     // 프로필 이미지 변경
-    @Operation(summary = "S3에 이미지 업로드", description = "이미지를 S3에 업로드하고 URL 반환,임의로 MultilPartFile 형태로 데이터를 받았지만 필요하다면 형태 변환 가능 ")
+    @Operation(summary = "프로필 이미지 업로드", description = "이미지를 S3에 업로드하고 URL 반환,임의로 MultilPartFile 형태로 데이터를 받았지만 필요하다면 형태 변환 가능 ")
     @PostMapping("profile-image")
     public ResponseTemplate<MypageImageResponse> uploadProfileImage(@UserId long userId,@RequestPart("upload") MultipartFile request) throws IOException {
         MypageImageResponse response = mypageService.uploadMypageImageToS3(userId, request);

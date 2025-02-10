@@ -19,7 +19,7 @@ public class JwtUtilTest {
     @BeforeEach
     void setUp() {
         jwtUtil = new JwtUtil();
-        token = jwtUtil.createJwt(userId, email, role, expirationMs);
+        token = jwtUtil.createJwt("access", userId, email, role, expirationMs);
     }
 
     @Test

@@ -11,7 +11,6 @@ import com.be.byeoldam.domain.common.repository.TagBookmarkUrlRepository;
 import com.be.byeoldam.domain.personalcollection.model.PersonalCollection;
 import com.be.byeoldam.domain.personalcollection.repository.PersonalCollectionRepository;
 import com.be.byeoldam.domain.sharedcollection.model.SharedCollection;
-import com.be.byeoldam.domain.sharedcollection.model.SharedUser;
 import com.be.byeoldam.domain.sharedcollection.repository.SharedCollectionRepository;
 import com.be.byeoldam.domain.sharedcollection.repository.SharedUserRepository;
 import com.be.byeoldam.domain.tag.model.Color;
@@ -193,7 +192,7 @@ public class BookmarkService {
         // 공유컬렉션이라면 같은 컬렉션에 있는 유저인지 확인해봐야함
         if (bookmark.getPersonalCollection() != null) {
             // 개인컬렉션에 있는 북마크
-            if (!bookmark.getPersonalCollection().getUser().equals(userId)) {
+            if (!bookmark.getPersonalCollection().getUser().getId().equals(userId)) {
                 throw new CustomException("");
             }
         } else {

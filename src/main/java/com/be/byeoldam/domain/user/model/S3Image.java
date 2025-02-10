@@ -14,10 +14,10 @@ public class S3Image {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(length = 100, nullable = false, unique = true)
+    @Column(length = 300, nullable = false, unique = true)
     private String fileUrl;
 
-    @Column(length = 100, nullable = false, unique = true)
+    @Column(length = 300, nullable = false, unique = true)
     private String fileKey;
 
     private S3Image(String fileUrl, String fileKey) {

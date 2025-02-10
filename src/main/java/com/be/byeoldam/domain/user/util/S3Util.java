@@ -1,5 +1,6 @@
 package com.be.byeoldam.domain.user.util;
 
+import com.amazonaws.services.s3.model.CannedAccessControlList;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.PutObjectRequest;
 import com.be.byeoldam.config.S3Config;
@@ -17,10 +18,18 @@ import java.util.UUID;
 @RequiredArgsConstructor
 @Component
 public class S3Util {
-    private final S3Config s3Config;
+
+    @Value("${default-profile-image-url}")
+    private String defaultProfileImageUrl;
 
     @Value("${cloud.aws.s3.mypage-bucket}")
     private String bucket;
+
+    private final S3Config s3Config;
+
+    public String getDefaultProfileImageUrl() {
+        return defaultProfileImageUrl;
+    }
 
     // S3 이미지 업로드
     public S3UploadResponse imageUpload(MultipartFile file, String folderName) throws IOException {
@@ -38,11 +47,12 @@ public class S3Util {
         metadata.setContentType(file.getContentType()); // 파일 타입
 
 
-        String s3FilePathName = folderName + "/" + uuidFileName;
+        String s3FilePathName = uuidFileName;
 
         // S3에 파일 업로드
         s3Config.amazonS3Client().putObject(
                 new PutObjectRequest(bucket, s3FilePathName, inputStream, metadata)
+                        .withCannedAcl(CannedAccessControlList.PublicRead)
         );
 
         // S3에 저장된 이미지의 Url 주소 가져오기, getUrl("버킷명", "서버에 저장한 경로 포함한 파일명")
@@ -55,6 +65,7 @@ public class S3Util {
         try{
             s3Config.amazonS3Client().deleteObject(bucket, s3Key);
         }catch (Exception e){
+            e.getMessage();
             throw new CustomException("이미지 삭제 중 오류 발생!");
         }
     }

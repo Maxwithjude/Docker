@@ -51,7 +51,7 @@ export const useRssStore = defineStore("rss", () => {
 
     //rss 구독 목록 조회
     const getRss = async () => {
-        const response = await api.get(`/subscriptions`);
+        const response = await api.get(`/api/subscriptions`);
         rssList.value = response.data;
     };
 
@@ -60,20 +60,20 @@ export const useRssStore = defineStore("rss", () => {
 
     //특정 rss 최신 글 목록 조회
     const getRssArticles = async (rssId) => {
-        const response = await api.get(`/subscriptions/${rssId}`);
+        const response = await api.get(`/api/subscriptions/${rssId}`);
         rssArticles.value = response.data;
     };
 
 
     //rss 상태 갱신
     const updateRss = async () => {
-        const response = await api.get(`/subscriptions/refresh`);
+        const response = await api.get(`/api/subscriptions/refresh`);
         console.log(response.data);
     };
 
     //rss 구독 삭제
     const deleteRss = async (rssId) => {
-        const response = await api.delete(`/subscriptions/${rssId}`);
+        const response = await api.delete(`/api/subscriptions/${rssId}`);
         console.log(response.data);
     };
 

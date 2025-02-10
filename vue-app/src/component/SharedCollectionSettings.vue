@@ -13,7 +13,7 @@
         <div class="name-input-section">
           <input 
             type="text" 
-            v-model="collectionName"
+            v-model="newCollectionName"
             placeholder="컬렉션 이름을 입력하세요"
             class="name-input"
           />
@@ -58,10 +58,25 @@
 </template>
 
 <script setup>
-import { ref } from 'vue';
-import axios from 'axios';
+import { ref, computed } from 'vue';
+import { useCollectionStore } from '@/stores/collection';
+import api from '@/utils/api';
 
-const collectionName = ref('');
+const collectionStore = useCollectionStore();
+
+const props = defineProps({
+    currentName: {
+        type: String,
+        required: true
+    },
+    collectionId: {
+        type: Number,
+        required: true
+    }
+});
+
+const emit = defineEmits(['close', 'update']);
+const newCollectionName = ref(props.currentName);
 const newMemberEmail = ref('');
 const members = ref([
   { id: 1, name: '이은지' },
@@ -69,41 +84,55 @@ const members = ref([
   { id: 3, name: '박태현' }
 ]);
 
-const emit = defineEmits(['close']);
+const isValidName = computed(() => {
+    return newCollectionName.value.trim().length > 0;
+});
 
-// 이름 변경 함수
 const changeCollectionName = async () => {
-  try {
-    await axios.put('/api/collections/name', {
-      name: collectionName.value
-    });
-    alert('컬렉션 이름이 변경되었습니다.');
-  } catch (error) {
-    alert('이름 변경 중 오류가 발생했습니다.');
-    console.error(error);
-  }
+    if (isValidName.value) {
+        try {
+            await collectionStore.updateSharedCollectionName(
+                props.collectionId,
+                newCollectionName.value.trim()
+            );
+            emit('update', newCollectionName.value.trim());
+            emit('close');
+        } catch (error) {
+            console.error('공유 컬렉션 이름 변경 실패:', error);
+            // 에러 처리 로직 추가 가능
+        }
+    }
 };
 
-// 멤버 추가 함수
 const addMember = async () => {
+  if (!newMemberEmail.value.trim()) {
+    alert('이메일을 입력해주세요.');
+    return;
+  }
+
   try {
-    await axios.post('/api/collections/members', {
-      email: newMemberEmail.value
-    });
-    newMemberEmail.value = ''; // 입력 필드 초기화
-    // TODO: 멤버 목록 새로고침 로직 추가
-    alert('멤버가 추가되었습니다.');
+    await collectionStore.addMemberToSharedCollection(
+      props.collectionId,
+      newMemberEmail.value.trim()
+    );
+    
+    // 성공 후 입력 필드 초기화
+    newMemberEmail.value = '';
+    alert('멤버 초대 요청이 성공적으로 전송되었습니다.');
   } catch (error) {
-    alert('멤버 추가 중 오류가 발생했습니다.');
-    console.error(error);
+    console.error('멤버 초대 중 오류 발생:', error);
+    alert('멤버 초대 중 오류가 발생했습니다.');
   }
 };
 
-// 멤버 삭제 함수
 const removeMember = async (memberId) => {
   try {
-    await axios.delete(`/api/collections/members/${memberId}`);
-    // TODO: 멤버 목록 새로고침 로직 추가
+    await collectionStore.removeMemberFromSharedCollection(
+      props.collectionId,
+      memberId
+    );
+    // 멤버 목록에서 해당 멤버 제거
+    members.value = members.value.filter(member => member.id !== memberId);
     alert('멤버가 삭제되었습니다.');
   } catch (error) {
     alert('멤버 삭제 중 오류가 발생했습니다.');

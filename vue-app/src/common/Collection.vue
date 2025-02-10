@@ -6,7 +6,7 @@
         <button class="settings-button" @click.stop="openSettings">
           <i class="fas fa-cog"></i>
         </button>
-        <button class="delete-button" @click.stop="$emit('delete', collection.collection_id)">
+        <button class="delete-button" @click.stop="handleDelete">
           <i class="fas fa-trash"></i>
         </button>
       </div>
@@ -18,11 +18,15 @@
 
     <SharedCollectionSettings 
       v-if="showSharedSettings && !collection.isPersonal" 
+      :current-name="collection.name"
+      :collection-id="collection.collection_id"
       @close="showSharedSettings = false"
+      @update="handleNameUpdate"
     />
     <PersonalCollectionSettings 
       v-if="showPersonalSettings && collection.isPersonal"
-      :currentName="collection.name"
+      :current-name="collection.name"
+      :collection-id="collection.collection_id"
       @close="showPersonalSettings = false"
       @update="handleNameUpdate"
     />
@@ -31,6 +35,7 @@
 
 <script setup>
 import { ref } from 'vue';
+import { useCollectionStore } from '@/stores/collection';
 import SharedCollectionSettings from '../component/SharedCollectionSettings.vue';
 import PersonalCollectionSettings from '../component/PersonalCollectionSettings.vue';
 
@@ -46,6 +51,8 @@ const props = defineProps({
 
 const emit = defineEmits(['delete', 'click', 'update']);
 
+const collectionStore = useCollectionStore();
+
 const openSettings = () => {
   if (props.collection.isPersonal) {
     showPersonalSettings.value = true;
@@ -59,6 +66,21 @@ const handleNameUpdate = (newName) => {
     collectionId: props.collection.collection_id,
     newName: newName
   });
+};
+
+const handleDelete = async () => {
+  try {
+    if (props.collection.isPersonal) {
+      await collectionStore.deletePersonalCollection(props.collection.collection_id);
+    } else {
+      await collectionStore.deleteSharedCollection(props.collection.collection_id);
+    }
+    // 삭제 후 필요한 처리 (예: 목록 새로고침)
+    emit('delete', props.collection.collection_id);
+  } catch (error) {
+    console.error('컬렉션 삭제 중 오류 발생:', error);
+    // 에러 처리 로직 추가 가능
+  }
 };
 </script>
 

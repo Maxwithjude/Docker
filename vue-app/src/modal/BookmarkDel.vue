@@ -10,11 +10,28 @@
 </template>
 
 <script setup>
-const emit = defineEmits(['close', 'confirm'])
+import { useBookmarkStore } from '@/stores/bookmark'
+import { ElMessage } from 'element-plus'
 
-const handleDelete = () => {
-  emit('confirm')
-  emit('close')
+const emit = defineEmits(['close', 'confirm'])
+const bookmarkStore = useBookmarkStore()
+const props = defineProps({
+  bookmarkId: {
+    type: String,
+    required: true
+  }
+})
+
+const handleDelete = async () => {
+  try {
+    await bookmarkStore.deleteBookmark(props.bookmarkId)
+    ElMessage.success('북마크가 삭제되었습니다')
+    emit('confirm')
+    emit('close')
+  } catch (error) {
+    console.error('북마크 삭제 중 오류 발생:', error)
+    ElMessage.error('북마크 삭제에 실패했습니다')
+  }
 }
 </script>
 

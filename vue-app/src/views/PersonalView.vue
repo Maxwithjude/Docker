@@ -73,13 +73,16 @@ import SideBar from '@/common/SideBar.vue'
 import { computed, ref } from 'vue';
 import PersonalCollectionList from '@/component/PersonalCollectionList.vue';
 import CreateCollection from '@/modal/CreateCollection.vue';
-import { useCounterStore } from '@/stores/counter';
+import { useCollectionStore } from '@/stores/collection';
+import { storeToRefs } from 'pinia';
 
-const counterStore = useCounterStore(); 
+const collectionStore = useCollectionStore();
+const { personalCollections } = storeToRefs(collectionStore);
 const selectedCollection = ref('all');
 const showCreateModal = ref(false);
 
-const collections = computed(() => counterStore.personalCollections.results);
+const collections = computed(() => personalCollections.value.results);
+
 
 const filteredCollections = computed(() => {
     return collections.value.filter(collection => collection.name === selectedCollection.value);

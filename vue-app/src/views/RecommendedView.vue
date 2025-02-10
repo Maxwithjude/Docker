@@ -41,7 +41,7 @@
                         
                         <div class="bookmarks-grid" v-if="!isLoading">
                             <CardUnbookmarked 
-                                v-for="bookmark in recommendedBookmarks" 
+                                v-for="bookmark in recommendedBookmarksList" 
                                 :key="bookmark.id"
                                 :url="bookmark.url"
                                 :img="bookmark.img"
@@ -62,15 +62,19 @@
 <script setup>
 import { ref, onMounted, onUnmounted, computed } from 'vue';
 import { useRouter } from 'vue-router';
+import { storeToRefs } from 'pinia';
 import Header from '@/common/Header.vue';
 import SideBar from '@/common/SideBar.vue';
 import CardUnbookmarked from '@/common/CardUnbookmarked.vue';
-import { useCounterStore } from '@/stores/counter';
+import { useBookmarkStore } from '@/stores/bookmark';
 
 const router = useRouter();
-const store = useCounterStore();
+const bookmarkStore = useBookmarkStore();
+const { exampleUserDefineTags, exampleRecommendedBookmarks } = storeToRefs(bookmarkStore);
+const { getUserDefineTags, getRecommendedBookmarks } = bookmarkStore;
+
 const isLoading = ref(true);
-const recommendedBookmarks = ref([]);
+const recommendedBookmarksList = ref([]);
 const selectedTag = ref(null);
 const userTags = ref([]);
 const page = ref(1);
@@ -81,9 +85,13 @@ const hasUserTags = computed(() => userTags.value && userTags.value.length > 0);
 
 const fetchUserTags = async () => {
     try {
-        const response = await store.getUserDefineTags();
-        if (response.success && response.results.tagList) {
-            userTags.value = response.results.tagList.map((tagName, index) => ({
+        await getUserDefineTags();
+        // 실제 API 준비될 때까지 예시 데이터 사용
+        const tagList = exampleUserDefineTags.value.results.tagList;
+        console.log('태그 리스트:', tagList);
+        
+        if (tagList && tagList.length > 0) {
+            userTags.value = tagList.map((tagName, index) => ({
                 id: index + 1,
                 name: tagName
             }));
@@ -94,30 +102,26 @@ const fetchUserTags = async () => {
         }
     } catch (error) {
         console.error('태그 로딩 실패:', error);
-        userTags.value = [];  // 에러 시 빈 배열로 설정
+        userTags.value = [];
     }
 };
 
 const fetchRecommendedBookmarks = async (tagName = null) => {
     try {
         isLoading.value = true;
-        const response = await store.getRecommendedBookmarks(tagName, 12, page.value);
+        await getRecommendedBookmarks(tagName);
         
-        if (response.success && response.result.recommendedUrlList) {
-            const formattedBookmarks = response.result.recommendedUrlList.map((bookmark, index) => ({
+        // 실제 API 준비될 때까지 예시 데이터 사용
+        const recommendedList = exampleRecommendedBookmarks.value.result.recommendedUrlList;
+        
+        if (recommendedList) {
+            recommendedBookmarksList.value = recommendedList.map((bookmark, index) => ({
                 id: `${page.value}-${index}`,
                 url: bookmark.url,
                 title: bookmark.title,
                 description: bookmark.description,
                 img: bookmark.img
             }));
-
-            if (page.value === 1) {
-                recommendedBookmarks.value = formattedBookmarks;
-            } else {
-                recommendedBookmarks.value = [...recommendedBookmarks.value, ...formattedBookmarks];
-            }
-            hasMore.value = formattedBookmarks.length === 12;
         }
     } catch (error) {
         console.error('추천 북마크 로딩 실패:', error);
@@ -138,7 +142,8 @@ const setupIntersectionObserver = () => {
     observer.value = new IntersectionObserver((entries) => {
         if (entries[0].isIntersecting && hasMore.value && !isLoading.value) {
             page.value++;
-            fetchRecommendedBookmarks(selectedTag.value);
+            const selectedTagName = userTags.value.find(tag => tag.id === selectedTag.value)?.name;
+            fetchRecommendedBookmarks(selectedTagName);
         }
     });
 

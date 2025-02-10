@@ -95,12 +95,14 @@
 
 <script setup>
 import { ref, onMounted, onUnmounted } from 'vue'
-import { useCounterStore } from '@/stores/counter'
+import { useBookmarkStore } from '@/stores/bookmark'
+import { storeToRefs } from 'pinia'
 import Header from '@/common/Header.vue'
 import SideBar from '@/common/SideBar.vue'
 import Card from '@/common/Card.vue'
 
-const store = useCounterStore()
+const bookmarkStore = useBookmarkStore()
+const { searchBookmarksByTag } = storeToRefs(bookmarkStore)
 const searchTag = ref('')
 const bookmarks = ref([])
 const recommendedBookmarks = ref([])
@@ -122,7 +124,7 @@ const handleSearch = async () => {
         lastCursorId.value = null // 검색 시 커서 초기화
         hasMore.value = true // 검색 시 hasMore 초기화
         
-        const response = await store.searchBookmarksByTag(searchTag.value)
+        const response = await bookmarkStore.getSearchBookmarksByTag(searchTag.value)
         
         // 검색 결과 업데이트 (초기화 후 설정)
         bookmarks.value = response.result.userBookmarkList
@@ -159,7 +161,10 @@ const loadMoreBookmarks = async () => {
     
     try {
         loading.value = true
-        const response = await store.searchBookmarksByTag(searchTag.value, lastCursorId.value)
+        const response = await bookmarkStore.getSearchBookmarksByTag(
+            searchTag.value,
+            lastCursorId.value
+        )
         
         // 새로운 북마크들만 기존 목록에 추가
         const newBookmarks = response.result.userBookmarkList.filter(newBookmark => 

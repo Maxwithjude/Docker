@@ -73,28 +73,17 @@ import SideBar from '@/common/SideBar.vue'
 import { computed, ref } from 'vue';
 import SharedCollectionList from '@/component/SharedCollectionList.vue';
 import CreateCollection from '@/modal/CreateCollection.vue';
-import { useCounterStore } from '@/stores/counter';
+import { useCollectionStore } from '@/stores/collection';
+import { storeToRefs } from 'pinia';
 
-const counterStore = useCounterStore(); 
+const collectionStore = useCollectionStore();
+const { exampleSharedCollections } = storeToRefs(collectionStore);
 const selectedCollection = ref('all');
 const showCreateModal = ref(false);
 
 const collections = computed(() => {
-    const collectionList = counterStore.sharedCollections.results;
-    const bookmarks = counterStore.sharedCollectionsBookmarks.results;
-    
-    return collectionList.map(collection => {
-        if (collection.collection_id === bookmarks.collection_id) {
-            return {
-                ...collection,
-                users: bookmarks.users
-            };
-        }
-        return collection;
-    });
+    return exampleSharedCollections.value.results;
 });
-
-const collectionBookmarks = computed(() => counterStore.sharedCollectionsBookmarks.results);
 
 const filteredCollections = computed(() => {
     return collections.value.filter(collection => 

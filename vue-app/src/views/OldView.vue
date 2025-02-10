@@ -24,6 +24,7 @@
                     <div v-else class="cards-grid">
                         <Card
                             v-for="bookmark in bookmarkResults"
+                            :key="bookmark.bookmark_id"
                             :bookmarkId="bookmark.bookmark_id"
                             :url="bookmark.url"
                             :img="bookmark.img"
@@ -44,18 +45,37 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue';
+import { computed, onMounted } from 'vue';
 import Header from '@/common/Header.vue';
 import SideBar from '@/common/SideBar.vue';
 import Card from '@/common/Card.vue';
-import { useCounterStore } from '@/stores/counter';
+import { useBookmarkStore } from '@/stores/bookmark';
+import { storeToRefs } from 'pinia';
 
-const store = useCounterStore();
-const bookmarkResults = computed(() => store.oldBookmarks.results || []);
+const bookmarkStore = useBookmarkStore();
+const { exampleOldBookmarks } = storeToRefs(bookmarkStore);
 
-const togglePriority = (bookmark) => {
-    bookmark.priority = !bookmark.priority;
-}
+// 오래된 북마크 데이터 가져오기
+const bookmarkResults = computed(() => {
+    return exampleOldBookmarks.value?.results || [];
+});
+
+const togglePriority = async (bookmark) => {
+    try {
+        await bookmarkStore.changePiority(bookmark.bookmark_id, !bookmark.priority);
+        bookmark.priority = !bookmark.priority;
+    } catch (error) {
+        console.error('북마크 중요도 변경 실패:', error);
+    }
+};
+
+onMounted(async () => {
+    try {
+        await bookmarkStore.getOldBookmarks();
+    } catch (error) {
+        console.error('오래된 북마크 로딩 실패:', error);
+    }
+});
 </script>
 
 <style scoped>

@@ -33,10 +33,17 @@
 
 <script setup>
 import { ref, computed } from 'vue';
+import { useCollectionStore } from '@/stores/collection';
+
+const collectionStore = useCollectionStore();
 
 const props = defineProps({
     currentName: {
         type: String,
+        required: true
+    },
+    collectionId: {
+        type: Number,
         required: true
     }
 });
@@ -53,10 +60,19 @@ const closeModal = () => {
     emit('close');
 };
 
-const handleComplete = () => {
+const handleComplete = async () => {
     if (isValidName.value) {
-        emit('update', newCollectionName.value.trim());
-        closeModal();
+        try {
+            await collectionStore.updatePersonalCollectionName(
+                props.collectionId, 
+                newCollectionName.value.trim()
+            );
+            emit('update', newCollectionName.value.trim());
+            closeModal();
+        } catch (error) {
+            console.error('컬렉션 이름 변경 실패:', error);
+            // 여기에 에러 처리 로직 추가 (예: 사용자에게 알림 표시)
+        }
     }
 };
 </script>

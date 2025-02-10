@@ -24,8 +24,25 @@
 
 <script setup>
 import { ref } from 'vue'
+import { useBookmarkStore } from '@/stores/bookmark'
+import { ElMessage } from 'element-plus'
 
-const tags = ref(['태그1', '태그2', '태그3','태그4']) // 초기 태그 데이터
+const emit = defineEmits(['close'])
+const bookmarkStore = useBookmarkStore()
+
+const props = defineProps({
+  bookmarkId: {
+    type: String,
+    required: true
+  },
+  initialTags: {
+    type: Array,
+    required: true,
+    default: () => []
+  }
+})
+
+const tags = ref([...props.initialTags])
 const newTag = ref('')
 
 const addTag = () => {
@@ -39,9 +56,15 @@ const removeTag = (tagToRemove) => {
     tags.value = tags.value.filter(tag => tag !== tagToRemove)
 }
 
-const saveChanges = () => {
-    // 여기에 태그 저장 로직 구현
-    console.log('저장된 태그:', tags.value)
+const saveChanges = async () => {
+  try {
+    await bookmarkStore.manageTags(props.bookmarkId, tags.value)
+    ElMessage.success('태그가 성공적으로 수정되었습니다')
+    emit('close')
+  } catch (error) {
+    console.error('태그 수정 중 오류 발생:', error)
+    ElMessage.error('태그 수정에 실패했습니다')
+  }
 }
 </script>
 

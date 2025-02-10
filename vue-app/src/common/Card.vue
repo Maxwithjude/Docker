@@ -8,7 +8,8 @@
             <div class="settings">
                 <BookmarkSettings 
                     :priority="props.priority"
-                    @toggle-priority="togglePriority"
+                    :bookmark-id="props.bookmarkId"
+                    @toggle-priority="handlePriorityToggle"
                 />
             </div>
         </div>
@@ -100,14 +101,7 @@ const props = defineProps({
 const router = useRouter();
 
 const visibleTags = computed(() => props.tag.slice(0, 2));
-// const remainingTags = computed(() => props.tag.slice(2));
 const remainingTagsCount = computed(() => Math.max(0, props.tag.length - 2));
-
-const emit = defineEmits(['togglePriority']);
-
-const togglePriority = () => {
-    emit('togglePriority');
-};
 
 const imageSrc = computed(() => {
     return props.img && props.img.startsWith('http') 
@@ -120,6 +114,12 @@ const handleImageClick = () => {
         ? `/personal-collection/${props.bookmarkId}`
         : `/shared-collection/${props.bookmarkId}`;
     router.push(route);
+};
+
+const emit = defineEmits(['update:priority']);
+
+const handlePriorityToggle = () => {
+    emit('update:priority', !props.priority);
 };
 </script>
 

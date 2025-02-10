@@ -45,19 +45,40 @@
 </template>
 
 <script setup>
-import { ref } from 'vue';
+import { ref, onMounted } from 'vue'
+import { useCollectionStore } from '@/stores/collection'
+import { storeToRefs } from 'pinia'
+import { ElMessage } from 'element-plus'
 
-const emit = defineEmits(['close']);
+const emit = defineEmits(['close'])
+const collectionStore = useCollectionStore()
+const { members } = storeToRefs(collectionStore)
 
-const members = ref([
-    { id: 1, name: '이은지' },
-    { id: 2, name: '김진영' },
-    { id: 3, name: '박태현' }
-]);
+const props = defineProps({
+  collectionId: {
+    type: String,
+    required: true
+  }
+})
 
-const removeMember = (memberId) => {
-    members.value = members.value.filter(member => member.id !== memberId);
-};
+onMounted(async () => {
+  try {
+    await collectionStore.fetchCollectionMembers(props.collectionId)
+  } catch (error) {
+    console.error('멤버 목록 로드 실패:', error)
+    ElMessage.error('멤버 목록을 불러오는데 실패했습니다')
+  }
+})
+
+const removeMember = async (memberId) => {
+  try {
+    await collectionStore.removeMember(props.collectionId, memberId)
+    ElMessage.success('멤버가 삭제되었습니다')
+  } catch (error) {
+    console.error('멤버 삭제 실패:', error)
+    ElMessage.error('멤버 삭제에 실패했습니다')
+  }
+}
 
 const closeModal = () => {
     emit('close');

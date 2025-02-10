@@ -1,6 +1,7 @@
 package com.be.byeoldam.domain.notification;
 
 import com.be.byeoldam.common.ResponseTemplate;
+import com.be.byeoldam.common.annotation.UserId;
 import com.be.byeoldam.domain.notification.dto.NotificationResponse;
 import com.be.byeoldam.domain.notification.service.NotificationService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -19,10 +20,6 @@ public class NotificationController {
 
     private final NotificationService notificationService;
 
-    // 임시 userId
-    private final Long userId = 1L;
-
-
     /**
      * 사용자의 알림 목록 조회
      */
@@ -34,7 +31,7 @@ public class NotificationController {
     )
     @GetMapping
     public ResponseTemplate<List<NotificationResponse>> getNotifications(
-//            @RequestParam  userId
+            @UserId Long userId
     ) {
         return ResponseTemplate.ok(notificationService.getNotifications(userId));
     }
@@ -49,8 +46,8 @@ public class NotificationController {
     )
     @DeleteMapping("/{notificationId}/read")
     public ResponseTemplate<Void> deleteNotification(
-            @PathVariable Long notificationId
-//            @RequestParam userId
+            @PathVariable Long notificationId,
+            @UserId Long userId
     ) {
         notificationService.deleteNotification(notificationId, userId);
         return ResponseTemplate.ok();
@@ -66,7 +63,7 @@ public class NotificationController {
     )
     @DeleteMapping("/read")
     public ResponseTemplate<Void> deleteAllNotifications(
-//            @RequestParam userId
+            @UserId Long userId
     ) {
         notificationService.deleteAllNotifications(userId);
         return ResponseTemplate.ok();

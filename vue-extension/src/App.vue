@@ -15,8 +15,19 @@
         </RouterLink>
       </div>
       <button class="link-button">
-        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 6H5.25A2.25 2.25 0 0 0 3 8.25v10.5A2.25 2.25 0 0 0 5.25 21h10.5A2.25 2.25 0 0 0 18 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25" />
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke-width="1.5"
+          stroke="currentColor"
+          class="w-5 h-5"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            d="M13.5 6H5.25A2.25 2.25 0 0 0 3 8.25v10.5A2.25 2.25 0 0 0 5.25 21h10.5A2.25 2.25 0 0 0 18 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25"
+          />
         </svg>
       </button>
     </nav>
@@ -25,20 +36,32 @@
 </template>
 
 <script setup>
-import { RouterView } from "vue-router"
-import { onMounted } from 'vue'
-import { useUserStore } from './stores/userStore'
+import { RouterView } from "vue-router";
+import { onMounted } from "vue";
+import { useUserStore } from "./stores/userStore";
 
-const userStore = useUserStore()
+const userStore = useUserStore();
 
 onMounted(() => {
-  chrome.runtime.sendMessage({ action: 'getUserId' }, (response) => {
-    if (response && response.userId) {
-      console.log('App.vue에서 userId 불러오기 성공: ',response.userId)
-      userStore.setUserId(response.userId)
+  // 확장 아이콘 클릭 시 백그라운드 스크립트로 메시지 보내기
+  chrome.runtime.sendMessage({ action: "popupOpened" }, (response) => {
+    if (response && response.status === "success") {
+      // popupOpened 처리 후, extension Storage에서 사용자 로그인 정보가져오기
+      chrome.storage.local.get(["userId", "access_token"], (result) => {
+        if (result.userId && result.access_token) {
+          console.log(
+            "App.vue로 데이터 가져오기 성공 : ",
+            result.userId,
+            result.access_token
+          );
+          userStore.setUser(result.userId, result.access_token);
+        } else {
+          console.log("extension Storage에 저장된 사용자 정보 없음");
+        }
+      });
     }
-  })
-})
+  });
+});
 </script>
 
 <style scoped>

@@ -140,20 +140,16 @@ public class RssService {
         UserRss userRss = userRssRepository.findByUserIdAndRssId(userId, rssId)
                 .orElseThrow(() -> new CustomException("구독하지 않은 RSS입니다."));
 
-        String latestTitleBeforeUpdate = userRss.getLatestTitle();
+        String newestTitle = extractLatestTitle(rss.getRssUrl());
 
-        Page<RssPostResponse> latestArticles = fetchRssPosts(rss.getRssUrl(), latestTitleBeforeUpdate, pageable);
-
-        // 첫 페이지 요청 시에만 latestTitle 업데이트
-        if (pageable.getPageNumber() == 0 && !latestArticles.isEmpty()) {
-            String newestTitle = latestArticles.getContent().get(0).getTitle();
-
-            // 최신 글이 존재하면, previousTitle과 latestTitle 업데이트
-            if (!Objects.equals(newestTitle, latestTitleBeforeUpdate)) {
-                userRss.updateTitles(newestTitle);
-            }
+        if (newestTitle != null && pageable.getPageNumber() == 0) {
+            userRss.updateTitles(newestTitle);
         }
 
+        String latestTitleBeforeUpdate = userRss.getLatestTitle();
+        String previousBeforeUpdate = userRss.getPreviousTitle();
+
+        Page<RssPostResponse> latestArticles = fetchRssPosts(rss.getRssUrl(), latestTitleBeforeUpdate, previousBeforeUpdate, pageable);
 
         return RssLatestPostsResponse.of(
                 rss.getId(),
@@ -163,7 +159,7 @@ public class RssService {
     }
 
     // RSS의 최신 글 목록을 가져오는 메서드
-    public Page<RssPostResponse> fetchRssPosts(String rssUrl, String latestTitle, Pageable pageable) {
+    public Page<RssPostResponse> fetchRssPosts(String rssUrl, String latestTitle, String previousTitle, Pageable pageable) {
         try {
             // RSS 피드 가져오기
             URL feedSource = new URL(rssUrl);
@@ -175,33 +171,35 @@ public class RssService {
             if (entries.isEmpty()) {
                 return Page.empty(pageable);
             }
+//
+//            if (previousTitle == null) {
+//                return new PageImpl<>(
+//                        entries.stream()
+//                                .map(entry -> RssPostResponse.builder()
+//                                        .title(entry.getTitle())
+//                                        .url(entry.getLink())
+//                                        .isRead(false) // 첫 구독 시, 모든 글을 새 글로 처리
+//                                        .build()
+//                                )
+//                                .skip(pageable.getOffset())
+//                                .limit(pageable.getPageSize())
+//                                .toList(),
+//                        pageable,
+//                        entries.size()
+//                );
+//            }
 
-            if (latestTitle == null) {
-                return new PageImpl<>(
-                        entries.stream()
-                                .map(entry -> RssPostResponse.builder()
-                                        .title(entry.getTitle())
-                                        .url(entry.getLink())
-                                        .isRead(false) // 첫 구독 시, 모든 글을 새 글로 처리
-                                        .build()
-                                )
-                                .skip(pageable.getOffset())
-                                .limit(pageable.getPageSize())
-                                .toList(),
-                        pageable,
-                        entries.size()
-                );
-            }
-
-            // previousTitle에 해당하는 글의 publishedDate 가져오기
-            LocalDateTime latestDateTime = entries.stream()
-                    .filter(entry -> Objects.equals(entry.getTitle(), latestTitle))
-                    .map(entry -> convertToLocalDateTime(entry.getPublishedDate()))
-                    .findFirst()  // Optional로 반환됨
-                    .orElse(null); // 없으면 null
+            // latestTitle 해당하는 글의 publishedDate 가져오기
+            LocalDateTime previousDateTime = (previousTitle != null) ?
+                    entries.stream()
+                        .filter(entry -> Objects.equals(entry.getTitle(), previousTitle))
+                        .map(entry -> convertToLocalDateTime(entry.getPublishedDate()))
+                        .findFirst()  // Optional로 반환됨
+                        .orElse(null)
+                    : null;
 
             // 페이징 처리
-            List<RssPostResponse> pagedArticles = feed.getEntries().stream()
+            List<RssPostResponse> pagedArticles = entries.stream()
                     .skip(pageable.getOffset())
                     .limit(pageable.getPageSize())
                     .map(entry -> {
@@ -210,7 +208,7 @@ public class RssService {
 
                         LocalDateTime publishedDate = convertToLocalDateTime(entry.getPublishedDate());
 
-                        boolean isRead = (latestDateTime != null && publishedDate.isBefore(latestDateTime) || publishedDate.isEqual(latestDateTime));
+                        boolean isRead = (previousDateTime != null && (publishedDate.isBefore(previousDateTime) || publishedDate.isEqual(previousDateTime)));
 
                         return RssPostResponse.builder()
                                 .title(title)

@@ -14,14 +14,15 @@
 
 <script setup>
 defineProps({
-feeds: {
-    type: Array,
-    required: true
-},
-selectedFeed: {
-    type: Number,
-    required: true
-}
+    feeds: {
+        type: Array,
+        required: true,
+        default: () => []
+    },
+    selectedFeed: {
+        type: Number,
+        required: true
+    }
 })
 
 defineEmits(['select-feed'])

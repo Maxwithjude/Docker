@@ -52,10 +52,11 @@ const router = createRouter({
     },
     // 메인 페이지 : 로그인 후 개인의 메인 페이지
     {
-      path: '/main',
+      path: '/user/:id/main',
       name: 'main',
       component: MainView,
     },
+
     // 중요페이지
     {
       path: '/user/:id/important',

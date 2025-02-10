@@ -20,7 +20,7 @@
                             새 컬렉션
                         </button>
                     </div>
-                    <div v-if="collections.length === 0" class="empty-state">
+                    <div v-if="!allCollections?.length" class="empty-state">
                         <i class="fas fa-folder-open empty-icon"></i>
                         <p class="empty-text">컬렉션이 존재하지 않습니다.</p>
                         <p class="empty-description">
@@ -31,7 +31,7 @@
                     
                     <div v-else class="collections-grid">
                         <Collection 
-                            v-for="collection in collections"
+                            v-for="collection in allCollections"
                             :key="collection.collection_id"
                             :collection="collection"
                             @delete="deleteCollection"
@@ -53,6 +53,7 @@
 <script setup>
 import { onMounted, ref } from 'vue';
 import { useRouter } from 'vue-router';
+import { storeToRefs } from 'pinia';
 import Header from '@/common/Header.vue';
 import SideBar from '@/common/SideBar.vue';
 import Collection from '@/common/Collection.vue';
@@ -61,17 +62,21 @@ import { useCollectionStore } from '@/stores/collection';
 
 const router = useRouter();
 const collectionStore = useCollectionStore();
+const { allCollections } = storeToRefs(collectionStore);
 const showCreateModal = ref(false);
-const collections = ref([]);
 
 const createNewCollection = () => {
     showCreateModal.value = true;
 };
 
 const deleteCollection = async (collectionId) => {
-    if (confirm('정말로 이 컬렉션을 삭제하시겠습니까?')) {
-        await collectionStore.deleteCollection(collectionId);
-        collections.value = collections.value.filter(c => c.collection_id !== collectionId);
+    try {
+        if (confirm('정말로 이 컬렉션을 삭제하시겠습니까?')) {
+            await collectionStore.deleteCollection(collectionId);
+            // store의 allCollections가 자동으로 업데이트됨
+        }
+    } catch (error) {
+        console.error('컬렉션 삭제 실패:', error);
     }
 };
 
@@ -90,7 +95,13 @@ const navigateToCollection = (collection) => {
 };
 
 onMounted(async () => {
-    collections.value = await collectionStore.exampleAllCollections;
+    try {
+        await collectionStore.fetchAllCollection();
+    } catch (error) {
+        console.error('컬렉션 로딩 실패:', error);
+        // 에러 발생 시 예시 데이터 사용
+        allCollections.value = collectionStore.exampleAllCollections;
+    }
 });
 </script>
 

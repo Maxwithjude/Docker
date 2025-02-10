@@ -43,7 +43,9 @@
 
 <script setup>
 import { ref, computed } from 'vue';
+import { useCollectionStore } from '@/stores/collection';
 
+const collectionStore = useCollectionStore();
 const emit = defineEmits(['close']);
 
 const collectionName = ref('');
@@ -53,18 +55,21 @@ const isValid = computed(() => {
     return collectionName.value.trim().length > 0;
 });
 
-const handleCreate = () => {
+const handleCreate = async () => {
     if (!isValid.value) return;
     
-    const newCollection = {
-        name: collectionName.value,
-        type: collectionType.value
-    };
-    
-    console.log('새 컬렉션:', newCollection);
-    // 여기에 생성 로직 추가
-    
-    emit('close'); // 모달 닫기
+    try {
+        if (collectionType.value === 'personal') {
+            await collectionStore.createPersonalCollection(collectionName.value);
+        } else {
+            await collectionStore.createSharedCollection(collectionName.value);
+        }
+        
+        emit('close'); // 성공 시 모달 닫기
+    } catch (error) {
+        console.error('컬렉션 생성 중 오류 발생:', error);
+        // 여기에 에러 처리 로직 추가 (예: 사용자에게 알림 표시)
+    }
 };
 </script>
 

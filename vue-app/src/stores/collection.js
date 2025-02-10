@@ -50,33 +50,182 @@ export const useCollectionStore = defineStore("collection", () => {
     { "collection_id": 5, "name": "알고리즘스터디", "isPersonal": false },
     { "collection_id": 6, "name": "영어공부", "isPersonal": false }
   ]);
+  ///////////////////////////////////////////////////////////////////////////////////////////////
+  //개인 컬렉션 예시 response
+  const examplePersonalCollections = ref(
+    {
+      "success" : true,
+      "message" : "some message",
+      "results": [
+        {
+          "collection_id" : 1,
+          "name" : "개발",
+          "isPersonal" : true
+        }, 
+        {
+          "collection_id" : 2,
+          "name" : "자바",
+          "isPersonal" : true
+        },
+        {
+          "collection_id" : 3,
+          "name" : "웹서핑",
+          "isPersonal" : true
+        }
+      ] 
+    }
+  );
+  ///////////////////////////////////////////////////////////////////////////////////////////////
+  //공유 컬렉션 예시 response
+  const exampleSharedCollections = ref(
+    {
+      "success":true,
+      "message":"some message",
 
-    
+      "results": [
+        {
+          "collection_id" : 1,
+          "name" : "일본여행",
+          "isPersonal" : false
+        }, 
+        {
+          "collection_id" : 2,
+          "name" : "알고리즘스터디",
+          "isPersonal" : false
+        }, 
+        {
+          "collection_id" : 3,
+          "name" : "영어공부",
+          "isPersonal" : false
+        }
+      ]
+    }
+  )
+  ///////////////////////////////////////////////////////////////////////////////////////////////
+  // 개인 컬렉션 생성
+  const createPersonalCollection = async (name) => {
+    try {
+      const request = {
+        name: name
+      } 
+      const response = await api.post('/api/collections/personal', request)
+      console.log('컬렉션 생성 성공:')
+    } catch (error) {
+      console.error('개인 컬렉션 생성 중 오류 발생:', error)
+      throw error
+    }
+  }
 
-//     //개인 컬렉션 불러오기
-//     const getPersonalCollection = async (params) => {
-//         try {
-//             const res = await axios.get(`${REST_API_URL}/personal`)
-//         } catch (error) {
-            
-//         }
-//     }
+  // 공유 컬렉션 생성
+  const createSharedCollection = async (name) => {
+    try {
+      const request = {
+        "sharedCollectionName": name
+      } 
+      const response = await api.post('/api/collections/shared', request)
+      console.log('컬렉션 생성 성공:')
 
-//     //공유컬렉션
-//     const getSharedCollection = async (id) => {
-//         try {
-//             const res = await axios.get(`${REST_API_URL}/shared`), params: { id: id }
-//         } catch (error) {
-            
-//         }
-//     }
+    } catch (error) {
+      console.error('컬렉션 생성 중 오류 발생:', error)
+      throw error
+    }
+  }
+  // 개인컬렉션 이름 변경
+  const updatePersonalCollectionName = async (collectionId, newName) => {
+    try {
+      const request = {
+        "newName": newName
+      }
+      const response = await api.put(`/api/collections/personal/${collectionId}`, request)
+      console.log('컬렉션 이름 변경 성공:')
+
+    } catch (error) {
+      console.error('컬렉션 이름 변경 중 오류 발생:', error)
+      throw error
+    }
+  }
+  // 공유컬렉션 이름 변경
+  const updateSharedCollectionName = async (collectionId, newName) => {
+    try {
+      const request = {
+        "newName": newName
+      }
+      const response = await api.put(`/api/collections/shared/${collectionId}`, request)
+      console.log('컬렉션 이름 변경 성공:')
+
+    } catch (error) {
+      console.error('컬렉션 이름 변경 중 오류 발생:', error)
+      throw error
+    }
+  }
+  //개인컬렉션 삭제
+  const deletePersonalCollection = async (collectionId) => {
+    try {
+      const response = await api.delete(`/api/collections/personal/${collectionId}`)
+      console.log('개인컬렉션 삭제 성공:')
+    } catch (error) {
+      console.error('개인컬렉션 삭제 중 오류 발생:', error)
+      throw error
+    }
+
+  }
+  //공유컬렉션 삭제
+  const deleteSharedCollection = async (collectionId) => {
+    try { 
+      const response = await api.delete(`/api/collections/shared/${collectionId}`)
+      console.log('공유컬렉션 삭제 성공:')
+    } catch (error) {
+      console.error('공유컬렉션 삭제 중 오류 발생:', error)
+      throw error
+    }
+
+  } 
+  // 공유 컬렉션 인원 초대 요청 
+  const addMemberToSharedCollection = async (collectionId, memberEmail) => {
+    try {
+      const request = {
+        "email": memberEmail
+      }
+      const response = await api.post(`/api/collections/shared/${collectionId}/invite`, request)
+      console.log('공유컬렉션 인원 추가 성공:')
+
+    } catch (error) {
+      console.error('공유컬렉션 인원 추가 중 오류 발생:', error)
+      throw error
+    }
+  }
+
+  //공유 컬렉션 인원 강퇴
+  const removeMemberFromSharedCollection = async (collectionId, userId) => {
+    try {
+      const response = await api.delete(`/api/collections/shared/${collectionId}/members/${userId}`)
+      console.log('공유컬렉션 인원 강퇴 성공:')
+    } catch (error) {
+      console.error('공유컬렉션 인원 강퇴 중 오류 발생:', error)
+      throw error
+    }
+  }
+
+
+
     return{
         personalCollections,
         sharedCollections,
         allCollections,
         fetchAllCollection,
-    //     getPersonalCollection,
-    //     getSharedCollection,
         exampleAllCollections,
+        examplePersonalCollections,
+        exampleSharedCollections,
+        createPersonalCollection,
+        createSharedCollection,
+        updatePersonalCollectionName,
+        updateSharedCollectionName,
+        deletePersonalCollection,
+        deleteSharedCollection,
+        addMemberToSharedCollection,
+        removeMemberFromSharedCollection
     }
 });
+
+
+

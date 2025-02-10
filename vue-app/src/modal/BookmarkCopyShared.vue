@@ -18,8 +18,8 @@
           <option value="" disabled>컬렉션을 선택해주세요</option>
           <option 
             v-for="collection in sharedCollections" 
-            :key="collection.id" 
-            :value="collection.id"
+            :key="collection.collection_id" 
+            :value="collection.collection_id"
           >
             {{ collection.name }}
           </option>
@@ -43,18 +43,59 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
+import { useCollectionStore } from '@/stores/collection'
+import { storeToRefs } from 'pinia'
+import { ElMessage } from 'element-plus'
+import { useBookmarkStore } from '@/stores/bookmark'
 
+const props = defineProps({
+  bookmarkId: {
+    type: Number,
+    required: true
+  }
+})
+
+const emit = defineEmits(['close'])
+const collectionStore = useCollectionStore()
+const { sharedCollections } = storeToRefs(collectionStore)
 const selectedCollection = ref('')
-const sharedCollections = ref([]) // API로부터 공유 컬렉션 목록을 받아올 예정
+const bookmarkStore = useBookmarkStore()
 
-const handleCopy = () => {
-  // 복사 로직 구현
+const handleCopy = async () => {
+  try {
+    if (!selectedCollection.value) {
+      ElMessage.warning('컬렉션을 선택해주세요')
+      return
+    }
+    
+    await bookmarkStore.moveToOtherCollection(
+      props.bookmarkId,
+      false, // 공유 컬렉션으로 복사하므로 false
+      selectedCollection.value
+    )
+    
+    ElMessage.success('북마크가 공유 컬렉션으로 복사되었습니다')
+    emit('close')
+  } catch (error) {
+    console.error('북마크 복사 중 오류 발생:', error)
+    ElMessage.error('북마크 복사에 실패했습니다')
+  }
 }
 
 const handleClose = () => {
-  // 모달 닫기 로직 구현
+  emit('close')
 }
+
+onMounted(async () => {
+  try {
+    // 공유 컬렉션 목록 불러오기
+    await collectionStore.fetchSharedCollections()
+  } catch (error) {
+    console.error('공유 컬렉션 로드 실패:', error)
+    ElMessage.error('공유 컬렉션 목록을 불러오는데 실패했습니다')
+  }
+})
 </script>
 
 <style scoped>

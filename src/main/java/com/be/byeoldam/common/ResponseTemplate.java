@@ -28,6 +28,11 @@ public class ResponseTemplate<T> {
         return new ResponseTemplate<>(true, message, results);
     }
 
+    public static <T> ResponseTemplate<T> ok(String message) {
+        return new ResponseTemplate<>(true, message, null);
+    }
+
+
     public static <T> ResponseTemplate<T> fail(String message) {
         return new ResponseTemplate<>(false, message, null);
     }

@@ -1,6 +1,6 @@
 package com.be.byeoldam.sharedcollection;
 
-import com.be.byeoldam.domain.sharedcollection.SharedCollectionService;
+import com.be.byeoldam.domain.sharedcollection.service.SharedCollectionService;
 import com.be.byeoldam.domain.sharedcollection.dto.SharedCollectionRequest;
 import com.be.byeoldam.domain.sharedcollection.dto.SharedCollectionResponse;
 import com.be.byeoldam.domain.sharedcollection.model.Role;

@@ -1,6 +1,7 @@
 package com.be.byeoldam.domain.memo;
 
 import com.be.byeoldam.common.ResponseTemplate;
+import com.be.byeoldam.common.annotation.UserId;
 import com.be.byeoldam.domain.memo.dto.MemoRequest;
 import com.be.byeoldam.domain.memo.dto.MemoResponse;
 import io.swagger.v3.oas.annotations.Operation;
@@ -19,9 +20,6 @@ public class MemoController {
 
     private final MemoService memoService;
 
-    // 임시 userId
-    private final Long userId = 1L;
-
     /**
      * 📌 메모 생성
      */
@@ -30,7 +28,8 @@ public class MemoController {
     @PostMapping
     public ResponseTemplate<MemoResponse> createMemo(
             @PathVariable Long bookmarkId,
-            @RequestBody MemoRequest request
+            @RequestBody MemoRequest request,
+            @UserId Long userId
     ) {
 
         return ResponseTemplate.ok(memoService.createMemo(userId, bookmarkId, request));
@@ -58,7 +57,8 @@ public class MemoController {
     public ResponseTemplate<MemoResponse> updateMemo(
             @PathVariable Long bookmarkId,
             @PathVariable Long memoId,
-            @RequestBody MemoRequest request
+            @RequestBody MemoRequest request,
+            @UserId Long userId
     ) {
 
         return ResponseTemplate.ok(memoService.updateMemo(userId, bookmarkId, memoId, request));
@@ -72,7 +72,8 @@ public class MemoController {
     @DeleteMapping("/{memoId}")
     public ResponseTemplate<Void> deleteMemo(
             @PathVariable Long bookmarkId,
-            @PathVariable Long memoId
+            @PathVariable Long memoId,
+            @UserId Long userId
     ) {
 
         memoService.deleteMemo(userId, bookmarkId, memoId);

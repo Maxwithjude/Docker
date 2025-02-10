@@ -52,12 +52,13 @@ import Card from '@/common/Card.vue';
 import { useBookmarkStore } from '@/stores/bookmark';
 
 const bookmarkStore = useBookmarkStore();
-const { exampleImportantBookmarks } = storeToRefs(bookmarkStore);
+const { importantBookmarks } = storeToRefs(bookmarkStore);
 const { getImportantBookmarks } = bookmarkStore;
 
 
+
 // exampleImportantBookmarks 대신 실제 데이터인 importantBookmarks 사용
-const bookmarkResults = computed(() => exampleImportantBookmarks.value.results || []);
+const bookmarkResults = computed(() => importantBookmarks.value.results || []);
 
 
 onMounted(async () => {

@@ -23,7 +23,6 @@
                 :isPersonal="false"
                 :createdAt="bookmark.created_at"
                 :updatedAt="bookmark.updated_at"
-                @togglePriority="togglePriority(bookmark)"
             />
         </div>
         <div v-else class="empty-message">
@@ -40,7 +39,8 @@ import { storeToRefs } from 'pinia';
 import { useBookmarkStore } from '@/stores/bookmark';
 
 const bookmarkStore = useBookmarkStore();
-const { exampleSharedCollectionBookmarks } = storeToRefs(bookmarkStore);
+const { sharedCollectionBookmarks } = storeToRefs(bookmarkStore);
+
 
 const props = defineProps({
     collectionInfo: {
@@ -51,21 +51,11 @@ const props = defineProps({
 
 // collection_id에 해당하는 북마크들을 찾아서 반환
 const bookmarks = computed(() => {
-    const bookmarksData = exampleSharedCollectionBookmarks.value?.results;
-    if (!bookmarksData) return [];
-    return bookmarksData.collection_id === props.collectionInfo.collection_id
-        ? bookmarksData.bookmarks
-        : [];
+    return sharedCollectionBookmarks.value?.results?.bookmarks || [];
 });
 
-const togglePriority = async (bookmark) => {
-    try {
-        await bookmarkStore.changePiority(bookmark.bookmark_id, !bookmark.priority);
-        bookmark.priority = !bookmark.priority;
-    } catch (error) {
-        console.error('북마크 중요도 변경 실패:', error);
-    }
-}
+
+
 </script>
 
 <style scoped>

@@ -70,7 +70,7 @@
 <script setup>
 import Header from '@/common/Header.vue'
 import SideBar from '@/common/SideBar.vue'
-import { computed, ref } from 'vue';
+import { computed, ref, onMounted } from 'vue';
 import PersonalCollectionList from '@/component/PersonalCollectionList.vue';
 import CreateCollection from '@/modal/CreateCollection.vue';
 import { useCollectionStore } from '@/stores/collection';
@@ -81,16 +81,27 @@ const { personalCollections } = storeToRefs(collectionStore);
 const selectedCollection = ref('all');
 const showCreateModal = ref(false);
 
-const collections = computed(() => personalCollections.value.results);
-
+const collections = computed(() => {
+    return personalCollections.value?.results || [];
+});
 
 const filteredCollections = computed(() => {
-    return collections.value.filter(collection => collection.name === selectedCollection.value);
+    return collections.value.filter(collection => 
+        collection.name === selectedCollection.value
+    );
 });
 
 const createNewCollection = () => {
     showCreateModal.value = true;
 };
+
+onMounted(async () => {
+    try {
+        await collectionStore.fetchAllCollection();
+    } catch (error) {
+        console.error('컬렉션 데이터 로딩 실패:', error);
+    }
+});
 </script>
 
 <style scoped>

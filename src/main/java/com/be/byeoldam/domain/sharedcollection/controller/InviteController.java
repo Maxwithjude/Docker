@@ -2,13 +2,13 @@ package com.be.byeoldam.domain.sharedcollection.controller;
 
 
 import com.be.byeoldam.common.ResponseTemplate;
+import com.be.byeoldam.common.annotation.UserId;
 import com.be.byeoldam.domain.sharedcollection.dto.InviteRequest;
 import com.be.byeoldam.domain.sharedcollection.service.InviteService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 @Tag(name = "Invite", description = "공유컬렉션 초대 API")
@@ -19,9 +19,6 @@ public class InviteController {
 
     private final InviteService inviteService;
 
-    // 임시 userId
-    private final Long inviterId = 1L;
-
 
     @Operation(summary = "공유 컬렉션 초대", description = "공유 컬렉션에 다른 사용자를 초대합니다.")
     @ApiResponse(
@@ -31,7 +28,7 @@ public class InviteController {
     @PostMapping("/{collectionId}/invite")
     public ResponseTemplate<Void> inviteUser(
             @PathVariable Long collectionId,
-            //userid
+            @UserId Long inviterId,
             @RequestBody InviteRequest request
     ) {
         inviteService.inviteUser(collectionId, inviterId, request);

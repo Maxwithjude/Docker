@@ -15,6 +15,28 @@ services:
     networks:
       - my-network
 
+  # redis:
+  #   image: redis:latest
+  #   container_name: redis
+  #   ports:
+  #     - "6379:6379"
+  #   networks:
+  #     - my-network
+  #   volumes:
+  #     - redis_data:/data
+
+  # rabbitmq:
+  #   image: rabbitmq:4.0.5-management
+  #   container_name: rabbitmq
+  #   ports:
+  #     - "5672:5672"  # AMQP 프로토콜
+  #     - "15672:15672"  # 관리 웹 UI
+  #   environment:
+  #     RABBITMQ_DEFAULT_USER: ssafy
+  #     RABBITMQ_DEFAULT_PASS: ssafy
+  #   networks:
+  #     - my-network
+
   backend:
     build: 
       context: ./backend
@@ -23,10 +45,18 @@ services:
     # restart: always
     depends_on:
       - mysql
+      # - redis
+      # - rabbitmq
     environment:
       SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/ssafy_db
       SPRING_DATASOURCE_USERNAME: root
       SPRING_DATASOURCE_PASSWORD: ssafy
+      # SPRING_REDIS_HOST: redis
+      # SPRING_REDIS_PORT: 6379
+      # SPRING_RABBITMQ_HOST: rabbitmq
+      # SPRING_RABBITMQ_PORT: 5672
+      # SPRING_RABBITMQ_USERNAME: ssafy
+      # SPRING_RABBITMQ_PASSWORD: ssafy
     ports:
       - "8080:8080"
     networks:
@@ -53,3 +83,4 @@ networks:
 
 volumes:
   mysql_data:
+  # redis_data:

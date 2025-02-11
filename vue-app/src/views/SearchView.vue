@@ -55,7 +55,6 @@
                                         :isPersonal="bookmark.isPersonal"
                                         :createdAt="bookmark.created_at"
                                         :updatedAt="bookmark.updated_at"
-                                        @togglePriority="togglePriority(bookmark)"
                                     />
                                 </div>
                                 
@@ -94,7 +93,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted } from 'vue'
+import { ref, onMounted, onUnmounted, computed } from 'vue'
 import { useBookmarkStore } from '@/stores/bookmark'
 import { storeToRefs } from 'pinia'
 import Header from '@/common/Header.vue'
@@ -104,16 +103,19 @@ import Card from '@/common/Card.vue'
 const bookmarkStore = useBookmarkStore()
 const { searchBookmarksByTag } = storeToRefs(bookmarkStore)
 const searchTag = ref('')
-const bookmarks = ref([])
-const recommendedBookmarks = ref([])
 const loading = ref(false)
-const hasMore = ref(true)
-const lastCursorId = ref(null)
 const hasSearched = ref(false)
+const lastCursorId = ref(null)
+const hasMore = ref(true)
 
-const togglePriority = (bookmark) => {
-    bookmark.priority = !bookmark.priority;
-}
+const bookmarks = computed(() => {
+    return searchBookmarksByTag.value?.result?.userBookmarkList || []
+})
+
+const recommendedBookmarks = computed(() => {
+    return searchBookmarksByTag.value?.result?.recommendedBookmarkList || []
+})
+
 
 const handleSearch = async () => {
     if (!searchTag.value.trim()) return
@@ -124,19 +126,15 @@ const handleSearch = async () => {
         lastCursorId.value = null // 검색 시 커서 초기화
         hasMore.value = true // 검색 시 hasMore 초기화
         
-        const response = await bookmarkStore.getSearchBookmarksByTag(searchTag.value)
-        
-        // 검색 결과 업데이트 (초기화 후 설정)
-        bookmarks.value = response.result.userBookmarkList
-        recommendedBookmarks.value = response.result.recommendedBookmarkList
+        await bookmarkStore.getSearchBookmarksByTag(searchTag.value)
         
         // 마지막 북마크의 ID를 커서로 설정
-        if (response.result.userBookmarkList.length > 0) {
-            lastCursorId.value = response.result.userBookmarkList[response.result.userBookmarkList.length - 1].bookmark_id
+        if (bookmarks.value.length > 0) {
+            lastCursorId.value = bookmarks.value[bookmarks.value.length - 1].bookmark_id
         }
         
         // 받아온 데이터가 페이지 사이즈보다 작으면 더 이상 데이터가 없음
-        if (response.result.userBookmarkList.length < 6) {
+        if (bookmarks.value.length < 6) {
             hasMore.value = false
         }
         
@@ -161,25 +159,18 @@ const loadMoreBookmarks = async () => {
     
     try {
         loading.value = true
-        const response = await bookmarkStore.getSearchBookmarksByTag(
+        await bookmarkStore.getSearchBookmarksByTag(
             searchTag.value,
             lastCursorId.value
         )
         
         // 새로운 북마크들만 기존 목록에 추가
-        const newBookmarks = response.result.userBookmarkList.filter(newBookmark => 
-            !bookmarks.value.some(existingBookmark => 
-                existingBookmark.bookmark_id === newBookmark.bookmark_id
-            )
-        )
-        
-        if (newBookmarks.length > 0) {
-            bookmarks.value = [...bookmarks.value, ...newBookmarks]
-            lastCursorId.value = newBookmarks[newBookmarks.length - 1].bookmark_id
+        if (bookmarks.value.length > 0) {
+            lastCursorId.value = bookmarks.value[bookmarks.value.length - 1].bookmark_id
         }
         
         // 받아온 데이터가 페이지 사이즈보다 작으면 더 이상 데이터가 없음
-        if (response.result.userBookmarkList.length < 6) {
+        if (bookmarks.value.length < 6) {
             hasMore.value = false
         }
     } catch (error) {

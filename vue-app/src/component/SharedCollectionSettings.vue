@@ -58,7 +58,7 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue';
+import { ref, computed, onMounted } from 'vue';
 import { useCollectionStore } from '@/stores/collection';
 import api from '@/utils/api';
 
@@ -78,14 +78,28 @@ const props = defineProps({
 const emit = defineEmits(['close', 'update']);
 const newCollectionName = ref(props.currentName);
 const newMemberEmail = ref('');
-const members = ref([
-  { id: 1, name: '이은지' },
-  { id: 2, name: '김진영' },
-  { id: 3, name: '박태현' }
-]);
+const members = ref([]);
 
 const isValidName = computed(() => {
     return newCollectionName.value.trim().length > 0;
+});
+
+const fetchMembers = async () => {
+  try {
+    await collectionStore.getMembersByCollectionId(props.collectionId);
+    // results 배열의 각 사용자 정보를 members에 맞는 형식으로 변환
+    members.value = collectionStore.membersByCollectionId.value.results.map(user => ({
+      id: user.user_id,
+      name: user.nickname
+    }));
+  } catch (error) {
+    console.error('멤버 정보 로딩 실패:', error);
+  }
+};
+
+// 컴포넌트가 마운트될 때 멤버 정보 로드
+onMounted(() => {
+  fetchMembers();
 });
 
 const changeCollectionName = async () => {
@@ -116,7 +130,9 @@ const addMember = async () => {
       newMemberEmail.value.trim()
     );
     
-    // 성공 후 입력 필드 초기화
+    // 멤버 추가 후 목록 새로고침
+    await fetchMembers();
+    
     newMemberEmail.value = '';
     alert('멤버 초대 요청이 성공적으로 전송되었습니다.');
   } catch (error) {

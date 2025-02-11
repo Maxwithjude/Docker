@@ -4,10 +4,11 @@ import api from "@/utils/api";
 
 //북마크에 관한 함수 store
 export const useRssStore = defineStore("rss", () => {
-
+    //rss 구독 목록 조회 실제 response
     const rssList = ref({});
-    const rssArticles = ref({});
+    //rss 구독 목록 조회 예시 response
     const exRssList = ref({
+
         success:true,
         message:"some message",
         results: [
@@ -24,8 +25,12 @@ export const useRssStore = defineStore("rss", () => {
               },
             ]
     });
+    //구독 중인 rss 최신 글 목록 조회 실제 response
+    const rssArticles = ref({});
+    //구독 중인 rss 최신 글 목록 조회 예시 response
     const exRssArticles = ref({
         "success":true,
+
         "message":"some message",
         "results": {
             "rss_id": 1,

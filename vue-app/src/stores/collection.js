@@ -101,6 +101,37 @@ export const useCollectionStore = defineStore("collection", () => {
       ]
     }
   )
+  //공유 컬렉션 id로 멤버 조회 response
+  const membersByCollectionId = ref({})
+  //공유 컬렉션 id로 멤버 조회
+  const getMembersByCollectionId = async (collectionId) => {
+    try {
+      const response = await api.get(`/api/collections/shared/${collectionId}/users`)
+      membersByCollectionId.value = response.data
+    } catch (error) {
+      console.error('공유컬렉션 멤버 조회 중 오류 발생:', error)
+      throw error;
+    }
+  };
+  // 공유 컬렉션 id로 멤버 조회 예시 response
+  const exampleMembersByCollectionId = ref(
+    {
+      "success" : true,
+      "message" : "공유컬렉션의 사용자를 조회합니다. ",
+      "results" : [
+        {
+          "user_id" : 1,
+          "email" : "example11@naver.com",
+          "nickname" : "사용자1"
+        }, 
+        {
+          "user_id" : 2,
+          "email" : "ex222@google.com",
+          "nickname" : "사용자2"
+        }, 
+      ]
+    }
+  )
   ///////////////////////////////////////////////////////////////////////////////////////////////
   // 개인 컬렉션 생성
   const createPersonalCollection = async (name) => {
@@ -223,7 +254,10 @@ export const useCollectionStore = defineStore("collection", () => {
         deletePersonalCollection,
         deleteSharedCollection,
         addMemberToSharedCollection,
-        removeMemberFromSharedCollection
+        removeMemberFromSharedCollection,
+        getMembersByCollectionId,
+        exampleMembersByCollectionId,
+        membersByCollectionId
     }
 });
 

@@ -15,7 +15,7 @@
                 :isPersonal="true"
                 :createdAt="bookmark.created_at"
                 :updatedAt="bookmark.updated_at"
-                @togglePriority="togglePriority(bookmark)"
+
             />
         </div>
         <div v-else class="empty-message">
@@ -27,12 +27,12 @@
 
 <script setup>
 import Card from '@/common/Card.vue';
-import { computed } from 'vue';
+import { computed, onMounted } from 'vue';
 import { storeToRefs } from 'pinia';
 import { useBookmarkStore } from '@/stores/bookmark';
 
 const bookmarkStore = useBookmarkStore();
-const { examplePersonalCollectionBookmarks } = storeToRefs(bookmarkStore);
+const { personalCollectionBookmarks } = storeToRefs(bookmarkStore);
 
 const props = defineProps({
     collectionInfo: {
@@ -41,21 +41,19 @@ const props = defineProps({
     }
 });
 
-// collection_id에 해당하는 북마크들을 찾아서 반환
-const bookmarks = computed(() => {
-    const bookmarksData = examplePersonalCollectionBookmarks.value?.results;
-    if (!bookmarksData) return [];
-    return bookmarksData.name === props.collectionInfo.name ? bookmarksData.bookmarks : [];
+onMounted(async () => {
+    try {
+        await bookmarkStore.getPersonalCollectionBookmarks(props.collectionInfo.collection_id);
+    } catch (error) {
+        console.error('컬렉션의 북마크 로딩 실패:', error);
+    }
 });
 
-const togglePriority = async (bookmark) => {
-    try {
-        await bookmarkStore.changePiority(bookmark.bookmark_id, !bookmark.priority);
-        bookmark.priority = !bookmark.priority;
-    } catch (error) {
-        console.error('북마크 중요도 변경 실패:', error);
-    }
-}
+const bookmarks = computed(() => {
+    return personalCollectionBookmarks.value?.results?.bookmarks || [];
+});
+
+
 </script>
 
 <style scoped>

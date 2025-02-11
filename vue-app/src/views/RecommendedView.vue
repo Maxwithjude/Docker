@@ -70,8 +70,9 @@ import { useBookmarkStore } from '@/stores/bookmark';
 
 const router = useRouter();
 const bookmarkStore = useBookmarkStore();
-const { exampleUserDefineTags, exampleRecommendedBookmarks } = storeToRefs(bookmarkStore);
+const { userDefineTags, recommendedBookmarks } = storeToRefs(bookmarkStore);
 const { getUserDefineTags, getRecommendedBookmarks } = bookmarkStore;
+
 
 const isLoading = ref(true);
 const recommendedBookmarksList = ref([]);
@@ -87,9 +88,10 @@ const fetchUserTags = async () => {
     try {
         await getUserDefineTags();
         // 실제 API 준비될 때까지 예시 데이터 사용
-        const tagList = exampleUserDefineTags.value.results.tagList;
+        const tagList = userDefineTags.value.results.tagList;
         console.log('태그 리스트:', tagList);
         
+
         if (tagList && tagList.length > 0) {
             userTags.value = tagList.map((tagName, index) => ({
                 id: index + 1,
@@ -112,8 +114,9 @@ const fetchRecommendedBookmarks = async (tagName = null) => {
         await getRecommendedBookmarks(tagName);
         
         // 실제 API 준비될 때까지 예시 데이터 사용
-        const recommendedList = exampleRecommendedBookmarks.value.result.recommendedUrlList;
+        const recommendedList = recommendedBookmarks.value.result.recommendedUrlList;
         
+
         if (recommendedList) {
             recommendedBookmarksList.value = recommendedList.map((bookmark, index) => ({
                 id: `${page.value}-${index}`,

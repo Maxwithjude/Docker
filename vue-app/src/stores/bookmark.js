@@ -153,15 +153,13 @@ export const useBookmarkStore = defineStore("bookmark", () => {
             const response = await api.get('/api/tags/recommend');
 
             userDefineTags.value = response.data;
-            // API 준비될 때까지 예시 데이터 사용
-            userDefineTags.value = exampleUserDefineTags.value;
             return userDefineTags.value;
 
         } catch (error) {
             console.error('태그 로딩 실패:', error);
-            // 에러 시에도 예시 데이터 사용
-            userDefineTags.value = exampleUserDefineTags.value;
+            userDefineTags.value = userDefineTags.value;
             return userDefineTags.value;
+
 
         }
       };
@@ -195,14 +193,11 @@ export const useBookmarkStore = defineStore("bookmark", () => {
         try {
             const response = await api.get(`/api/tags/search?cursorId=${cursorId}&size=${size}&tag=${tagName}`);
             recommendedBookmarks.value = response.data;
-            // API 준비될 때까지 예시 데이터 사용
-            recommendedBookmarks.value = exampleRecommendedBookmarks.value;
             return recommendedBookmarks.value;
         } catch (error) {
             console.error('북마크 로딩 실패:', error);
-            // 에러 시에도 예시 데이터 사용
-            recommendedBookmarks.value = exampleRecommendedBookmarks.value;
             return recommendedBookmarks.value;
+
         }
       };
 
@@ -348,26 +343,11 @@ export const useBookmarkStore = defineStore("bookmark", () => {
 
       //태그 기반 검색 불러오는 함수
       const getSearchBookmarksByTag = async (tagName, cursorId = 1, size = 10) => {
-        try {
-            const response = await api.get(`/api/tags/my-data/search`, {
-                params: {
-                    cursorId,
-                    size,
-                    tag: tagName
-                }
-            });
-            searchBookmarksByTag.value = response.data;
-            
-            // API 준비될 때까지 예시 데이터 사용
-            searchBookmarksByTag.value = exampleSearchedBookmarksByTag.value;
-            return searchBookmarksByTag.value;
-        } catch (error) {
-            console.error('태그 기반 검색 실패:', error);
-            // 에러 시에도 예시 데이터 사용
-            searchBookmarksByTag.value = exampleSearchedBookmarksByTag.value;
-            return searchBookmarksByTag.value;
-        }
+        const response = await api.get(`/api/tags/my-data/search?cursorId=${cursorId}&size=${size}&tag=${tagName}`);
+        searchBookmarksByTag.value = response.data;
+        console.log(response.data);
       };
+
 
       //태그 기반 검색 예시 response
       const exampleSearchedBookmarksByTag = ref({

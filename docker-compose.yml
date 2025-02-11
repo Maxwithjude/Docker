@@ -1,0 +1,55 @@
+
+
+services:
+  mysql:
+    image: mysql:8
+    container_name: mysql
+    # restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: ssafy
+      MYSQL_DATABASE: ssafy_db
+    ports:
+      - "3307:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    networks:
+      - my-network
+
+  backend:
+    build: 
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: backend
+    # restart: always
+    depends_on:
+      - mysql
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/ssafy_db
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: ssafy
+    ports:
+      - "8080:8080"
+    networks:
+      - my-network
+
+
+  frontend:
+    build: 
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: frontend
+    depends_on:
+      - backend
+    ports:
+      - "5173:5173"
+    networks:
+      - my-network
+    volumes:
+      - ./frontend/vue-app:/app
+      - /app/node_modules
+
+networks:
+  my-network:
+
+volumes:
+  mysql_data:

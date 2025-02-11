@@ -1,0 +1,8 @@
+[submodule "backend"]
+	path = backend
+	url = https://lab.ssafy.com/s12-webmobile2-sub1/S12P11A208.git
+	branch = dev/be
+[submodule "frontend"]
+	path = frontend
+	url = https://lab.ssafy.com/s12-webmobile2-sub1/S12P11A208.git
+	branch = dev/fe

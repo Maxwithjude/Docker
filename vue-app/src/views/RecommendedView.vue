@@ -16,12 +16,10 @@
                     </div>
 
                     <!-- 태그가 없는 경우 -->
-                    <div v-if="!hasUserTags" class="no-tags-container">
-                        <div class="no-tags-content">
-                            <i class="fas fa-tags no-tags-icon"></i>
-                            <h3>관심사 태그가 없습니다</h3>
-                            <p>관심 태그를 추가하면 관련된 추천 콘텐츠를 받아볼 수 있습니다.</p>
-                        </div>
+                    <div v-if="!hasUserTags" class="empty-state">
+                        <i class="fas fa-tags empty-icon"></i>
+                        <p class="empty-text">관심사 태그가 없습니다</p>
+                        <p class="empty-description">관심 태그를 추가하면 관련된 추천 콘텐츠를 받아볼 수 있습니다.</p>
                     </div>
 
                     <!-- 태그가 있는 경우 -->
@@ -41,8 +39,8 @@
                         
                         <div class="bookmarks-grid" v-if="!isLoading">
                             <CardUnbookmarked 
-                                v-for="bookmark in recommendedBookmarksList" 
-                                :key="bookmark.id"
+                                v-for="bookmark in recommendedBookmarks.result.recommendedUrlList" 
+                                :key="bookmark.url"
                                 :url="bookmark.url"
                                 :img="bookmark.img"
                                 :title="bookmark.title"
@@ -75,7 +73,6 @@ const { getUserDefineTags, getRecommendedBookmarks } = bookmarkStore;
 
 
 const isLoading = ref(true);
-const recommendedBookmarksList = ref([]);
 const selectedTag = ref(null);
 const userTags = ref([]);
 const page = ref(1);
@@ -112,20 +109,6 @@ const fetchRecommendedBookmarks = async (tagName = null) => {
     try {
         isLoading.value = true;
         await getRecommendedBookmarks(tagName);
-        
-        // 실제 API 준비될 때까지 예시 데이터 사용
-        const recommendedList = recommendedBookmarks.value.result.recommendedUrlList;
-        
-
-        if (recommendedList) {
-            recommendedBookmarksList.value = recommendedList.map((bookmark, index) => ({
-                id: `${page.value}-${index}`,
-                url: bookmark.url,
-                title: bookmark.title,
-                description: bookmark.description,
-                img: bookmark.img
-            }));
-        }
     } catch (error) {
         console.error('추천 북마크 로딩 실패:', error);
     } finally {
@@ -135,9 +118,7 @@ const fetchRecommendedBookmarks = async (tagName = null) => {
 
 const handleTagSelect = async (tagId) => {
     selectedTag.value = tagId;
-    page.value = 1;
     const selectedTagName = userTags.value.find(tag => tag.id === tagId)?.name;
-    console.log('선택된 태그:', selectedTagName);
     await fetchRecommendedBookmarks(selectedTagName);
 };
 
@@ -300,52 +281,31 @@ onUnmounted(() => {
     color: #007bff;
 }
 
-.no-tags-container {
+.empty-state {
     display: flex;
-    justify-content: center;
+    flex-direction: column;
     align-items: center;
-    min-height: 400px;
-    margin: 20px 0;
-}
-
-.no-tags-content {
+    justify-content: center;
+    padding: 60px 20px;
     text-align: center;
-    padding: 40px;
     background: #f8f9fa;
     border-radius: 12px;
-    max-width: 500px;
 }
 
-.no-tags-icon {
+.empty-icon {
     font-size: 48px;
-    color: #007bff;
-    margin-bottom: 20px;
+    color: #ccc;
+    margin-bottom: 16px;
 }
 
-.no-tags-content h3 {
-    font-size: 1.5rem;
-    color: #333;
-    margin-bottom: 12px;
-}
-
-.no-tags-content p {
+.empty-text {
+    font-size: 1.2rem;
     color: #666;
-    margin-bottom: 24px;
-    line-height: 1.5;
+    margin-bottom: 8px;
 }
 
-.add-tags-button {
-    padding: 10px 20px;
-    background-color: #007bff;
-    color: white;
-    border: none;
-    border-radius: 6px;
-    font-size: 1rem;
-    cursor: pointer;
-    transition: background-color 0.2s;
-}
-
-.add-tags-button:hover {
-    background-color: #0056b3;
+.empty-description {
+    color: #888;
+    font-size: 0.9rem;
 }
 </style>

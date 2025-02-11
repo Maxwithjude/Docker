@@ -75,12 +75,19 @@
                                         v-for="bookmark in recommendedBookmarks" 
                                         :key="bookmark.url"
                                         class="recommended-item"
-                                        @click="goToUrl(bookmark.url)"
                                     >
-                                        <img :src="bookmark.image" :alt="bookmark.title" class="recommended-image">
-                                        <div class="recommended-content">
-                                            <h3>{{ bookmark.title }}</h3>
+                                        <div class="recommended-content-wrapper" @click="goToUrl(bookmark.url)">
+                                            <img :src="bookmark.image" :alt="bookmark.title" class="recommended-image">
+                                            <div class="recommended-content">
+                                                <h3>{{ bookmark.title }}</h3>
+                                            </div>
                                         </div>
+                                        <button 
+                                            class="save-button"
+                                            @click.stop="showSaveModal(bookmark)"
+                                        >
+                                            save
+                                        </button>
                                     </div>
                                 </div>
                             </div>
@@ -90,6 +97,18 @@
             </div>
         </div>
     </div>
+
+    <!-- 북마크 저장 모달 -->
+    <BookmarkSave 
+        v-if="selectedBookmark"
+        :key="selectedBookmark.url"
+        :url="selectedBookmark.url"
+        :title="selectedBookmark.title"
+        :description="selectedBookmark.description"
+        :img="selectedBookmark.image"
+        @close="selectedBookmark = null"
+        @save="handleSave"
+    />
 </template>
 
 <script setup>
@@ -99,6 +118,7 @@ import { storeToRefs } from 'pinia'
 import Header from '@/common/Header.vue'
 import SideBar from '@/common/SideBar.vue'
 import Card from '@/common/Card.vue'
+import BookmarkSave from '@/modal/BookmarkSave.vue'
 
 const bookmarkStore = useBookmarkStore()
 const { searchBookmarksByTag } = storeToRefs(bookmarkStore)
@@ -107,6 +127,7 @@ const loading = ref(false)
 const hasSearched = ref(false)
 const lastCursorId = ref(null)
 const hasMore = ref(true)
+const selectedBookmark = ref(null)
 
 const bookmarks = computed(() => {
     return searchBookmarksByTag.value?.result?.userBookmarkList || []
@@ -145,10 +166,6 @@ const handleSearch = async () => {
     }
 }
 
-const handleTogglePriority = async (bookmarkId) => {
-    // TODO: 북마크 우선순위 토글 API 구현
-    console.log('Toggle priority for bookmark:', bookmarkId)
-}
 
 const goToUrl = (url) => {
     window.open(url, '_blank')
@@ -188,6 +205,16 @@ const handleScroll = () => {
     if (scrollTop + clientHeight >= scrollHeight - 300 && hasMore.value) {
         loadMoreBookmarks()
     }
+}
+
+const showSaveModal = (bookmark) => {
+    selectedBookmark.value = bookmark
+}
+
+const handleSave = () => {
+    // 북마크 저장 로직 구현
+    console.log('Bookmark saved:', selectedBookmark.value)
+    selectedBookmark.value = null
 }
 
 onMounted(() => {

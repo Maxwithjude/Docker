@@ -18,7 +18,7 @@
                     <div v-if="!bookmarkResults.length" class="empty-state">
                         <i class="fas fa-star empty-icon"></i>
                         <p class="empty-text">오랜기간 읽지않은 북마크가 없습니다.</p>
-                        <p class="empty-description">[예시]북마크에 별표를 클릭하여 중요 북마크로 지정할 수 있습니다.</p>
+                        <p class="empty-description">북마크 등록 후 30일이 지난 북마크는 오래된 북마크로 분류됩니다.</p>
                     </div>
                 
                     <div v-else class="cards-grid">

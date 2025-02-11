@@ -42,7 +42,11 @@ import { ElMessage } from 'element-plus'
 
 const props = defineProps({
   bookmarkId: {
-    type: String,
+    type: Number,
+    required: true
+  },
+  isPersonal: {
+    type: Boolean,
     required: true
   }
 })
@@ -68,7 +72,7 @@ const moveBookmark = async () => {
   try {
     await bookmarkStore.moveToOtherCollection(
       props.bookmarkId,
-      true,
+      props.isPersonal,
       selectedCollectionId.value
     )
     emit('moveComplete')

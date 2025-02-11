@@ -4,7 +4,15 @@
         <div class="content-wrapper">
             <SideBar class="sidebar"/>
             <div class="main-content">
-                <div class="detail-view">
+                <div v-if="error" class="error-message">
+                    {{ error }}
+                </div>
+                
+                <div v-if="isInitializing" class="loading">
+                    데이터를 불러오는 중...
+                </div>
+                
+                <div v-else class="detail-view">
                     <!-- URL 프리뷰 섹션 -->
                     <section class="preview-section">
                         <h2>URL 프리뷰</h2>
@@ -16,13 +24,15 @@
                                 </a>
                             </div>
                             <iframe
+                                v-if="!iframeError"
                                 :src="bookmark.url"
                                 class="website-preview"
                                 frameborder="0"
                                 sandbox="allow-same-origin allow-scripts allow-popups allow-forms"
                                 loading="lazy"
+                                @error="handleIframeError"
                             ></iframe>
-                            <div class="iframe-fallback" v-if="iframeError">
+                            <div v-if="iframeError" class="iframe-fallback">
                                 <p>미리보기를 불러올 수 없습니다.</p>
                             </div>
                         </div>
@@ -37,22 +47,31 @@
                                 v-model="newMemo" 
                                 placeholder="메모를 입력하세요..."
                                 rows="4"
+                                :disabled="isSubmitting"
                             ></textarea>
-                            <button @click="addMemo" class="add-memo-btn">메모 추가</button>
+                            <button 
+                                @click="addMemo" 
+                                class="add-memo-btn"
+                                :disabled="isSubmitting || !newMemo.trim()"
+                            >
+                                {{ isSubmitting ? '추가 중...' : '메모 추가' }}
+                            </button>
                         </div>
-                        <div class="memo-list">
+                        
+                        <div v-if="isLoading" class="loading">
+                            메모를 불러오는 중...
+                        </div>
+                        
+                        <div v-else class="memo-list">
                             <div v-for="memo in memos" :key="memo.id" class="memo-item">
-                                <div class="memo-header">
-                                    <span class="user-name">{{ memo.userName }}</span>
-                                    <span class="memo-date">{{ memo.date }}</span>
-                                </div>
                                 <div class="memo-content">{{ memo.content }}</div>
+                                <div class="memo-date">{{ memo.date }}</div>
                                 <button 
-                                    v-if="memo.userName === currentUser.name" 
                                     @click="deleteMemo(memo.id)" 
                                     class="delete-memo-btn"
+                                    :disabled="isSubmitting"
                                 >
-                                    삭제
+                                    {{ isSubmitting ? '삭제 중...' : '삭제' }}
                                 </button>
                             </div>
                         </div>
@@ -64,18 +83,26 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue';
-import { useRoute } from 'vue-router';
+import { ref, onMounted, onUnmounted } from 'vue';
+import { useRoute, useRouter } from 'vue-router';
+import { useBookmarkStore } from '@/stores/bookmark';
 import Header from '@/common/Header.vue';
 import SideBar from '@/common/SideBar.vue';
-import { useBookmarkStore } from '@/stores/bookmark';
 
 const route = useRoute();
+const router = useRouter();
 const bookmarkStore = useBookmarkStore();
-const bookmark = ref(null);
+
+// 상태 관리
+const bookmark = ref(router.currentRoute.value.state?.bookmarkData || null);
 const newMemo = ref('');
 const memos = ref([]);
+const error = ref(null);
+const isLoading = ref(false);
+const isSubmitting = ref(false);
+const isInitializing = ref(true);
 const iframeError = ref(false);
+const isComponentMounted = ref(true);
 
 // 현재 사용자 정보 (예시)
 const currentUser = {
@@ -83,63 +110,135 @@ const currentUser = {
     name: '사용자 이름'
 };
 
+// 메모 추가
 const addMemo = async () => {
-    if (newMemo.value.trim()) {
-        try {
-            await bookmarkStore.createMemo(bookmark.value.id, newMemo.value);
+    if (isSubmitting.value || !newMemo.value.trim()) return;
+    
+    try {
+        isSubmitting.value = true;
+        error.value = null;
+        
+        const response = await bookmarkStore.createMemo(bookmark.value.id, newMemo.value);
+        if (response.data.success) {
+            const newMemoData = response.data.results;
             memos.value.push({
-                id: Date.now(),
-                content: newMemo.value,
-                date: new Date().toLocaleString(),
-                userName: currentUser.name
+                id: newMemoData.memo_id,
+                content: newMemoData.content,
+                date: new Date(newMemoData.created_at).toLocaleString(),
+                userName: newMemoData.nickname,
+                imageUrl: newMemoData.image_url
             });
             newMemo.value = '';
-        } catch (error) {
-            console.error('메모 추가 실패:', error);
+        }
+    } catch (err) {
+        error.value = '메모 추가 실패: ' + err.message;
+        console.error('메모 추가 실패:', err);
+    } finally {
+        if (isComponentMounted.value) {
+            isSubmitting.value = false;
         }
     }
 };
 
-const deleteMemo = async (id) => {
+// 메모 삭제
+const deleteMemo = async (memoId) => {
+    if (isSubmitting.value) return;
+    
     try {
-        await bookmarkStore.deleteMemo(bookmark.value.id, id);
-        memos.value = memos.value.filter(memo => memo.id !== id);
-    } catch (error) {
-        console.error('메모 삭제 실패:', error);
+        isSubmitting.value = true;
+        error.value = null;
+        
+        const response = await bookmarkStore.deleteMemo(bookmark.value.id, memoId);
+        if (response.data.success) {
+            memos.value = memos.value.filter(memo => memo.id !== memoId);
+        }
+    } catch (err) {
+        error.value = '메모 삭제 실패: ' + err.message;
+        console.error('메모 삭제 실패:', err);
+    } finally {
+        if (isComponentMounted.value) {
+            isSubmitting.value = false;
+        }
     }
 };
 
-// iframe 로드 실패 시 처리
+// 메모 목록 조회
+const fetchMemos = async () => {
+    if (!bookmark.value?.id) return;
+    
+    try {
+        isLoading.value = true;
+        error.value = null;
+        
+        const response = await bookmarkStore.getMemo(bookmark.value.id);
+        if (response.data.success) {
+            memos.value = response.data.results.memos.map(memo => ({
+                id: memo.memo_id,
+                content: memo.content,
+                date: new Date(memo.created_at).toLocaleString(),
+                userName: memo.nickname,
+                imageUrl: memo.image_url
+            }));
+        }
+    } catch (err) {
+        error.value = '메모 로딩 실패: ' + err.message;
+        console.error('메모 로딩 실패:', err);
+    } finally {
+        if (isComponentMounted.value) {
+            isLoading.value = false;
+        }
+    }
+};
+
+// iframe 에러 처리
 const handleIframeError = () => {
     iframeError.value = true;
 };
 
 onMounted(async () => {
-    const bookmarkId = parseInt(route.params.id);
-    const bookmarksData = bookmarkStore.exampleSharedCollectionBookmarks.value.results;
-    const foundBookmark = bookmarksData.bookmarks.find(b => b.bookmark_id === bookmarkId);
-    
-    if (foundBookmark) {
-        bookmark.value = {
-            id: foundBookmark.bookmark_id,
-            image: foundBookmark.img,
-            title: foundBookmark.title,
-            description: foundBookmark.description,
-            url: foundBookmark.url,
-            hashtags: foundBookmark.tag,
-        };
+    try {
+        isInitializing.value = true;
+        error.value = null;
+
+        if (!bookmark.value) {
+            const bookmarkId = parseInt(route.params.id);
+            const response = await bookmarkStore.getBookmarkDetail(bookmarkId);
+            
+            if (response.data.success) {
+                const bookmarkData = response.data.results;
+                bookmark.value = {
+                    id: bookmarkData.bookmark_id,
+                    title: bookmarkData.title,
+                    description: bookmarkData.description,
+                    url: bookmarkData.url,
+                    img: bookmarkData.img,
+                    tag: bookmarkData.tag,
+                    priority: bookmarkData.priority,
+                    createdAt: bookmarkData.created_at,
+                    updatedAt: bookmarkData.updated_at
+                };
+            }
+        }
         
-        try {
-            await bookmarkStore.getMemo(bookmarkId);
-        } catch (error) {
-            console.error('메모 로딩 실패:', error);
+        if (bookmark.value) {
+            await fetchMemos();
+        }
+    } catch (err) {
+        error.value = '데이터 로딩 실패: ' + err.message;
+        console.error('북마크 데이터 로딩 실패:', err);
+    } finally {
+        if (isComponentMounted.value) {
+            isInitializing.value = false;
         }
     }
+});
+
+onUnmounted(() => {
+    isComponentMounted.value = false;
 });
 </script>
 
 <style scoped>
-
 .layout {
     display: flex;
     flex-direction: column;
@@ -309,5 +408,25 @@ textarea {
 
 .original-link-btn i {
     font-size: 0.9em;
+}
+
+.error-message {
+    color: #dc3545;
+    padding: 10px;
+    margin: 10px 0;
+    background-color: #f8d7da;
+    border: 1px solid #f5c6cb;
+    border-radius: 4px;
+}
+
+.loading {
+    text-align: center;
+    padding: 20px;
+    color: #666;
+}
+
+button:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
 }
 </style>

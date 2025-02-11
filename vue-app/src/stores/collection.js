@@ -25,8 +25,8 @@ export const useCollectionStore = defineStore("collection", () => {
 
       // baseURL은 이미 설정되어 있으므로 경로만 지정
       const [personalRes, sharedRes] = await Promise.all([
-        api.get('/api/collections/personal'),  // REST_API_URL 제거
-        api.get('/api/collections/shared'),    // REST_API_URL 제거
+        api.get('/collections/personal'),  // REST_API_URL 제거
+        api.get('/collections/shared'),    // REST_API_URL 제거
       ]);
 
       if (personalRes.data.success && sharedRes.data.success) {
@@ -106,7 +106,7 @@ export const useCollectionStore = defineStore("collection", () => {
   //공유 컬렉션 id로 멤버 조회
   const getMembersByCollectionId = async (collectionId) => {
     try {
-      const response = await api.get(`/api/collections/shared/${collectionId}/users`)
+      const response = await api.get(`/collections/shared/${collectionId}/users`)
       membersByCollectionId.value = response.data
     } catch (error) {
       console.error('공유컬렉션 멤버 조회 중 오류 발생:', error)
@@ -139,7 +139,7 @@ export const useCollectionStore = defineStore("collection", () => {
       const request = {
         name: name
       } 
-      const response = await api.post('/api/collections/personal', request)
+      const response = await api.post('/collections/personal', request)
       console.log('컬렉션 생성 성공:')
     } catch (error) {
       console.error('개인 컬렉션 생성 중 오류 발생:', error)
@@ -153,7 +153,7 @@ export const useCollectionStore = defineStore("collection", () => {
       const request = {
         "sharedCollectionName": name
       } 
-      const response = await api.post('/api/collections/shared', request)
+      const response = await api.post('/collections/shared', request)
       console.log('컬렉션 생성 성공:')
 
     } catch (error) {
@@ -167,7 +167,7 @@ export const useCollectionStore = defineStore("collection", () => {
       const request = {
         "newName": newName
       }
-      const response = await api.put(`/api/collections/personal/${collectionId}`, request)
+      const response = await api.put(`/collections/personal/${collectionId}`, request)
       console.log('컬렉션 이름 변경 성공:')
 
     } catch (error) {
@@ -181,7 +181,7 @@ export const useCollectionStore = defineStore("collection", () => {
       const request = {
         "newName": newName
       }
-      const response = await api.put(`/api/collections/shared/${collectionId}`, request)
+      const response = await api.put(`/collections/shared/${collectionId}`, request)
       console.log('컬렉션 이름 변경 성공:')
 
     } catch (error) {
@@ -192,7 +192,7 @@ export const useCollectionStore = defineStore("collection", () => {
   //개인컬렉션 삭제
   const deletePersonalCollection = async (collectionId) => {
     try {
-      const response = await api.delete(`/api/collections/personal/${collectionId}`)
+      const response = await api.delete(`/collections/personal/${collectionId}`)
       console.log('개인컬렉션 삭제 성공:')
     } catch (error) {
       console.error('개인컬렉션 삭제 중 오류 발생:', error)
@@ -203,7 +203,7 @@ export const useCollectionStore = defineStore("collection", () => {
   //공유컬렉션 삭제
   const deleteSharedCollection = async (collectionId) => {
     try { 
-      const response = await api.delete(`/api/collections/shared/${collectionId}`)
+      const response = await api.delete(`/collections/shared/${collectionId}`)
       console.log('공유컬렉션 삭제 성공:')
     } catch (error) {
       console.error('공유컬렉션 삭제 중 오류 발생:', error)
@@ -217,7 +217,7 @@ export const useCollectionStore = defineStore("collection", () => {
       const request = {
         "email": memberEmail
       }
-      const response = await api.post(`/api/collections/shared/${collectionId}/invite`, request)
+      const response = await api.post(`/collections/shared/${collectionId}/invite`, request)
       console.log('공유컬렉션 인원 추가 성공:')
 
     } catch (error) {
@@ -229,7 +229,7 @@ export const useCollectionStore = defineStore("collection", () => {
   //공유 컬렉션 인원 강퇴
   const removeMemberFromSharedCollection = async (collectionId, userId) => {
     try {
-      const response = await api.delete(`/api/collections/shared/${collectionId}/members/${userId}`)
+      const response = await api.delete(`/collections/shared/${collectionId}/members/${userId}`)
       console.log('공유컬렉션 인원 강퇴 성공:')
     } catch (error) {
       console.error('공유컬렉션 인원 강퇴 중 오류 발생:', error)

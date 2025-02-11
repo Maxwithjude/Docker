@@ -17,11 +17,11 @@
         </el-button>
         
         <el-button link @click="copyToSharedCollection">
-          공유 컬렉션으로 복사
+          다른 공유 컬렉션으로 복사
         </el-button>
         
         <el-button link @click="showMoveDialog">
-          다른 컬렉션으로 이동
+          다른 개인 컬렉션으로 이동
         </el-button>
         
         <el-button link @click="showTagManagement">
@@ -44,7 +44,11 @@
     append-to-body
     class="bookmark-copy-dialog"
   >
-    <BookmarkCopyShared @close="showCopyModal = false" />
+    <BookmarkCopyShared 
+      :bookmark-id="props.bookmarkId"
+      :is-personal="props.isPersonal"
+      @close="showCopyModal = false" 
+    />
   </el-dialog>
 
   <el-dialog
@@ -57,6 +61,7 @@
   >
     <BookmarkMovePersonal 
       :bookmark-id="props.bookmarkId"
+      :is-personal="props.isPersonal"
       @close="showMoveModal = false"
       @move-complete="handleMoveComplete"
     />
@@ -88,6 +93,7 @@
       class="bookmark-delete-modal"
   >
       <BookmarkDel
+          :bookmark-id="props.bookmarkId"
           @close="showDeleteModal = false"
           @confirm="handleDeleteConfirm"
       />
@@ -104,7 +110,7 @@ import BookmarkTagSetting from '@/modal/BookmarkTagSetting.vue'
 import BookmarkDel from '@/modal/BookmarkDel.vue'
 
 const bookmarkStore = useBookmarkStore()
-const emit = defineEmits(['togglePriority'])
+const emit = defineEmits(['update:priority'])
 const props = defineProps({
   priority: {
     type: Boolean,
@@ -116,6 +122,10 @@ const props = defineProps({
   },
   tag: {
     type: Array,
+    required: true
+  },
+  isPersonal: {
+    type: Boolean,
     required: true
   }
 })
@@ -132,7 +142,7 @@ const togglePriority = async () => {
     const success = await bookmarkStore.changePriority(props.bookmarkId, !props.priority)
     if (success) {
       ElMessage.success(props.priority ? '중요 북마크가 해제되었습니다.' : '중요 북마크로 설정되었습니다.')
-      emit('togglePriority')
+      emit('update:priority', !props.priority)
       isVisible.value = false
     } else {
       ElMessage.error('중요도 변경에 실패했습니다.')

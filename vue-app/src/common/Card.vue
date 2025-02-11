@@ -9,6 +9,8 @@
                 <BookmarkSettings 
                     :priority="props.priority"
                     :bookmark-id="props.bookmarkId"
+                    :is-personal="props.isPersonal"
+                    :tag="props.tag"
                     @toggle-priority="handlePriorityToggle"
                 />
             </div>
@@ -56,6 +58,10 @@ import BookmarkSettings from '@/common/BookmarkSettings.vue';
 import { useRouter } from 'vue-router';
 
 const props = defineProps({
+    key: {
+        type: Number,
+        required: true
+    },
     bookmarkId: {
         type: Number,
         required: true
@@ -113,7 +119,25 @@ const handleImageClick = () => {
     const route = props.isPersonal 
         ? `/personal-collection/${props.bookmarkId}`
         : `/shared-collection/${props.bookmarkId}`;
-    router.push(route);
+    
+    router.push({
+        path: route,
+        state: {
+            bookmarkData: {
+                key: props.key,
+                bookmarkId: props.bookmarkId,
+                isPersonal: props.isPersonal,
+                title: props.title,
+                description: props.description,
+                url: props.url,
+                img: props.img,
+                tag: props.tag,
+                priority: props.priority,
+                createdAt: props.createdAt,
+                updatedAt: props.updatedAt
+            }
+        }
+    });
 };
 
 const emit = defineEmits(['update:priority']);

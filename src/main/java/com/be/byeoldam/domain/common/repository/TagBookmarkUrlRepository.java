@@ -12,4 +12,6 @@ public interface TagBookmarkUrlRepository extends JpaRepository<TagBookmarkUrl, 
     void deleteByTag(Tag tag);
 
     boolean existsByTagAndBookmarkUrl(Tag tag, BookmarkUrl bookmarkUrl);
+
+    boolean existsByBookmarkUrlAndTag(BookmarkUrl bookmarkUrl, Tag tag);
 }

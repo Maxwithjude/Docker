@@ -24,9 +24,6 @@ public class Bookmark extends BaseTimeEntity {
     @JoinColumn(name = "url_id", nullable = false)
     private BookmarkUrl bookmarkUrl;
 
-    // 컬렉션은 여러 북마크를 가지고
-    // 북마크는 하나의 컬렉션을 가짐
-    // 북마크가 N
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="personal_collection_id")
     private PersonalCollection personalCollection;

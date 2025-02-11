@@ -46,8 +46,8 @@ public class BookmarkService {
     // 2. bookmarkUrl에 추가 or referenceCount increment
     // 3. bookmark_tag에 추가
     // 4. tag 추가 or referenceCount increment
-    // ❗❗❗ 똑같은 url 저장하려고 하면 막기 (컬렉션)
-    // ❗❗❗ 태그 테두리 색상 추가
+    // 똑같은 url 저장하려고 하면 막기 (컬렉션)
+    // 태그 테두리 색상 추가
     @Transactional
     public void createBookmark(CreateBookmarkRequest request, Long userId) {
         // user를 찾고
@@ -60,21 +60,21 @@ public class BookmarkService {
             throw new CustomException("");
         }
 
-        // ❗ 개인 컬렉션에 이미 저장된 url이면 저장할 수 없게 처리하기
-        // bookmarkUrl이 있으면 그 객체로 personalCollection에
-        bookmarkUrlRepository.findByUrl(request.getUrl())
-                .flatMap(bookmarkUrl -> bookmarkRepository.findByBookmarkUrlAndUser(bookmarkUrl, user))
-                .filter(bookmark -> bookmark.getPersonalCollection() != null)
-                .ifPresent(bookmark -> {
-                    throw new CustomException("이미 개인 컬렉션에 저장된 북마크입니다.");
-                });
-
-        // ❗븍마크 존재 여부 확인 후 없으면 생성, 그 후 +1
+        // 븍마크 존재 여부 확인 후 없으면 생성, 그 후 +1
         BookmarkUrl bookmarkUrl = bookmarkUrlRepository.findByUrl(request.getUrl())
                 .orElseGet(() ->
-                    // TODO : readingTime 나중에 추가 필요
-                    bookmarkUrlRepository.save(BookmarkUrl.create(request.getUrl(), 0L, 0)));
+                        // TODO : readingTime 나중에 추가 필요
+                        bookmarkUrlRepository.save(BookmarkUrl.create(request.getUrl(), 0L, 0)));
         bookmarkUrl.increment();
+
+        bookmarkRepository.findByUrlAndUser(bookmarkUrl, user).stream()
+                .filter(bookmark -> bookmark.getPersonalCollection() != null)
+                .findFirst()
+                .ifPresent(bookmark -> {
+                    throw new CustomException("");
+                });
+
+
 
         // 2. Bookmark에 bookmark 추가해주기
         // 2-1. 컬렉션 타입 확인하기
@@ -99,21 +99,21 @@ public class BookmarkService {
                 .orElse(Collections.emptyList());
 
         // 3-1. 태그 리스트 저장 or referenceCount++
-        // ❗ 태그의 존재 여부 확인 후 없으면 생성, 그 후 +1
+        // 태그의 존재 여부 확인 후 없으면 생성, 그 후 +1
         List<Tag> tags = tagDtos.stream()
                 .map(dto -> {
                     Tag tag = tagRepository.findByName(dto.getTagName())
                             .orElseGet(() -> tagRepository.save(Tag.createTag(dto.getTagName(), dto.getTagColor(), dto.getTagBolder())));
-                    tag.increment();
                     return tagRepository.save(tag);
                 })
                 .toList();
 
         // 4. bookmark_tag에 추가
         // 5. 추가 사항
-        // ❗❗❗ tag-bookmarkUrl에도 추가 (빠진 것 같아서 추가함)
+        // tag-bookmarkUrl에도 추가
         for (Tag tag : tags) {
             bookmarkTagRepository.save(BookmarkTag.create(bookmark, tag));
+            tag.increment();
             if (!tagBookmarkUrlRepository.existsByTagAndBookmarkUrl(tag, bookmarkUrl)) {
                 tagBookmarkUrlRepository.save(TagBookmarkUrl.create(tag, bookmarkUrl));
             }
@@ -137,44 +137,57 @@ public class BookmarkService {
                 .orElseThrow(() -> new CustomException(""));
 
         // 기존 태그 리스트
-        List<Tag> beforeTags = bookmarkTagRepository.findByBookmark(bookmark).stream()
-                .map(BookmarkTag::getTag)
+        List<String> beforeTagNames = bookmarkTagRepository.findByBookmark(bookmark).stream()
+                .map(bookmarkTag -> bookmarkTag.getTag().getName())
                 .toList();
 
         // 요청에 있는 태그 dto 리스트
-        List<TagDto> newTagNames = Optional.ofNullable(request.getTags())
+        List<TagDto> newTagDtos = Optional.ofNullable(request.getTags())
                 .orElse(Collections.emptyList());
 
-        // 새롭게 저장되는 태그를 등록, 처음 저장하는 태그면 저장도 해주기
-        List<Tag> newTags = newTagNames.stream()
-                .filter(tagDto -> tagRepository.findByName(tagDto.getTagName()).isEmpty()) // 🔥 DB에 없는 태그만 필터링
-                .map(tagDto -> {
-                    Tag newTag = tagDto.toEntity();
-                    newTag.increment();
-                    return tagRepository.save(newTag);
-                })
+        // 요청으로 들어온 태그 이름 리스트
+        List<String> newTagNames = newTagDtos.stream()
+                .map(TagDto::getTagName)
                 .toList();
 
+        // 완전 새롭게 저장되는 태그를 등록, 처음 저장하는 태그면 저장도 해주기 (기존에 누구도 저장한 적 없는 태그)
+        newTagDtos.stream()
+                .filter(tagDto -> tagRepository.findByName(tagDto.getTagName()).isEmpty())
+                .forEach(tagDto -> {
+                    Tag newTag = tagDto.toEntity();
+                    tagRepository.save(newTag);
+                    // TODO : url-tag 연관 관계 추가
+                });
+
+        // 북마크에 없었던 태그 리스트 : newTags
+        List<Tag> newTags = newTagNames.stream()
+                .filter(tagName -> !beforeTagNames.contains(tagName)) // 기존 태그 리스트에 없는 태그만 필터링
+                .map(tagName -> tagRepository.findByName(tagName).orElseThrow(() -> new CustomException("Tag not found")))
+                .toList();
 
         // 추가할 태그 북마크-태그에도 추가,
-        // ❗❗❗ 태그-북마크링크에서도 추가
+        // 태그-북마크링크에서도 추가
         newTags.forEach(tag -> {
             // 북마크-태그 연관관계 추가
             BookmarkTag newBookmarkTag = BookmarkTag.create(bookmark, tag);
+            tag.increment();
             bookmarkTagRepository.save(newBookmarkTag);
 
             // 북마크링크-태그 연관관계 추가
-            tagBookmarkUrlRepository.save(TagBookmarkUrl.create(tag, bookmark.getBookmarkUrl()));
+            if(!tagBookmarkUrlRepository.existsByBookmarkUrlAndTag(bookmark.getBookmarkUrl(), tag)) {
+                tagBookmarkUrlRepository.save(TagBookmarkUrl.create(tag, bookmark.getBookmarkUrl()));
+            }
         });
 
-
         // 수정 후 없는 태그 리스트 -> 삭제할 태그
-        List<Tag> removedTags = beforeTags.stream()
-                .filter(tag -> newTags.stream().noneMatch(newTag -> newTag.getName().equals(tag.getName())))
+        List<String> removedTagNames = beforeTagNames.stream()
+                .filter(tagName -> !newTagNames.contains(tagName))
                 .toList();
 
         // 삭제할 태그 referenceCount--, referenceCount 0이면 삭제
-        for (Tag tag : removedTags) {
+        for (String name : removedTagNames) {
+            Tag tag = tagRepository.findByName(name)
+                    .orElseThrow(() -> new CustomException("Tag not found"));
             tag.decrement();
             // 북마크-태그 테이블에서 삭제 (북마크와 태그의 연관관계 삭제)
             bookmarkTagRepository.deleteByBookmarkAndTag(bookmark, tag);
@@ -235,14 +248,14 @@ public class BookmarkService {
         for (BookmarkTag bookmarkTag : bookmarkTags) {
             Tag tag = bookmarkTag.getTag();
             tag.decrement();
-            if (bookmarkTag.getTag().getReferenceCount() == 0) {
+            bookmarkTagRepository.deleteByBookmark(bookmark);
+            if (tag.getReferenceCount() == 0) {
                 // Tag 삭제, 북마크-태그 테이블에서 연관관계 삭제
-                bookmarkTagRepository.deleteByTag(tag);
                 tagRepository.delete(tag);
             }
         }
 
-        // 삭제가 가능한 유저라면,,, 삭제를 해야 함
+        // 진짜 찐으로 북마크 삭제를 해야 함
         bookmarkRepository.delete(bookmark);
     }
 
@@ -276,14 +289,14 @@ public class BookmarkService {
         Bookmark newBookmark = bookmark.copy();
 
         // 개인 > 공유
-        if (bookmark.getPersonalCollection() != null) {
+        if (!request.isPersonal() && bookmark.getPersonalCollection() != null) {
             SharedCollection collection = sharedCollectionRepository.findById(request.getCollectionId())
                     .orElseThrow(() -> new CustomException(""));
             newBookmark.updatePersonalCollection(null); // 개인 컬렉션 해제
             newBookmark.updateSharedCollection(collection);
 
         // 공유 > 공유
-        } else if (bookmark.getSharedCollection() != null) {
+        } else if (!request.isPersonal() && bookmark.getSharedCollection() != null) {
             SharedCollection collection = sharedCollectionRepository.findById(request.getCollectionId())
                     .orElseThrow(() -> new CustomException(""));
             newBookmark.updateSharedCollection(collection);
@@ -320,7 +333,6 @@ public class BookmarkService {
     public void changePriority(Long bookmarkId) {
         Bookmark bookmark = bookmarkRepository.findById(bookmarkId)
                 .orElseThrow(() -> new CustomException(""));
-
         bookmark.updatePriority();
     }
 }

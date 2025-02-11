@@ -1,6 +1,5 @@
 package com.be.byeoldam.domain.bookmark.repository;
 
-
 import com.be.byeoldam.domain.bookmark.model.Bookmark;
 import com.be.byeoldam.domain.common.model.BookmarkUrl;
 import com.be.byeoldam.domain.user.model.User;
@@ -18,4 +17,6 @@ public interface BookmarkRepository extends JpaRepository<Bookmark, Long> {
     List<Bookmark> findUnreadBookmarksByUserIdAndDate(@Param("userId") Long userId, @Param("targetDate") LocalDateTime targetDate);
 
     Optional<Bookmark> findByBookmarkUrlAndUser(BookmarkUrl bookmarkUrl, User user);
+
+    List<Bookmark> findByUrlAndUser(BookmarkUrl bookmarkUrl, User user);
 }

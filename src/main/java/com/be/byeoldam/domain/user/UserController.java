@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequiredArgsConstructor
 @Tag(name = "User", description = "User 관련 API")
+@RequestMapping("/api/users")
 public class UserController {
 
     private final UserService userService;
@@ -23,7 +24,7 @@ public class UserController {
             summary = "회원가입",
             description = "새로운 사용자 등록, 이후 사용자 정의 태그도 입력해야 하기 때문에 로그인과 동일하게 사용자 정보 제공"
     )
-    @PostMapping("/api/users/register")
+    @PostMapping("/register")
     public ResponseTemplate<UserRegisterResponse> registerUser(@RequestBody UserRegisterRequest request) {
        UserRegisterResponse response = userService.registerUser(request);
        return ResponseTemplate.ok(response);
@@ -45,7 +46,7 @@ public class UserController {
             summary = "이메일 인증 코드 요청",
             description = "사용자의 이메일 주소로 인증 코드 전송. Redis가 도커 환경에서 실행되면 실제 구현이 추가될 예정.(아직 구현 X)"
     )
-    @PostMapping("/api/users/email/send")
+    @PostMapping("/email/send")
     public ResponseTemplate<String> sendVerificationEmail(@RequestParam String email){
         return ResponseTemplate.ok("이메일 인증 코드가 전송되었습니다.");
     }
@@ -54,7 +55,7 @@ public class UserController {
             summary = "이메일 인증 코드 검증",
             description = "사용자가 입력한 인증 코드가 올바른지 검증. Redis가 도커 환경에서 실행되면 실제 구현이 추가될 예정.(아직 구현 X)"
     )
-    @GetMapping("/api/users/email/verify")
+    @GetMapping("/email/verify")
     public ResponseTemplate<String> verifyEmailCode(@RequestParam String email, @RequestParam String code) {
         return ResponseTemplate.ok("인증 완료!");
     }
@@ -63,7 +64,7 @@ public class UserController {
             summary = "로그아웃",
             description = "RefreshToken을 서버에서 제거하며, AccessToken은 클라이언트에서 직접 삭제해야 합니다, 아래와 같이 따로 전송해야하는 데이터는 없고 API만 호출해줘!"
     )
-    @PostMapping("/api/users/logout")
+    @PostMapping("/logout")
     public ResponseTemplate<String> logout(){
         userService.logout();
         return ResponseTemplate.ok("로그아웃이 완료되었습니다.");
@@ -73,7 +74,7 @@ public class UserController {
             summary = "refreshToken을 통해 Access토큰 재발급",
             description = "아래 형식에 맞게 RefreshToken을 던져주면, 토큰을 재발급!"
     )
-    @PostMapping("api/users/refresh")
+    @PostMapping("/refresh")
     public ResponseTemplate<UserTokenResponse> refreshToken(@RequestBody UserTokenRequest userTokenRequest){
         System.out.println("UserController.refreshToken");
         System.out.println(userTokenRequest.getRefreshToken());

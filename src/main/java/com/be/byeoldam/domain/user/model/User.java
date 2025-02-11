@@ -2,7 +2,10 @@ package com.be.byeoldam.domain.user.model;
 
 import com.be.byeoldam.common.entity.BaseTimeEntity;
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AccessLevel;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 
@@ -69,6 +72,25 @@ public class User extends BaseTimeEntity{
     public void updateRefreshToken(String refreshToken){
         this.refreshToken = refreshToken;
     }
+
+    public void updateProfileImage(String profileUrl){
+        this.profileUrl = profileUrl;
+    }
+
+    public void updateMypage(String nickname, int alertDay) {
+        if (nickname != null) {
+            this.nickname = nickname;
+        }
+        if (alertDay != 0) {
+            this.alertDay = alertDay;
+        }
+    }
+
+    public void deactivate(){
+        this.deletedAt = LocalDateTime.now();
+        this.isActive = AccountStatus.INACTIVE;
+    }
+
     @Builder
     public User(String email, String password, String nickname, Provider provider, Integer alertDay, Boolean isVerified, AccountStatus isActive, String profileUrl, String providerId) {
         this.email = email;
@@ -98,7 +120,7 @@ public class User extends BaseTimeEntity{
             this.isActive = AccountStatus.ACTIVE;
         }
         if(this.profileUrl == null) {
-            profileUrl ="*";
+            profileUrl ="https://byeol-mypage.s3.ap-northeast-2.amazonaws.com/free-icon-user-9386837.PNG";
         }
         if(this.role == null){
             role = "ROLE_USER";

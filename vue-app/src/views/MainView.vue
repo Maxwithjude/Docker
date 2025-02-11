@@ -99,8 +99,6 @@ onMounted(async () => {
         await collectionStore.fetchAllCollection();
     } catch (error) {
         console.error('컬렉션 로딩 실패:', error);
-        // 에러 발생 시 예시 데이터 사용
-        allCollections.value = collectionStore.exampleAllCollections;
     }
 });
 </script>

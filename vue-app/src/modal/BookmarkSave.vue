@@ -43,24 +43,52 @@
             </div>
 
             <div class="modal-footer">
-                <button class="save-button" @click="handleSave">이동</button>
+                <button class="save-button" @click="handleSave">저장</button>
             </div>
         </div>
     </div>
 </template>
 
 <script setup>
-import { ref } from 'vue';
+import { ref, computed } from 'vue';
+import { useCollectionStore } from '@/stores/collection';
+import { useBookmarkStore } from '@/stores/bookmark';
 
-const emit = defineEmits(['close']);
+const props = defineProps({
+    key: {
+        type: String,
+        required: true
+    },
+    url: {
+        type: String,
+        required: true
+    },
+    title: {
+        type: String,
+        required: true
+    },
+    description: {
+        type: String,
+        required: true
+    },
+    img: {
+        type: String,
+        required: true
+    }
+});
+
+const emit = defineEmits(['close', 'save']);
+const collectionStore = useCollectionStore();
+const bookmarkStore = useBookmarkStore();
+
+// 컴포넌트가 마운트될 때 컬렉션 데이터를 가져옵니다
+await collectionStore.fetchAllCollection();
 
 const selectedCollection = ref('');
-const collections = ref([
-    { id: 1, name: '컬렉션 1' },
-    { id: 2, name: '컬렉션 2' },
-]);
+// personalCollections 대신 allCollections 사용
+const collections = computed(() => collectionStore.allCollections);
 
-const selectedTags = ref(['Redis', 'SMTP', 'Spring']);
+const selectedTags = ref([]);
 const newTag = ref('');
 
 const addTag = () => {
@@ -78,9 +106,37 @@ const closeModal = () => {
     emit('close');
 };
 
-const handleSave = () => {
-    // 저장 로직 구현
-    closeModal();
+const handleSave = async () => {
+    try {
+        if (!selectedCollection.value) {
+            alert('컬렉션을 선택해주세요.');
+            return;
+        }
+
+        // 선택된 컬렉션이 개인 컬렉션인지 확인
+        const collection = collectionStore.allCollections.find(
+            c => c.collection_id === selectedCollection.value
+        );
+        
+        // 태그 형식 변환
+        const formattedTags = selectedTags.value.map(tag => ({
+            tagName: tag,
+            tagColor: "#111111" // 기본 색상 설정
+        }));
+
+        await bookmarkStore.saveBookmark(
+            props.url, // props로 전달받은 URL
+            selectedCollection.value,
+            collection.isPersonal,
+            formattedTags
+        );
+
+        emit('save'); // 저장 성공 이벤트 발생
+        closeModal();
+    } catch (error) {
+        console.error('북마크 저장 중 오류 발생:', error);
+        alert('북마크 저장에 실패했습니다.');
+    }
 };
 </script>
 

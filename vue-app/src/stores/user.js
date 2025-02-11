@@ -140,7 +140,7 @@ const checkCode = async (params) => {
   // 회원가입 함수
   const signup = async (form) => {
     try {
-      const response = await axios.post(`${REST_API_URL}/api/users/register`, {
+      const response = await axios.post(`${REST_API_URL}/users/register`, {
         email: form.email,
         password: form.password,
         nickname: form.nickname,

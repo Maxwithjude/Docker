@@ -23,9 +23,25 @@ public class BookmarkUrl {
     private int readingTime;
 
     @Builder
-    public BookmarkUrl(String url, Long referenceCount, int readingTime) {
+    private BookmarkUrl(String url, Long referenceCount, int readingTime) {
         this.url = url;
         this.referenceCount = referenceCount;
         this.readingTime = readingTime;
+    }
+
+    public static BookmarkUrl create(String url, Long referenceCount, int readingTime) {
+        return BookmarkUrl.builder()
+                        .url(url)
+                        .referenceCount(referenceCount)
+                        .readingTime(readingTime)
+                        .build();
+    }
+
+    public void decrement() {
+        this.referenceCount -= 1;
+    }
+
+    public void increment() {
+        this.referenceCount += 1;
     }
 }

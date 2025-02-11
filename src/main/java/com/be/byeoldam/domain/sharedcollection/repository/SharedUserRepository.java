@@ -18,4 +18,6 @@ public interface SharedUserRepository extends JpaRepository<SharedUser, Long> {
     void deleteAllBySharedCollection(SharedCollection collection);
 
     boolean existsBySharedCollectionIdAndUserId(Long collectionId, Long inviterId);
+
+    boolean existsByUserAndSharedCollection(User user, SharedCollection sharedCollection);
 }

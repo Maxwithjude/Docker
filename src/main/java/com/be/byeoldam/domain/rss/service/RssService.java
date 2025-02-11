@@ -300,4 +300,25 @@ public class RssService {
 
         return null;
     }
+
+    /**
+     * RSS 목록 중 새 글이 있는지 확인하는 메서드
+     */
+    public boolean hasNewArticles(Long userId) {
+        List<UserRss> userRssList = userRssRepository.findByUserId(userId);
+
+        for (UserRss userRss : userRssList) {
+            try {
+                String currentTitle = extractLatestTitle(userRss.getRss().getRssUrl());
+
+                if (currentTitle != null && !currentTitle.equals(userRss.getLatestTitle())) {
+                    return true;
+                }
+            } catch (Exception e) {
+                throw new CustomException("RSS 피드를 가져오는 중 오류가 발생했습니다.");
+            }
+        }
+
+        return false;
+    }
 }

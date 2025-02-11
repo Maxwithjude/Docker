@@ -78,6 +78,12 @@ services:
       - ./frontend/vue-app:/app
       - /app/node_modules
 
+  adminer:
+    image: adminer
+    ports:
+      - "8000:8000"
+    networks:
+      - my-network
 networks:
   my-network:
 

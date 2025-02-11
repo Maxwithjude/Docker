@@ -12,7 +12,7 @@ import java.util.List;
 @Getter
 @AllArgsConstructor
 @Builder
-public class CollectionBookmarkResponse {
+public class PersonalBookmarkResponse {
     private Long bookmarkId;
     private String url;
     private String img;
@@ -24,8 +24,8 @@ public class CollectionBookmarkResponse {
     private LocalDateTime updatedAt;
     private List<TagDto> tags;
 
-    public static CollectionBookmarkResponse of(Bookmark bookmark, List<TagDto> tagDtos, String img, String title, String description) {
-        return CollectionBookmarkResponse.builder()
+    public static PersonalBookmarkResponse of(Bookmark bookmark, List<TagDto> tagDtos, String img, String title, String description) {
+        return PersonalBookmarkResponse.builder()
                 .bookmarkId(bookmark.getId())
                 .url(bookmark.getBookmarkUrl().getUrl())
                 .img(img)

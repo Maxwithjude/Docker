@@ -1,5 +1,11 @@
 package com.be.byeoldam.domain.sharedcollection.service;
 
+import com.be.byeoldam.domain.bookmark.dto.TagDto;
+import com.be.byeoldam.domain.bookmark.model.Bookmark;
+import com.be.byeoldam.domain.bookmark.repository.BookmarkRepository;
+import com.be.byeoldam.domain.bookmark.repository.BookmarkTagRepository;
+import com.be.byeoldam.domain.personalcollection.dto.PersonalBookmarkResponse;
+import com.be.byeoldam.domain.sharedcollection.dto.SharedBookmarkResponse;
 import com.be.byeoldam.domain.sharedcollection.dto.SharedCollectionRequest;
 import com.be.byeoldam.domain.sharedcollection.dto.SharedCollectionResponse;
 import com.be.byeoldam.domain.sharedcollection.model.Role;
@@ -7,6 +13,9 @@ import com.be.byeoldam.domain.sharedcollection.model.SharedCollection;
 import com.be.byeoldam.domain.sharedcollection.model.SharedUser;
 import com.be.byeoldam.domain.sharedcollection.repository.SharedCollectionRepository;
 import com.be.byeoldam.domain.sharedcollection.repository.SharedUserRepository;
+import com.be.byeoldam.domain.tag.model.Tag;
+import com.be.byeoldam.domain.tag.util.JsoupUtil;
+import com.be.byeoldam.domain.tag.util.UrlPreview;
 import com.be.byeoldam.domain.user.model.User;
 import com.be.byeoldam.domain.user.repository.UserRepository;
 import com.be.byeoldam.exception.CustomException;
@@ -26,6 +35,10 @@ public class SharedCollectionService {
     private final SharedUserRepository sharedUserRepository;
 
     private final UserRepository userRepository;
+
+    private final BookmarkRepository bookmarkRepository;
+
+    private final BookmarkTagRepository bookmarkTagRepository;
 
     // 공유컬렉션 생성
     // 예외 1. user_id 확인
@@ -99,6 +112,16 @@ public class SharedCollectionService {
         sharedUserRepository.deleteAllBySharedCollection(collection);
     }
 
+    // 공유컬렉션 상세 조회 - 북마크 목록 조회
+    @Transactional(readOnly = true)
+    public List<SharedBookmarkResponse> getCollectionBookmark(Long userId, Long collectionId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new CustomException(""));
+        SharedCollection collection = sharedCollectionRepository.findById(collectionId)
+                .orElseThrow(() -> new CustomException(""));
+        List<Bookmark> bookmarks = bookmarkRepository.findByUserAndSharedCollection(user, collection);
+        return makeBookmarkResponse(bookmarks);
+    }
 
     // 공유컬렉션 멤버 관리 - 초대
     // 초대 알림에서 수락을 누르면 이쪽으로 넘어옴
@@ -151,5 +174,18 @@ public class SharedCollectionService {
         }
 
         sharedUserRepository.delete(ejectedSharedUser);
+    }
+
+    private List<SharedBookmarkResponse> makeBookmarkResponse(List<Bookmark> bookmarks) {
+        return bookmarks.stream()
+                .map(bookmark -> {
+                    UrlPreview preview = JsoupUtil.fetchMetadata(bookmark.getBookmarkUrl().getUrl());
+                    List<TagDto> tagDtos = bookmarkTagRepository.findByBookmark(bookmark).stream()
+                            .map(bookmarkTag -> {
+                                Tag tag = bookmarkTag.getTag();
+                                return TagDto.of(tag);
+                            }).toList();
+                    return SharedBookmarkResponse.of(bookmark, tagDtos, preview.getImageUrl(), preview.getTitle(), preview.getDescription());
+                }).toList();
     }
 }

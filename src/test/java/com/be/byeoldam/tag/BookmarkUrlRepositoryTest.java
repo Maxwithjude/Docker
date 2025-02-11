@@ -46,12 +46,12 @@ class BookmarkUrlRepositoryTest {
     @BeforeEach
     void setUp() {
         // 1. URL 저장
-        BookmarkUrl url1 = bookmarkUrlRepository.save(new BookmarkUrl("https://www.naver.com/",2L,1));
-        BookmarkUrl url2 = bookmarkUrlRepository.save(new BookmarkUrl("https://www.google.com/",4L,2));
-        BookmarkUrl url3 = bookmarkUrlRepository.save(new BookmarkUrl("https://www.wikipedia.org",3L,3));
-        BookmarkUrl url4 = bookmarkUrlRepository.save(new BookmarkUrl("https://www.facebook.com",7L,4));
-        BookmarkUrl url5 = bookmarkUrlRepository.save(new BookmarkUrl("https://www.youtube.com",10L,5));
-        BookmarkUrl url6 = bookmarkUrlRepository.save(new BookmarkUrl("https://www.daum.net",1L,6));
+        BookmarkUrl url1 = bookmarkUrlRepository.save(BookmarkUrl.create("https://www.naver.com/",2L,1));
+        BookmarkUrl url2 = bookmarkUrlRepository.save(BookmarkUrl.create("https://www.google.com/",4L,2));
+        BookmarkUrl url3 = bookmarkUrlRepository.save(BookmarkUrl.create("https://www.wikipedia.org",3L,3));
+        BookmarkUrl url4 = bookmarkUrlRepository.save(BookmarkUrl.create("https://www.facebook.com",7L,4));
+        BookmarkUrl url5 = bookmarkUrlRepository.save(BookmarkUrl.create("https://www.youtube.com",10L,5));
+        BookmarkUrl url6 = bookmarkUrlRepository.save(BookmarkUrl.create("https://www.daum.net",1L,6));
         // 2. 태그 저장
         Tag tag = tagRepository.save(Tag.create("검색"));
 

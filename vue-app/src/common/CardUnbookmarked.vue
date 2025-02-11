@@ -31,7 +31,13 @@
     <!-- 북마크 저장 모달 추가 -->
     <BookmarkSave 
         v-if="showSaveModal" 
+        :key="props.url"
+        :url="props.url"
+        :title="props.title"
+        :description="props.description"
+        :img="props.img"
         @close="showSaveModal = false"
+        @save="showSaveModal = false"
     />
 </template>
 
@@ -40,6 +46,10 @@ import { ref, computed } from 'vue';
 import BookmarkSave from '@/modal/BookmarkSave.vue';
 
 const props = defineProps({
+    key: {
+        type: String,
+        required: true
+    },
     url: {
         type: String,
         required: true

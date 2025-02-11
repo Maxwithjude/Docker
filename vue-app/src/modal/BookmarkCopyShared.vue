@@ -53,7 +53,11 @@ const props = defineProps({
   bookmarkId: {
     type: Number,
     required: true
-  }
+  },
+  isPersonal: {
+    type: Boolean,
+    required: true
+  },
 })
 
 const emit = defineEmits(['close'])
@@ -71,7 +75,7 @@ const handleCopy = async () => {
     
     await bookmarkStore.moveToOtherCollection(
       props.bookmarkId,
-      false, // 공유 컬렉션으로 복사하므로 false
+      props.isPersonal,
       selectedCollection.value
     )
     

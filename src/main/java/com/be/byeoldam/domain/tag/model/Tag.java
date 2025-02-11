@@ -31,6 +31,8 @@ public class Tag {
     @PrePersist
     private void prePersist() {
         this.referenceCount = 0;
+        this.color = "red";
+        this.bolderColor = "green";
     }
 
     public static Tag create(String name){

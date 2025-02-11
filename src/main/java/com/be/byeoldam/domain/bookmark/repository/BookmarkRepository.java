@@ -16,7 +16,5 @@ public interface BookmarkRepository extends JpaRepository<Bookmark, Long> {
     @Query("SELECT b FROM Bookmark b WHERE b.user.id = :userId AND b.isRead = false AND b.createdAt <= :targetDate")
     List<Bookmark> findUnreadBookmarksByUserIdAndDate(@Param("userId") Long userId, @Param("targetDate") LocalDateTime targetDate);
 
-    Optional<Bookmark> findByBookmarkUrlAndUser(BookmarkUrl bookmarkUrl, User user);
-
-    List<Bookmark> findByUrlAndUser(BookmarkUrl bookmarkUrl, User user);
+    List<Bookmark> findByBookmarkUrlAndUser(BookmarkUrl bookmarkUrl, User user);
 }

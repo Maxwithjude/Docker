@@ -67,7 +67,7 @@ public class BookmarkService {
                         bookmarkUrlRepository.save(BookmarkUrl.create(request.getUrl(), 0L, 0)));
         bookmarkUrl.increment();
 
-        bookmarkRepository.findByUrlAndUser(bookmarkUrl, user).stream()
+        bookmarkRepository.findByBookmarkUrlAndUser(bookmarkUrl, user).stream()
                 .filter(bookmark -> bookmark.getPersonalCollection() != null)
                 .findFirst()
                 .ifPresent(bookmark -> {

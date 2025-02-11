@@ -47,7 +47,8 @@ public class UserController {
             description = "사용자의 이메일 주소로 인증 코드 전송. Redis가 도커 환경에서 실행되면 실제 구현이 추가될 예정.(아직 구현 X)"
     )
     @PostMapping("/email/send")
-    public ResponseTemplate<String> sendVerificationEmail(@RequestParam String email){
+    public ResponseTemplate<String> sendVerificationEmail(@RequestBody UserEmailRequest request){
+        userService.sendEmailVerificationCode(request);
         return ResponseTemplate.ok("이메일 인증 코드가 전송되었습니다.");
     }
 

@@ -6,8 +6,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.util.Objects;
-import java.util.Random;
-
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -24,31 +22,33 @@ public class Tag {
     @Column(name = "reference_count", nullable = false)
     private int referenceCount;
 
-    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    Color color;
+    String color;
+
+    @Column(nullable = false)
+    String bolderColor;
 
     @PrePersist
     private void prePersist() {
         this.referenceCount = 0;
-        this.color = Color.values()[new Random().nextInt(Color.values().length)];
     }
 
     public static Tag create(String name){
         return new Tag(name);
     }
 
-    public static Tag createTag(String name, Color color) {
-        return new Tag(name, color);
+    public static Tag createTag(String name, String color, String bolderColor) {
+        return new Tag(name, color, bolderColor);
     }
 
     private Tag(String name){
         this.name = name;
     }
 
-    private Tag(String name, Color color) {
+    private Tag(String name, String color, String bolderColor) {
         this.name = name;
         this.color = color;
+        this.bolderColor = bolderColor;
     }
 
     public void increment() {

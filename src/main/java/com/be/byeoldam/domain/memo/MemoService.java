@@ -1,7 +1,6 @@
 package com.be.byeoldam.domain.memo;
 
-
-import com.be.byeoldam.domain.bookmark.BookmarkRepository;
+import com.be.byeoldam.domain.bookmark.repository.BookmarkRepository;
 import com.be.byeoldam.domain.bookmark.model.Bookmark;
 import com.be.byeoldam.domain.memo.dto.MemoRequest;
 import com.be.byeoldam.domain.memo.dto.MemoResponse;

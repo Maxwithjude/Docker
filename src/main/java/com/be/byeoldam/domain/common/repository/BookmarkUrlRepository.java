@@ -8,4 +8,6 @@ import java.util.Optional;
 
 public interface BookmarkUrlRepository extends JpaRepository<BookmarkUrl, Long>, BookmarkUrlRepositoryCustom {
     Optional<BookmarkUrl> findByUrl(String url);
+
+    boolean existsByUrl(String url);
 }

@@ -11,7 +11,6 @@ import java.util.List;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 public class CreateBookmarkRequest {
-    private Long userId;
     private String url;
     private Long collectionId;
     private boolean isPersonal;

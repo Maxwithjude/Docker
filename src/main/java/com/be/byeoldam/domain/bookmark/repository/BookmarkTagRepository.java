@@ -13,4 +13,6 @@ public interface BookmarkTagRepository extends JpaRepository<BookmarkTag, Long> 
     void deleteByBookmark(Bookmark bookmark);
 
     void deleteByBookmarkAndTag(Bookmark bookmark, Tag tag);
+
+    void deleteByTag(Tag tag);
 }

@@ -5,6 +5,7 @@ import com.be.byeoldam.domain.common.model.BookmarkUrl;
 import com.be.byeoldam.domain.personalcollection.model.PersonalCollection;
 import com.be.byeoldam.domain.sharedcollection.model.SharedCollection;
 import com.be.byeoldam.domain.user.model.User;
+import com.be.byeoldam.exception.CustomException;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -43,6 +44,15 @@ public class Bookmark extends BaseTimeEntity {
 
     @Column(name="is_read")
     private boolean isRead;
+
+    @PrePersist
+    @PreUpdate
+    private void validateCollections() {
+        if ((personalCollection == null && sharedCollection == null) ||
+                (personalCollection != null && sharedCollection != null)) {
+            throw new CustomException("Bookmark에는 personalCollection 또는 sharedCollection 중 하나만 있어야 합니다.");
+        }
+    }
 
     @Builder
     private Bookmark(BookmarkUrl bookmarkUrl, PersonalCollection personalCollection, SharedCollection sharedCollection, User user, boolean priority, boolean isRead) {
@@ -88,17 +98,17 @@ public class Bookmark extends BaseTimeEntity {
 
     // 복사 메서드
     public Bookmark copy() {
-        Bookmark newBookmark = new Bookmark();
-        newBookmark.id = this.id;
-        newBookmark.personalCollection = this.personalCollection;
-        newBookmark.sharedCollection = this.sharedCollection;
-        newBookmark.user = this.user;
-        newBookmark.priority = this.priority;
-        newBookmark.isRead = this.isRead;
-        return newBookmark;
+        return Bookmark.builder()
+                .bookmarkUrl(this.bookmarkUrl)
+                .personalCollection(this.personalCollection)
+                .sharedCollection(this.sharedCollection)
+                .user(this.user)
+                .priority(false)
+                .isRead(false)
+                .build();
     }
 
-    public void updatePriority(boolean changedPriority) {
-        this.priority = changedPriority;
+    public void updatePriority() {
+        this.priority = !this.priority;
     }
 }

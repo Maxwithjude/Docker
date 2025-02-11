@@ -7,7 +7,9 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface TagBookmarkUrlRepository extends JpaRepository<TagBookmarkUrl, Long>, TagBookmarkUrlRepositoryCustom {
 
-    void deleteByUrl(BookmarkUrl url);
+    void deleteByBookmarkUrl(BookmarkUrl url);
 
     void deleteByTag(Tag tag);
+
+    boolean existsByTagAndBookmarkUrl(Tag tag, BookmarkUrl bookmarkUrl);
 }

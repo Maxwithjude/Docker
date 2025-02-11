@@ -11,7 +11,5 @@ import java.util.List;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 public class UpdateBookmarkRequest {
-
-    private List<String> tags;
-
+    private List<TagDto> tags;
 }

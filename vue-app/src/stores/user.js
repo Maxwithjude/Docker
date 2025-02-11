@@ -39,7 +39,7 @@ const userLogin = async (email, password) => {
     formData.append("password", password);
 
     // 로그인 요청
-    const res = await axios.post(`${REST_API_URL}/login`, formData, {
+    const res = await axios.post(`${REST_API_URL}/users/login`, formData, {
       headers: {
         "Content-Type": "application/x-www-form-urlencoded",
       },
@@ -57,7 +57,7 @@ const userLogin = async (email, password) => {
 
       // /me 엔드포인트로 테스트 요청
       try {
-        const meResponse = await api.get('/me');
+        const meResponse = await api.get('/users/me');
         console.log('내 정보 요청 성공:', meResponse.data);
       } catch (meError) {
         console.error('내 정보 요청 실패:', meError);

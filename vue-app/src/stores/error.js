@@ -13,7 +13,7 @@ export const useErrorStore = defineStore("error", {
           return null;
         }
 
-        const res = await axios.post(`${REST_API_URL}/api/users/refresh`, { refreshToken });
+        const res = await axios.post(`${REST_API_URL}/users/refresh`, { refreshToken });
 
         if (res.data?.status && res.data?.results) {
           const { accessToken, refreshToken: newRefreshToken } = res.data.results;

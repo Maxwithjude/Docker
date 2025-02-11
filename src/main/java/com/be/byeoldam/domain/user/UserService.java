@@ -53,7 +53,7 @@ public class UserService {
                 + "인증 코드는 10분 동안만 유효합니다. 인증을 완료해 주세요.\n\n"
                 + "감사합니다.\n"
                 + "- 별다이 팀 드림"); // 이메일 본문
-        message.setFrom(senderEmail); // 보내는 사람 이메일 (네이버 이메일 주소), secret에 넣은거랑 같아야만 함.
+        message.setFrom(senderEmail+"@naver.com"); // 보내는 사람 이메일 (네이버 이메일 주소), secret에 넣은거랑 같아야만 함.
         javaMailSender.send(message); // 이메일 전송
 
         // Todo: 레디스에 저장.

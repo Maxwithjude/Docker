@@ -9,6 +9,8 @@ import com.be.byeoldam.exception.CustomException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.core.Authentication;
@@ -17,6 +19,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.time.Duration;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
@@ -24,11 +27,15 @@ import java.util.Random;
 @Service
 @RequiredArgsConstructor
 public class UserService {
-    private final JavaMailSender javaMailSender;
     private final UserRepository userRepository;
+
+    private final JavaMailSender javaMailSender;
     private final PasswordEncoder passwordEncoder;
     private final JwtUtil jwtUtil;
     private final S3Util s3Util;
+    // Redis와 통신하기 위해 사용되는 RedisTemplate의 문자열 전용 버전
+    private final StringRedisTemplate stringRedisTemplate;
+    private final Duration REDIS_EXPIRATION = Duration.ofMinutes(10);
 
     @Value("${mail.username}")
     private String senderEmail;
@@ -56,10 +63,28 @@ public class UserService {
         message.setFrom(senderEmail+"@naver.com"); // 보내는 사람 이메일 (네이버 이메일 주소), secret에 넣은거랑 같아야만 함.
         javaMailSender.send(message); // 이메일 전송
 
-        // Todo: 레디스에 저장.
+        //Redis에 저장
+        String key = newEmail;
+        String value = verificationCode;
+        ValueOperations<String, String> stringValueOperations = stringRedisTemplate.opsForValue();
+        stringValueOperations.set(key, value, REDIS_EXPIRATION);
     }
 
-    // Todo: 인증코드 확인
+
+   // 인증 코드 확인
+    void checkVerificationCode(UserVerificationCodeRequest userVerificationCode) {
+        String key = userVerificationCode.getEmail();
+        String code = userVerificationCode.getVerificationCode();
+
+        ValueOperations<String, String> stringValueOperations = stringRedisTemplate.opsForValue();
+        String value = stringValueOperations.get(key);
+
+        if(!value.equals(code)) {
+            throw new CustomException("입력하신 인증번호가 일치하지 않습니다,");
+        }
+
+        stringRedisTemplate.delete(key);
+    }
 
     // 회원 가입
     @Transactional

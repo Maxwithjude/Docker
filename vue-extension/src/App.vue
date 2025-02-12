@@ -64,7 +64,6 @@ onMounted(() => {
 });
 </script>
 
-
 <style scoped>
 .container {
   width: 450px;

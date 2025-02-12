@@ -197,7 +197,7 @@ const generatePastelColors = () => {
   return { tagColor, tagBorderColor };
 };
 
-
+const url = ref("");
 const accessToken = ref("");
 const gptTags = ref([ // GPT 생성 태그 배열
   { tagName: "태그1", ...generatePastelColors()  },
@@ -210,20 +210,15 @@ const finalTags = computed(() => {
   return [...gptTags.value, ...newTags.value];
 });
 
-const url = ref("");
-const readingTime = ref(null);
 onMounted(async () => {
   try {
-    // URL, 읽기 시간, 토큰을 비동기적으로 가져오기
-    const pageInfo = await new Promise((resolve, reject) => {
-      chrome.runtime.sendMessage({ action: "getPageInfo" }, (response) => {
-        if (response && response.url && response.readingTime) {
-          resolve({
-            url: response.url,
-            readingTime: response.readingTime
-          });
+    // URL과 액세스 토큰을 비동기적으로 가져오기
+    const fetchedUrl = await new Promise((resolve, reject) => {
+      chrome.runtime.sendMessage({ action: "getCurrentUrl" }, (response) => {
+        if (response && response.url) {
+          resolve(response.url);
         } else {
-          reject("페이지 정보를 가져오는 데 실패했습니다.");
+          reject("URL을 가져오는 데 실패했습니다.");
         }
       });
     });
@@ -238,39 +233,33 @@ onMounted(async () => {
       });
     });
 
-    url.value = pageInfo.url;
-    readingTime.value = pageInfo.readingTime;
+    url.value = fetchedUrl;
     accessToken.value = fetchedAccessToken;
-    console.log('StorageView.vue 가져오기 성공:', {
-      url: url.value,
-      readingTime: readingTime.value,
-      accessToken: accessToken.value
-    });
-
+    console.log('StorageView.vue 가져오기 성공 : ',url.value, accessToken.value);
 
     // 초기 데이터 로드 API 요청
-    // const response = await api.post("/popup/load", { siteUrl: url.value }, {
-    //   headers: {
-    //     "Content-Type": "application/json",
-    //     "Authorization": `Bearer ${accessToken.value}`, 
-    //   }
-    // });
+    const response = await api.post("/popup/load", { siteUrl: url.value }, {
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${accessToken.value}`, 
+      }
+    });
 
-    // if (response.data.success) {
-    //   console.log("팝업 데이터 로드 성공:", response.data.data);
-    // } else {
-    //   console.error("에러 발생:", response.data.message);
-    // }
+    if (response.data.success) {
+      console.log("팝업 데이터 로드 성공:", response.data.data);
+    } else {
+      console.error("에러 발생:", response.data.message);
+    }
 
   } catch (error) {
     console.error("데이터 로딩 실패:", error);
   }
 });
 
+
 // 북마크 저장 API 요청
 const saveBookmark = async () => {
   if (url.value) {
-   
     try {
       const response = await api.post(
         "/bookmarks/extension", 
@@ -283,7 +272,6 @@ const saveBookmark = async () => {
             tagColor: finalTag.tagColor,
             tagBorderColor: finalTag.tagBorderColor
           })),
-          readingTime: readingTime.value
         }
       );
       if (response.status === 201) {

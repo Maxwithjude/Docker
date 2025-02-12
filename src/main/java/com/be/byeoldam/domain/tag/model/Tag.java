@@ -4,8 +4,8 @@ import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import java.util.Random;
 
+import java.util.Objects;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -22,23 +22,55 @@ public class Tag {
     @Column(name = "reference_count", nullable = false)
     private int referenceCount;
 
-    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    Color color;
+    String color;
+
+    @Column(nullable = false)
+    String bolderColor;
 
     @PrePersist
     private void prePersist() {
         this.referenceCount = 0;
-        this.color = Color.values()[new Random().nextInt(Color.values().length)];
+        this.color = "red";
+        this.bolderColor = "green";
     }
 
     public static Tag create(String name){
         return new Tag(name);
     }
 
+    public static Tag createTag(String name, String color, String bolderColor) {
+        return new Tag(name, color, bolderColor);
+    }
+
     private Tag(String name){
         this.name = name;
     }
 
+    private Tag(String name, String color, String bolderColor) {
+        this.name = name;
+        this.color = color;
+        this.bolderColor = bolderColor;
+    }
 
+    public void increment() {
+        this.referenceCount += 1;
+    }
+
+    public void decrement() {
+        this.referenceCount -= 1;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Tag tag = (Tag) o;
+        return Objects.equals(id, tag.id);  // id를 기준으로 비교
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);  // id를 기준으로 hashCode 생성
+    }
 }

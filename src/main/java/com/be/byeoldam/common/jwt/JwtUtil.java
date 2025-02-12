@@ -2,8 +2,10 @@ package com.be.byeoldam.common.jwt;
 
 
 import io.jsonwebtoken.Jwts;
-import org.springframework.stereotype.Component;
 
+import jakarta.annotation.PostConstruct;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 import java.nio.charset.StandardCharsets;
@@ -11,8 +13,16 @@ import java.util.Date;
 
 @Component
 public class JwtUtil {
-    private String secret = "vmfhaltmskdlstkfkdgodyroqkfwkdbalroqkfwkdb alaaaaaaaaaaaaaaaabbbbb";
-    private SecretKey secretKey = new SecretKeySpec(secret.getBytes(StandardCharsets.UTF_8), Jwts.SIG.HS256.key().build().getAlgorithm());
+
+    @Value("${jwt.secret.key}")
+    private String secret;
+
+    // secret 필드가 주입되기 전에 secretKey를 생성하려고 하기 때문에 문제가 발생(Spring 빈 초기화 순서)
+    private SecretKey secretKey;
+    @PostConstruct
+    public void init() {
+        this.secretKey = new SecretKeySpec(secret.getBytes(StandardCharsets.UTF_8), Jwts.SIG.HS256.key().build().getAlgorithm());
+    }
 
     //jwt 생성
     public String createJwt(String category, long userId, String email, String role, Long expiredMs) {

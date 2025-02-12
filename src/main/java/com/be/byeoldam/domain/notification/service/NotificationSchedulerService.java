@@ -1,7 +1,7 @@
 package com.be.byeoldam.domain.notification.service;
 
-import com.be.byeoldam.domain.bookmark.BookmarkRepository;
 import com.be.byeoldam.domain.bookmark.model.Bookmark;
+import com.be.byeoldam.domain.bookmark.repository.BookmarkRepository;
 import com.be.byeoldam.domain.notification.NotificationRepository;
 import com.be.byeoldam.domain.notification.dto.NotificationMessage;
 import com.be.byeoldam.domain.notification.event.NotificationProducer;

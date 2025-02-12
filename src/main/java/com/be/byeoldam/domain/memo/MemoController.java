@@ -61,7 +61,7 @@ public class MemoController {
             @UserId Long userId
     ) {
 
-        return ResponseTemplate.ok(memoService.updateMemo(userId, bookmarkId, memoId, request));
+        return ResponseTemplate.ok(memoService.updateMemo(userId, memoId, bookmarkId, request));
     }
 
     /**
@@ -76,7 +76,7 @@ public class MemoController {
             @UserId Long userId
     ) {
 
-        memoService.deleteMemo(userId, bookmarkId, memoId);
+        memoService.deleteMemo(userId, memoId, bookmarkId);
         return ResponseTemplate.ok();
     }
 }

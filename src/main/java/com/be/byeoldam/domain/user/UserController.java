@@ -47,7 +47,8 @@ public class UserController {
             description = "사용자의 이메일 주소로 인증 코드 전송. Redis가 도커 환경에서 실행되면 실제 구현이 추가될 예정.(아직 구현 X)"
     )
     @PostMapping("/email/send")
-    public ResponseTemplate<String> sendVerificationEmail(@RequestParam String email){
+    public ResponseTemplate<String> sendVerificationEmail(@RequestBody UserEmailRequest request){
+        userService.sendEmailVerificationCode(request);
         return ResponseTemplate.ok("이메일 인증 코드가 전송되었습니다.");
     }
 
@@ -55,8 +56,9 @@ public class UserController {
             summary = "이메일 인증 코드 검증",
             description = "사용자가 입력한 인증 코드가 올바른지 검증. Redis가 도커 환경에서 실행되면 실제 구현이 추가될 예정.(아직 구현 X)"
     )
-    @GetMapping("/email/verify")
-    public ResponseTemplate<String> verifyEmailCode(@RequestParam String email, @RequestParam String code) {
+    @PostMapping("/email/verify")
+    public ResponseTemplate<String> verifyEmailCode(@RequestBody UserVerificationCodeRequest request) {
+        userService.checkVerificationCode(request);
         return ResponseTemplate.ok("인증 완료!");
     }
 
@@ -76,8 +78,6 @@ public class UserController {
     )
     @PostMapping("/refresh")
     public ResponseTemplate<UserTokenResponse> refreshToken(@RequestBody UserTokenRequest userTokenRequest){
-        System.out.println("UserController.refreshToken");
-        System.out.println(userTokenRequest.getRefreshToken());
         UserTokenResponse response = userService.refreshToken(userTokenRequest.getRefreshToken());
         return ResponseTemplate.ok(response);
     }
@@ -88,11 +88,8 @@ public class UserController {
     )
     @GetMapping("/me")
     public ResponseTemplate<String> me(@UserId Long userId){
-        System.out.println("UserController.me");
-        System.out.println("userId:" + userId);
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         CustomUserDetails customUserDetails = (CustomUserDetails) authentication.getPrincipal();
-        System.out.println(customUserDetails);
         return ResponseTemplate.ok("유저ID:" + userId + "고생했어!");
     }
 

@@ -7,29 +7,28 @@ import { useCollectionStore } from "./collection";
 const REST_API_URL = import.meta.env.VITE_API_BASE_URL;
 //testtest
 export const useUserStore = defineStore("user", () => {
+  const collectionStore = useCollectionStore();
+  const user = ref(null);
 
-  
-    const user = ref(null);
+  // const username = ref(null)
+  // const password1 = ref(null)
+  // const password2 = ref(null)
+  // const nickname = ref(null)
+  // const age = ref(null)
+  // const email = ref(null)
+  // const profile_img = ref(null)
 
-    // const username = ref(null)
-    // const password1 = ref(null)
-    // const password2 = ref(null)
-    // const nickname = ref(null)
-    // const age = ref(null)
-    // const email = ref(null)
-    // const profile_img = ref(null)
+  // const payload = {
+  //   username: username.value,
+  //   password1: password1.value,
+  //   password2: password2.value,
+  //   nickname: nickname.value,
+  //   age: age.value,
+  //   email: email.value,
+  //   profile_img: profile_img.value
+  // }
 
-    // const payload = {
-    //   username: username.value,
-    //   password1: password1.value,
-    //   password2: password2.value,
-    //   nickname: nickname.value,
-    //   age: age.value,
-    //   email: email.value,
-    //   profile_img: profile_img.value
-    // }
-
-    //api 경로 : `http:localhost:8080/api/users/login`
+  //api 경로 : `http:localhost:8080/api/users/login`
 //   임시 로그인 함수
 
 const userLogin = async (email, password) => {

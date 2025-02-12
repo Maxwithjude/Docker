@@ -8,26 +8,83 @@ import com.be.byeoldam.domain.user.util.S3Util;
 import com.be.byeoldam.exception.CustomException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.data.redis.core.ValueOperations;
+import org.springframework.mail.SimpleMailMessage;
+import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.time.Duration;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Random;
 
 @Service
 @RequiredArgsConstructor
 public class UserService {
     private final UserRepository userRepository;
+
+    private final JavaMailSender javaMailSender;
     private final PasswordEncoder passwordEncoder;
     private final JwtUtil jwtUtil;
     private final S3Util s3Util;
+    // Redis와 통신하기 위해 사용되는 RedisTemplate의 문자열 전용 버전
+    private final StringRedisTemplate stringRedisTemplate;
+    private final Duration REDIS_EXPIRATION = Duration.ofMinutes(10);
+
+    @Value("${mail.username}")
+    private String senderEmail;
 
     // 이메일 인증번호 발송(이메일 중복 확인 + 유효 코드 보내기)
+    void sendEmailVerificationCode(UserEmailRequest userEmailRequest) {
+        String newEmail = userEmailRequest.getEmail();
+        if(userRepository.existsByEmail(newEmail)) {
+            throw new CustomException("이미 존재하는 이메일이니다.");
+        }
 
-    // 인증코드 확인
+        // 6자리 인증번호
+        String verificationCode = generateVerificationCode();
+
+        // 이메일 발송
+        SimpleMailMessage message = new SimpleMailMessage();
+        message.setTo(newEmail); // 받는 사람 이메일
+        message.setSubject("[별담] 이메일 인증 코드 안내"); // 이메일 제목
+        message.setText("안녕하세요, 별담(BYEOLDAM)입니다.\n\n"
+                + "요청하신 이메일 인증 코드를 안내드립니다.\n\n"
+                + "인증 코드: " + verificationCode + "\n\n"
+                + "인증 코드는 10분 동안만 유효합니다. 인증을 완료해 주세요.\n\n"
+                + "감사합니다.\n"
+                + "- 별다이 팀 드림"); // 이메일 본문
+        message.setFrom(senderEmail+"@naver.com"); // 보내는 사람 이메일 (네이버 이메일 주소), secret에 넣은거랑 같아야만 함.
+        javaMailSender.send(message); // 이메일 전송
+
+        //Redis에 저장
+        String key = newEmail;
+        String value = verificationCode;
+        ValueOperations<String, String> stringValueOperations = stringRedisTemplate.opsForValue();
+        stringValueOperations.set(key, value, REDIS_EXPIRATION);
+    }
+
+
+   // 인증 코드 확인
+    void checkVerificationCode(UserVerificationCodeRequest userVerificationCode) {
+        String key = userVerificationCode.getEmail();
+        String code = userVerificationCode.getVerificationCode();
+
+        ValueOperations<String, String> stringValueOperations = stringRedisTemplate.opsForValue();
+        String value = stringValueOperations.get(key);
+
+        if(!value.equals(code)) {
+            throw new CustomException("입력하신 인증번호가 일치하지 않습니다,");
+        }
+
+        stringRedisTemplate.delete(key);
+    }
 
     // 회원 가입
     @Transactional
@@ -119,5 +176,11 @@ public class UserService {
         tokens.put("access", accessToken);
         tokens.put("refresh", refreshToken);
         return tokens;
+    }
+
+    public static String generateVerificationCode() {
+        Random random = new Random();
+        int code = 100000 + random.nextInt(900000); // 100000 ~ 999999 범위의 숫자 생성
+        return String.valueOf(code);
     }
 }

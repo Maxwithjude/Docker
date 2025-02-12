@@ -12,4 +12,6 @@ public interface TagRepository extends JpaRepository<Tag, Long>, TagRepositoryCu
     Optional<Tag> findByName(String name);
 
     List<Tag> findByNameIn(List<String> names);
+
+    boolean existsByName(String name);
 }

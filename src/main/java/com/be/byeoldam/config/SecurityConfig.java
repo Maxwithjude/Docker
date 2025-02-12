@@ -61,15 +61,20 @@ public class SecurityConfig {
          * */
         http.authorizeHttpRequests((auth) -> auth
                 .requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/v3/api-docs.yaml", "/v3/api-docs/swagger-config").permitAll() //swagger
-                .requestMatchers("/login", "api/users/register","api/users/refresh").permitAll() //모든 사용자
+                .requestMatchers("/login", "api/users/register","api/users/refresh","api/users/email/send","api/users/email/verify").permitAll() //모든 사용자
                 .requestMatchers("/admin").hasRole("ADMIN") //role이 ADMIN인 유저만(추후에 수정하기)
-                .requestMatchers("/").permitAll()
+                .requestMatchers("/","/api/test").permitAll()
                 .anyRequest().authenticated()); //나머지는 로그인한 유저만
 
         http.addFilterAt(new LoginFilter(authenticationManager(), jwtUtil, userService), UsernamePasswordAuthenticationFilter.class);
         http.addFilterBefore(new JWTFilter(jwtUtil, userDetailsService), LoginFilter.class);
 //        // 커스텀한 로그아웃 필터 사용하기
 //       http.addFilterBefore(new CustomLogoutFilter(jwtUtil, refreshRepository), LogoutFilter.class);
+
+        LoginFilter loginFilter = new LoginFilter(authenticationManager(), jwtUtil, userService);
+        loginFilter.setFilterProcessesUrl("/api/users/login");
+        http.addFilterAt(loginFilter, UsernamePasswordAuthenticationFilter.class);
+        http.addFilterBefore(new JWTFilter(jwtUtil, userDetailsService), LoginFilter.class);
 
         return http.build();
     }

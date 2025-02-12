@@ -9,6 +9,8 @@ import com.be.byeoldam.domain.common.model.BookmarkUrl;
 import com.be.byeoldam.domain.common.model.TagBookmarkUrl;
 import com.be.byeoldam.domain.common.repository.BookmarkUrlRepository;
 import com.be.byeoldam.domain.common.repository.TagBookmarkUrlRepository;
+import com.be.byeoldam.domain.memo.MemoRepository;
+import com.be.byeoldam.domain.memo.model.Memo;
 import com.be.byeoldam.domain.personalcollection.model.PersonalCollection;
 import com.be.byeoldam.domain.personalcollection.repository.PersonalCollectionRepository;
 import com.be.byeoldam.domain.sharedcollection.model.SharedCollection;
@@ -40,6 +42,7 @@ public class BookmarkService {
     private final BookmarkUrlRepository bookmarkUrlRepository;
     private final SharedUserRepository sharedUserRepository;
     private final TagBookmarkUrlRepository tagBookmarkUrlRepository;
+    private final MemoRepository memoRepository;
 
     // 북마크 추가
     // 1. Bookmarks에 추가
@@ -199,7 +202,7 @@ public class BookmarkService {
             if (tag.getReferenceCount() == 0) {
                 // 태그-url 연관관계 삭제
                 tagBookmarkUrlRepository.deleteByTag(tag);
-                tagRepository.delete(tag); // 태그 삭제
+//                tagRepository.delete(tag); // 태그 삭제
             }
         }
     }
@@ -243,7 +246,7 @@ public class BookmarkService {
         if (url.getReferenceCount() == 0) {
             // 북마크 링크 삭제, tag-bookmarkurl 연관 관계도 삭제하기
             tagBookmarkUrlRepository.deleteByBookmarkUrl(url);
-            bookmarkUrlRepository.delete(url);
+//            bookmarkUrlRepository.delete(url);
         }
 
         // 2. 태그 쪽 삭제
@@ -257,9 +260,14 @@ public class BookmarkService {
             if (tag.getReferenceCount() == 0) {
                 // Tag 삭제, 북마크-태그 테이블에서 연관관계 삭제
                 tagBookmarkUrlRepository.deleteByTag(tag);
-                tagRepository.delete(tag);
+//                tagRepository.delete(tag);
             }
         }
+
+        // 메모 삭제
+        // 북마크에 메모가 있으면 메모도 삭제
+        memoRepository.deleteAllByBookmarkId(bookmarkId);
+
 
         // 진짜 찐으로 북마크 삭제를 해야 함
         bookmarkRepository.delete(bookmark);

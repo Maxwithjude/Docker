@@ -84,6 +84,13 @@ public class PersonalCollectionService {
         if (!collection.getUser().getId().equals(userId)) {
             throw new CustomException("해당 컬렉션에 대한 권한이 없습니다.");
         }
+
+        List<Bookmark> bookmarkList = bookmarkRepository.findByUserAndPersonalCollection(user, collection);
+
+        for (Bookmark bookmark : bookmarkList) {
+            bookmarkService.deleteBookmark(userId, bookmark.getId());
+        }
+
         personalCollectionRepository.delete(collection);
     }
 

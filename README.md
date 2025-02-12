@@ -35,7 +35,7 @@
 ![ERD](image/ERD.png)
 
 ### Architecture Diagram
-![Architect](image/Architecture_Diagram.png)
+![Architect](Web App Reference Architecture (3).png)
 
 ### User Flow & Wire Frame
 [🔗 User Flow](https://www.figma.com/board/Ce1fyDbZh7lUdKMhZG1E4r/A208---FlowChart?node-id=0-1&p=f&t=gaoDUj24KI55Ow2o-0)

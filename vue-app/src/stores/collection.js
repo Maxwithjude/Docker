@@ -2,7 +2,7 @@ import { ref, computed } from "vue";
 import { defineStore } from "pinia";
 import axios from "axios";
 import router from "@/router";
-
+import api from "@/utils/api";
 const REST_API_URL_coll = `http://localhost:8080/api/collections`;
 
 

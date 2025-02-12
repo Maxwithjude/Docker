@@ -154,18 +154,26 @@ import { useRouter } from "vue-router";
 
   const isEmailVerified = ref(false);
   const isEmailSent = ref(false);
-
+///////////////////////////////////////////////////////////////////////////////////////////
   // 폼 유효성 검사를 위한 computed 속성 추가
+  // const isFormValid = computed(() => {
+  //   return email.value &&
+  //     verificationCode.value &&
+  //     nickname.value &&
+  //     password.value &&
+  //     confirmPassword.value &&
+  //     isEmailVerified.value &&
+  //     password.value === confirmPassword.value;
+  // });
   const isFormValid = computed(() => {
     return email.value &&
-      verificationCode.value &&
       nickname.value &&
       password.value &&
       confirmPassword.value &&
-      isEmailVerified.value &&
+      // isEmailVerified.value && // 이메일 인증 체크 제거
       password.value === confirmPassword.value;
   });
-
+///////////////////////////////////////////////////////////////////////////////////////////
   // 인증번호 발송
   const sendVerificationCode = async () => {
     try {
@@ -217,19 +225,19 @@ import { useRouter } from "vue-router";
       };
     }
   };
-  
+  ///////////////////////////////////////////////////////////////////////////////////////////
   // 회원가입
   const handleRegister = async () => {
     // 이메일 인증 확인
-    if (!isEmailVerified.value) {
-      modal.value = { 
-        visible: true, 
-        success: false, 
-        message: "이메일 인증을 완료해주세요" 
-      };
-      return;
-    }
-
+    // if (!isEmailVerified.value) {
+    //   modal.value = { 
+    //     visible: true, 
+    //     success: false, 
+    //     message: "이메일 인증을 완료해주세요" 
+    //   };
+    //   return;
+    // }
+///////////////////////////////////////////////////////////////////////////////////////////
     // 비밀번호 확인
     if (password.value !== confirmPassword.value) {
       modal.value = { 

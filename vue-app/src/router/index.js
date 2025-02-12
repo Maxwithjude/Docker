@@ -52,50 +52,50 @@ const router = createRouter({
     },
     // 메인 페이지 : 로그인 후 개인의 메인 페이지
     {
-      path: '/user/:id/main',
+      path: '/main',
       name: 'main',
       component: MainView,
     },
 
     // 중요페이지
     {
-      path: '/user/:id/important',
+      path: '/important',
       name: 'important',
       component: ImportantView,
     },
     // 추천페이지
     {
-      path: '/user/:id/recommended',
+      path: '/recommended',
       name: 'recommended',
       component: RecommendedView,
     },
     // 개인 컬렉션
     {
-      path: '/user/:id/personal',
+      path: '/personal',
       name: 'personal',
       component: PersonalView,
     },
     // 공유 컬렉션
     {
-      path: '/user/:id/shared',
+      path: '/shared',
       name: 'shared',
       component: SharedView,
     },
     // 검색 페이지
     {
-      path: '/user/:id/search',
+      path: '/search',
       name: 'search',
       component: SearchView,
     },
     // 피드 페이지
     {
-      path: '/user/:id/feed',
+      path: '/feed',
       name: 'feed',
       component: FeedView,
     },  
     // 오래된 북마크 페이지
     {
-      path: '/user/:id/old',
+      path: '/old',
       name: 'old',
       component: OldView,
     },

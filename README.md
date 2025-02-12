@@ -55,7 +55,7 @@
 - **Frontend**: React  
 - **Backend**: Spring Boot, JPA 
 - **Database**: MySQL, Redis
-- **Infra**: Docker, AWS EKS, Prometheus, Grafana
+- **Infra**: Docker, Prometheus, Grafana
 - **External Integration**: RSS Feed, Chrome Extension  
 
 

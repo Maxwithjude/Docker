@@ -34,4 +34,6 @@ public class PersonalCollection extends BaseTimeEntity {
     public void updateName(String updatedName) {
         this.name = updatedName;
     }
+
+
 }

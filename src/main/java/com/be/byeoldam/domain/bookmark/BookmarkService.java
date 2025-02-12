@@ -137,6 +137,7 @@ public class BookmarkService {
                 .orElseThrow(() -> new CustomException("사용자를 찾을 수 없습니다."));
 
         // 북마크 가져오기
+        System.out.println(bookmarkId);
         Bookmark bookmark = bookmarkRepository.findById(bookmarkId)
                 .orElseThrow(() -> new CustomException("해당 북마크가 없습니다."));
 

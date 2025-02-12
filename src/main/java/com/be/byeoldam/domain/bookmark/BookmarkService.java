@@ -255,7 +255,6 @@ public class BookmarkService {
             tag.decrement();
             bookmarkTagRepository.delete(bookmarkTag);
             if (tag.getReferenceCount() == 0) {
-                tagBookmarkUrlRepository.deleteByTag(tag);
                 // Tag 삭제, 북마크-태그 테이블에서 연관관계 삭제
                 tagBookmarkUrlRepository.deleteByTag(tag);
                 tagRepository.delete(tag);
@@ -333,6 +332,7 @@ public class BookmarkService {
         // 5. 북마크 URL referenceCount 증가
         BookmarkUrl bookmarkUrl = bookmark.getBookmarkUrl();
         bookmarkUrl.increment();
+        bookmarkRepository.save(newBookmark);
     }
 
     // 북마크 중요도 수정

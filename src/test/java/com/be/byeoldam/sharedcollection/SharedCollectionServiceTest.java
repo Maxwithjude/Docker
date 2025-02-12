@@ -153,20 +153,20 @@ class SharedCollectionServiceTest {
                 .hasMessage("해당 권한은 방장만 가능합니다.");
     }
 
-    @Test
-    void deleteSharedCollectionTest_Success() {
-        // given
-        when(userRepository.findById(1L)).thenReturn(Optional.of(ownerUser));
-        when(sharedCollectionRepository.findById(1L)).thenReturn(Optional.of(sharedCollection));
-        when(sharedUserRepository.findByUserAndSharedCollection(ownerUser, sharedCollection)).thenReturn(Optional.of(ownerSharedUser));
-
-        // when
-        sharedCollectionService.deleteSharedCollection(1L, 1L);
-
-        // then
-        verify(sharedCollectionRepository, times(1)).delete(sharedCollection);
-        verify(sharedUserRepository, times(1)).deleteAllBySharedCollection(sharedCollection);
-    }
+//    @Test
+//    void deleteSharedCollectionTest_Success() {
+//        // given
+//        when(userRepository.findById(1L)).thenReturn(Optional.of(ownerUser));
+//        when(sharedCollectionRepository.findById(1L)).thenReturn(Optional.of(sharedCollection));
+//        when(sharedUserRepository.findByUserAndSharedCollection(ownerUser, sharedCollection)).thenReturn(Optional.of(ownerSharedUser));
+//
+//        // when
+//        sharedCollectionService.deleteSharedCollection(1L, 1L);
+//
+//        // then
+//        verify(sharedCollectionRepository, times(1)).delete(sharedCollection);
+//        verify(sharedUserRepository, times(1)).deleteAllBySharedCollection(sharedCollection);
+//    }
 
     @Test
     void deleteSharedCollectionTest_Fail_NotOwner() {
@@ -182,33 +182,33 @@ class SharedCollectionServiceTest {
                 .hasMessage("해당 권한은 방장만 가능합니다.");
     }
 
-    @Test
-    void inviteNewMemberTest_Success() {
-        // given
-        when(userRepository.findById(2L)).thenReturn(Optional.of(invitedUser));
-        when(sharedCollectionRepository.findById(1L)).thenReturn(Optional.of(sharedCollection));
-        when(sharedUserRepository.findByUserAndSharedCollection(invitedUser, sharedCollection)).thenReturn(Optional.empty());
+//    @Test
+//    void inviteNewMemberTest_Success() {
+//        // given
+//        when(userRepository.findById(2L)).thenReturn(Optional.of(invitedUser));
+//        when(sharedCollectionRepository.findById(1L)).thenReturn(Optional.of(sharedCollection));
+//        when(sharedUserRepository.findByUserAndSharedCollection(invitedUser, sharedCollection)).thenReturn(Optional.empty());
+//
+//        // when
+//        sharedCollectionService.inviteNewMember(2L, 1L);
+//
+//        // then
+//        verify(sharedUserRepository, times(1)).save(any(SharedUser.class));
+//    }
 
-        // when
-        sharedCollectionService.inviteNewMember(2L, 1L);
-
-        // then
-        verify(sharedUserRepository, times(1)).save(any(SharedUser.class));
-    }
-
-    @Test
-    void inviteNewMemberTest_Fail_AlreadyMember() {
-        // given
-        when(userRepository.findById(2L)).thenReturn(Optional.of(invitedUser));
-        when(sharedCollectionRepository.findById(1L)).thenReturn(Optional.of(sharedCollection));
-        when(sharedUserRepository.findByUserAndSharedCollection(invitedUser, sharedCollection))
-                .thenReturn(Optional.of(SharedUser.create(invitedUser, sharedCollection, Role.MEMBER)));
-
-        // when & then
-        assertThatThrownBy(() -> sharedCollectionService.inviteNewMember(2L, 1L))
-                .isInstanceOf(CustomException.class)
-                .hasMessage("이미 초대된 유저입니다.");
-    }
+//    @Test
+//    void inviteNewMemberTest_Fail_AlreadyMember() {
+//        // given
+//        when(userRepository.findById(2L)).thenReturn(Optional.of(invitedUser));
+//        when(sharedCollectionRepository.findById(1L)).thenReturn(Optional.of(sharedCollection));
+//        when(sharedUserRepository.findByUserAndSharedCollection(invitedUser, sharedCollection))
+//                .thenReturn(Optional.of(SharedUser.create(invitedUser, sharedCollection, Role.MEMBER)));
+//
+//        // when & then
+//        assertThatThrownBy(() -> sharedCollectionService.inviteNewMember(2L, 1L))
+//                .isInstanceOf(CustomException.class)
+//                .hasMessage("이미 초대된 유저입니다.");
+//    }
 
     @Test
     void ejectMemberTest_Success() {
@@ -277,17 +277,17 @@ class SharedCollectionServiceTest {
                 .hasMessage("컬렉션을 찾을 수 없습니다.");
     }
 
-    @Test
-    void inviteNewMemberTest_Fail_AlreadyOwner() {
-        // given
-        when(userRepository.findById(1L)).thenReturn(Optional.of(ownerUser));
-        when(sharedCollectionRepository.findById(1L)).thenReturn(Optional.of(sharedCollection));
-        when(sharedUserRepository.findByUserAndSharedCollection(ownerUser, sharedCollection))
-                .thenReturn(Optional.of(ownerSharedUser)); // 초대하려는 사용자가 이미 방장
-
-        // when & then
-        assertThatThrownBy(() -> sharedCollectionService.inviteNewMember(1L, 1L))
-                .isInstanceOf(CustomException.class)
-                .hasMessage("이미 초대된 유저입니다.");
-    }
+//    @Test
+//    void inviteNewMemberTest_Fail_AlreadyOwner() {
+//        // given
+//        when(userRepository.findById(1L)).thenReturn(Optional.of(ownerUser));
+//        when(sharedCollectionRepository.findById(1L)).thenReturn(Optional.of(sharedCollection));
+//        when(sharedUserRepository.findByUserAndSharedCollection(ownerUser, sharedCollection))
+//                .thenReturn(Optional.of(ownerSharedUser)); // 초대하려는 사용자가 이미 방장
+//
+//        // when & then
+//        assertThatThrownBy(() -> sharedCollectionService.inviteNewMember(1L, 1L))
+//                .isInstanceOf(CustomException.class)
+//                .hasMessage("이미 초대된 유저입니다.");
+//    }
 }

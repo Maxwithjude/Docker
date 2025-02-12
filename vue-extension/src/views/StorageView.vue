@@ -216,7 +216,12 @@ onMounted(async () => {
   try {
     // URL, 읽기 시간, 토큰을 비동기적으로 가져오기
     const pageInfo = await new Promise((resolve, reject) => {
-      chrome.runtime.sendMessage({ action: "getPageInfo" }, (response) => {
+      chrome.runtime.sendMessage({ action: "GET_PAGE_INFO_FROM_BACK" }, (response) => {
+        if (!response) {
+              reject("응답이 없습니다.");
+              return;
+          }
+
         if (response && response.url && response.readingTime) {
           resolve({
             url: response.url,
@@ -241,6 +246,7 @@ onMounted(async () => {
     url.value = pageInfo.url;
     readingTime.value = pageInfo.readingTime;
     accessToken.value = fetchedAccessToken;
+
     console.log('StorageView.vue 가져오기 성공:', {
       url: url.value,
       readingTime: readingTime.value,

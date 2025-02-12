@@ -22,9 +22,10 @@ window.addEventListener("message", (event) => {
 
 // <2> 웹페이지의 DOM에 직접 접근하여 읽기 시간 계산(WPM)
 function calculateReadingTime() {
-  // 1. 본문 찾기
-  const content = document.querySelector('article, main') || document.body;
-  const text = content.textContent.trim();
+  // 1. 본문 찾기 및 정제
+  const mainContent = document.querySelector('article, main') || document.body;
+  const cleanContent = cleanupContent(mainContent);
+  const text = cleanContent.textContent.trim();
   
   // 2. 문자 분석
   const stats = {
@@ -36,10 +37,10 @@ function calculateReadingTime() {
   
   // 3. 분당 읽기 시간 계산
   const readingSpeed = {
-    korean: 500,    
-    english: 200,   
-    number: 100,    
-    special: 1000
+    korean: 600,    
+    english: 300,   
+    number: 300,    
+    special: 1000   
   };
   
   const readingTime = 
@@ -52,15 +53,44 @@ function calculateReadingTime() {
   
   return {
     totalTime,
-    stats
+    stats,
+    text
   };
+}
+
+// 불필요한 요소 제거
+function cleanupContent(content) {
+  const excludeSelectors = [
+    'nav',
+    'header',
+    'footer',
+    'aside',
+    '.navigation',
+    '.nav',
+    '.menu',
+    '.sidebar',
+    '.ad',
+    '.advertisement',
+    '.comments',
+    '.social-share',
+    'script',
+    'style',
+    'iframe'
+  ].join(',');
+
+  const tempDiv = content.cloneNode(true);
+  const elementsToRemove = tempDiv.querySelectorAll(excludeSelectors);
+  elementsToRemove.forEach(el => el.remove());
+
+  return tempDiv;
 }
 
 // <3> background.js로 페이지 정보 전송
 const readingTimeInfo = calculateReadingTime();
 chrome.runtime.sendMessage({
-  action: "GET_PAGE_INFO",
+  action: "GET_PAGE_INFO_FROM_SITE",
   url: window.location.href,
   readingTime: readingTimeInfo.totalTime,
-  stats: readingTimeInfo.stats
+  stats: readingTimeInfo.stats,
+  text : readingTimeInfo.text
 });

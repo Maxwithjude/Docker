@@ -70,17 +70,19 @@ let readingTimeInfo = {
 
 // <1> contentScript.js로부터 페이지 정보 수신
 chrome.runtime.onMessage.addListener((message, sender) => {
-  if (message.action === "GET_PAGE_INFO") {
+  if (message.action === "GET_PAGE_INFO_FROM_SITE") {
     currentUrl = message.url;
     readingTimeInfo.readingTime = message.readingTime;
     readingTimeInfo.stats = message.stats;
+    readingTimeInfo.text = message.text;
     console.log("저장된 통계:", readingTimeInfo.stats);
+    console.log("TEXT:", readingTimeInfo.text);
   }
 });
 
 // <2> StorageView로 페이지 정보 응답
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
-  if (message.action === "getPageInfo") {
+  if (message.action === "GET_PAGE_INFO_FROM_BACK") {
     sendResponse({ url: currentUrl, readingTime: readingTimeInfo.readingTime });
   }
   return true;

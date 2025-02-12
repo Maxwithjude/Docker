@@ -5,6 +5,7 @@ import com.be.byeoldam.domain.bookmark.model.Bookmark;
 import com.be.byeoldam.domain.bookmark.repository.BookmarkRepository;
 import com.be.byeoldam.domain.bookmark.repository.BookmarkTagRepository;
 import com.be.byeoldam.domain.personalcollection.dto.PersonalBookmarkResponse;
+import com.be.byeoldam.domain.sharedcollection.dto.CollectionMemberResponse;
 import com.be.byeoldam.domain.sharedcollection.dto.SharedBookmarkResponse;
 import com.be.byeoldam.domain.sharedcollection.dto.SharedCollectionRequest;
 import com.be.byeoldam.domain.sharedcollection.dto.SharedCollectionResponse;
@@ -174,6 +175,28 @@ public class SharedCollectionService {
         }
 
         sharedUserRepository.delete(ejectedSharedUser);
+    }
+
+    public List<CollectionMemberResponse> getMember(Long userId, Long collectionId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new CustomException(""));
+        SharedCollection collection = sharedCollectionRepository.findById(collectionId)
+                .orElseThrow(() -> new CustomException(""));
+
+        List<SharedUser> sharedUsers = sharedUserRepository.findBySharedCollection(collection);
+        List<User> users = sharedUsers.stream().map(SharedUser::getUser).toList();
+
+        if (!users.contains(user)) {
+            throw new CustomException("");
+        }
+
+        return users.stream()
+                .map(member -> new CollectionMemberResponse(
+                        member.getId(),
+                        member.getEmail(),
+                        member.getNickname()
+                )).toList();
+
     }
 
     private List<SharedBookmarkResponse> makeBookmarkResponse(List<Bookmark> bookmarks) {

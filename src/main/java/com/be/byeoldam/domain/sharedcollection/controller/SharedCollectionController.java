@@ -90,8 +90,8 @@ public class SharedCollectionController {
         return ResponseTemplate.ok();
     }
 
-    @Operation(summary = "공윰컬렉션 멤버 초대", description = "공유컬렉션세 멤버를 초대")
-    @ApiResponse(responseCode = "200", description = "공유컬렉션 멤버 초대 성공", useReturnTypeSchema = true)
+    @Operation(summary = "공윰컬렉션 초대 수락", description = "공유컬렉션 초대 알림을 수락합니다.")
+    @ApiResponse(responseCode = "200", description = "공유컬렉션 수락 성공", useReturnTypeSchema = true)
     @PostMapping("/invite")
     public ResponseTemplate<Void> acceptSharedCollection(
             @RequestBody InviteAcceptRequest request,

@@ -3,6 +3,7 @@ package com.be.byeoldam.domain.notification;
 import com.be.byeoldam.common.ResponseTemplate;
 import com.be.byeoldam.common.annotation.UserId;
 import com.be.byeoldam.domain.notification.dto.NotificationResponse;
+import com.be.byeoldam.domain.notification.service.NotificationSchedulerService;
 import com.be.byeoldam.domain.notification.service.NotificationService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -19,6 +20,7 @@ import java.util.List;
 public class NotificationController {
 
     private final NotificationService notificationService;
+    private final NotificationSchedulerService notificationSchedulerService;
 
     /**
      * 사용자의 알림 목록 조회
@@ -67,5 +69,11 @@ public class NotificationController {
     ) {
         notificationService.deleteAllNotifications(userId);
         return ResponseTemplate.ok();
+    }
+
+    @PostMapping("/trigger")
+    public ResponseTemplate<String> triggerNotificationJob() {
+        notificationSchedulerService.createBookmarkNotification(); // 스케줄링 메서드 직접 실행
+        return ResponseTemplate.ok("🔔 알림 스케줄링 강제 실행 완료");
     }
 }

@@ -59,7 +59,7 @@ public class BookmarkController {
     }
 
     // 북마크 수정 - 중요도
-    @Operation(summary = "북마크 수정", description = "북마크 중요도 수정")
+    @Operation(summary = "북마크 중요도 수정", description = "북마크 중요도 수정")
     @ApiResponse(responseCode = "200", description = "북마크 수정 성공", useReturnTypeSchema = true)
     @PutMapping("/{bookmarkId}")
     public ResponseTemplate<Void> changeBookmarkPriority(

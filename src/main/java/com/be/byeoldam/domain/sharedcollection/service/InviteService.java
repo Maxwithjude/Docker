@@ -49,6 +49,7 @@ public class InviteService {
 
         // 초대 알림 생성
         InviteNotification notification = InviteNotification.builder()
+                .nickname(inviter.getNickname())
                 .message(inviter.getNickname() + "님이 공유 컬렉션에 초대하였습니다.")
                 .collection(sharedCollection)
                 .user(invitee)

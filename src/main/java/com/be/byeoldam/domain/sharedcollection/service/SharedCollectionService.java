@@ -153,6 +153,8 @@ public class SharedCollectionService {
 
         SharedUser newSharedUser = SharedUser.create(invitedUser, collection, Role.MEMBER);
         sharedUserRepository.save(newSharedUser);
+
+        notificationRepository.delete(inviteNotification);
     }
 
     // 공유멀렉션 멤버 관리 - 강퇴

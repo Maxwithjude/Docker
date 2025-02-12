@@ -253,9 +253,10 @@ public class BookmarkService {
         for (BookmarkTag bookmarkTag : bookmarkTags) {
             Tag tag = bookmarkTag.getTag();
             tag.decrement();
-            bookmarkTagRepository.deleteByBookmark(bookmark);
+            bookmarkTagRepository.delete(bookmarkTag);
             if (tag.getReferenceCount() == 0) {
                 // Tag 삭제, 북마크-태그 테이블에서 연관관계 삭제
+                tagBookmarkUrlRepository.deleteByTag(tag);
                 tagRepository.delete(tag);
             }
         }

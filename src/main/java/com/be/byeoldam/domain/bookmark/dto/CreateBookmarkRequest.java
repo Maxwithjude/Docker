@@ -15,4 +15,5 @@ public class CreateBookmarkRequest {
     private Long collectionId;
     private List<TagDto> tags;
     private boolean personal;
+    private int readingTime;
 }

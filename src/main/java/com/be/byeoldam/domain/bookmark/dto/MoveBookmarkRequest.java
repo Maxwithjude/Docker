@@ -10,5 +10,5 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class MoveBookmarkRequest {
     private Long collectionId;
-    private boolean isPersonal;
+    private boolean personal;
 }

@@ -115,25 +115,28 @@ const logout = async () => {
   // 이메일 인증 요청 함수
   const emailVerification = async (email) => {
     try {
-        await axios.post(`${REST_API_URL}/users/email/send`, {
-            email: email
-        })
+      const response = await axios.post(`${REST_API_URL}/users/email/send`, {
+        email: email
+      });
+      // 성공 시 true 반환
+      return response.data;
     } catch (error) {
-        console.error("이메일 인증에 실패하였습니다.")
+      console.error("이메일 인증 요청 실패:", error);
+      throw error;
     }
-  }
+  };
 
   //이메일 응답코드 검증 함수
   // userStore.js
-const checkCode = async (params) => {
+const checkCode = async (verifyCode) => {
     try {
-      // API 호출 부분 (실제 엔드포인트와 메서드는 백엔드 명세에 맞게 수정 필요)
       const response = await axios.post(`${REST_API_URL}/users/email/verify`, {
-        verifyCode: params
+        verifyCode: verifyCode
       });
-      
-      return response.data; // {success: true/false, message: string, results: null} 형태로 반환
+      // 성공 시 true 반환
+      return response.data;
     } catch (error) {
+      console.error("인증코드 확인 실패:", error);
       throw error;
     }
   };

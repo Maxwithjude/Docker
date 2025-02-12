@@ -12,6 +12,7 @@
                 v-model="email"
                 type="email"
                 id="email"
+                :disabled="isEmailVerified"
                 class="flex-1 p-2 border border-gray-300 rounded-l-md focus:ring focus:ring-blue-200"
                 placeholder="이메일"
                 required
@@ -19,9 +20,11 @@
               <button
                 type="button"
                 @click="sendVerificationCode"
+                :disabled="isEmailVerified"
                 class="bg-blue-600 text-white px-4 rounded-r-md hover:bg-blue-700 transition"
+                :class="{ 'opacity-50 cursor-not-allowed': isEmailVerified }"
               >
-                인증번호 발송
+                {{ isEmailSent ? '재발송' : '인증번호 발송' }}
               </button>
             </div>
           </div>
@@ -34,6 +37,7 @@
                 v-model="verificationCode"
                 type="text"
                 id="verificationCode"
+                :disabled="isEmailVerified"
                 class="flex-1 p-2 border border-gray-300 rounded-l-md focus:ring focus:ring-blue-200"
                 placeholder="6자리 숫자를 입력하세요"
                 maxlength="6"
@@ -44,9 +48,11 @@
               <button
                 type="button"
                 @click="verifyCode"
+                :disabled="isEmailVerified"
                 class="bg-blue-600 text-white px-4 rounded-r-md hover:bg-blue-700 transition"
+                :class="{ 'opacity-50 cursor-not-allowed': isEmailVerified }"
               >
-                인증하기
+                {{ isEmailVerified ? '인증완료' : '인증하기' }}
               </button>
             </div>
           </div>
@@ -93,7 +99,13 @@
           <!-- 가입하기 버튼 -->
           <button
             type="submit"
-            class="w-full bg-blue-600 text-white py-2 rounded-md hover:bg-blue-700 transition duration-300"
+            :disabled="!isFormValid"
+            :class="[
+              'w-full py-2 rounded-md transition duration-300',
+              isFormValid 
+                ? 'bg-blue-600 hover:bg-blue-700 text-white' 
+                : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+            ]"
           >
             가입하기
           </button>
@@ -121,9 +133,11 @@
   
   <script setup>
 import { useUserStore } from "@/stores/user";;
-import { ref } from "vue";
+import { ref, computed } from "vue";
+import { useRouter } from "vue-router";
   
   const userStore = useUserStore();
+  const router = useRouter();
   
 
   const email = ref("");
@@ -138,59 +152,111 @@ import { ref } from "vue";
     message: "",
   });
 
+  const isEmailVerified = ref(false);
+  const isEmailSent = ref(false);
+
+  // 폼 유효성 검사를 위한 computed 속성 추가
+  const isFormValid = computed(() => {
+    return email.value &&
+      verificationCode.value &&
+      nickname.value &&
+      password.value &&
+      confirmPassword.value &&
+      isEmailVerified.value &&
+      password.value === confirmPassword.value;
+  });
 
   // 인증번호 발송
   const sendVerificationCode = async () => {
-    try{
-        await userStore.emailVerification(email.value);
-        modal.value = { visible: true, success: true, message: "인증번호 발송이" };
-    }catch (error) {
-        alert('올바르지 않은 이메일 입니다')
-    }};
+    try {
+      const response = await userStore.emailVerification(email.value);
+      if (response.success) {
+        isEmailSent.value = true;
+        modal.value = { 
+          visible: true, 
+          success: true, 
+          message: response.message || "인증번호 발송이" 
+        };
+      }
+    } catch (error) {
+      modal.value = { 
+        visible: true, 
+        success: false, 
+        message: error.response?.data?.message || "이메일 발송이"
+      };
+    }
+  };
   
   // 인증 코드 확인
-  // RegisterView.vue의 verifyCode 함수
-const verifyCode = async () => {
-  try {
-    const response = await userStore.checkCode(parseInt(verificationCode.value));
-    modal.value = {
-      visible: true,
-      success: response.success,
-      message: response.message || "이메일 인증이"
-    };
-  } catch (error) {
-    modal.value = {
-      visible: true,
-      success: false,
-      message: "이메일 인증이"
-    };
-  }
-};
+  const verifyCode = async () => {
+    if (!isEmailSent.value) {
+      modal.value = {
+        visible: true,
+        success: false,
+        message: "먼저 인증번호를 발송해주세요"
+      };
+      return;
+    }
+
+    try {
+      const response = await userStore.checkCode(verificationCode.value);
+      if (response.success) {
+        isEmailVerified.value = true;
+        modal.value = {
+          visible: true,
+          success: true,
+          message: response.message || "이메일 인증이"
+        };
+      }
+    } catch (error) {
+      isEmailVerified.value = false;
+      modal.value = {
+        visible: true,
+        success: false,
+        message: error.response?.data?.message || "이메일 인증이"
+      };
+    }
+  };
   
   // 회원가입
   const handleRegister = async () => {
-  if (password.value !== confirmPassword.value) {
-    modal.value = { visible: true, success: false, message: "비밀번호가 일치하지 않습니다." };
-    return;
-  }
+    // 이메일 인증 확인
+    if (!isEmailVerified.value) {
+      modal.value = { 
+        visible: true, 
+        success: false, 
+        message: "이메일 인증을 완료해주세요" 
+      };
+      return;
+    }
 
-  const payload = {
-    email: email.value,
-    password: password.value,
-    nickname: nickname.value,
+    // 비밀번호 확인
+    if (password.value !== confirmPassword.value) {
+      modal.value = { 
+        visible: true, 
+        success: false, 
+        message: "비밀번호가 일치하지 않습니다" 
+      };
+      return;
+    }
+
+    const payload = {
+      email: email.value,
+      password: password.value,
+      nickname: nickname.value,
+    };
+
+    try {
+      await userStore.signup(payload);
+      router.push({ name: 'login' });
+    } catch (error) {
+      modal.value = { 
+        visible: true, 
+        success: false, 
+        message: error.response?.data?.message || "회원가입에 실패했습니다" 
+      };
+    }
   };
-
-  try {
-    await userStore.signup(payload);
-    modal.value = { visible: true, success: true, message: "회원가입이 완료되었습니다." };
-    console.log("성공");
-    
-  } catch (error) {
-    modal.value = { visible: true, success: false, message: "회원가입에 실패했습니다." };
-    console.log("실패");
-    
-  }
-};
   </script>
   
   <style scoped>

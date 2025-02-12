@@ -6,8 +6,8 @@ services:
     container_name: mysql
     # restart: always
     environment:
-      MYSQL_ROOT_PASSWORD: ssafy
-      MYSQL_DATABASE: ssafy_db
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
     ports:
       - "3307:3306"
     volumes:
@@ -50,7 +50,7 @@ services:
     environment:
       SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/ssafy_db
       SPRING_DATASOURCE_USERNAME: root
-      SPRING_DATASOURCE_PASSWORD: ssafy
+      SPRING_DATASOURCE_PASSWORD: ${MYSQL_ROOT_PASSWORD}
       # SPRING_REDIS_HOST: redis
       # SPRING_REDIS_PORT: 6379
       # SPRING_RABBITMQ_HOST: rabbitmq
@@ -80,10 +80,14 @@ services:
 
   adminer:
     image: adminer
+    environment:
+      - ADMINER_DESIGN=pepa-linha
     ports:
-      - "8000:8000"
+      - "8001:8081"  # 외부 8001 -> 내부 8081
+    command: php -S 0.0.0.0:8081 -t /var/www/html  # 강제로 8081에서 실행
     networks:
-      - my-network
+      - my-network  # 네트워크 설정 추가
+
 networks:
   my-network:
 

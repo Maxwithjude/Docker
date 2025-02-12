@@ -31,7 +31,7 @@ public class InviteController {
             @UserId Long inviterId,
             @RequestBody InviteRequest request
     ) {
-        inviteService.inviteUser(collectionId, inviterId, request);
+        inviteService.inviteUser(inviterId, collectionId, request);
         return ResponseTemplate.ok();
     }
 }

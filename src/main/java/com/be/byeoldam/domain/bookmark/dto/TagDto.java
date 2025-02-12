@@ -14,4 +14,8 @@ public class TagDto {
     public Tag toEntity() {
         return Tag.createTag(tagName, tagColor, tagBolder);
     }
+
+    public static TagDto of(Tag tag) {
+        return new TagDto(tag.getName(), tag.getColor(), tag.getBolderColor());
+    }
 }

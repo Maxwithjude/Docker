@@ -1,9 +1,17 @@
 package com.be.byeoldam.domain.personalcollection;
 
+import com.be.byeoldam.domain.bookmark.dto.TagDto;
+import com.be.byeoldam.domain.bookmark.model.Bookmark;
+import com.be.byeoldam.domain.bookmark.repository.BookmarkRepository;
+import com.be.byeoldam.domain.bookmark.repository.BookmarkTagRepository;
+import com.be.byeoldam.domain.personalcollection.dto.PersonalBookmarkResponse;
 import com.be.byeoldam.domain.personalcollection.dto.PersonalCollectionRequest;
 import com.be.byeoldam.domain.personalcollection.dto.PersonalCollectionResponse;
 import com.be.byeoldam.domain.personalcollection.model.PersonalCollection;
 import com.be.byeoldam.domain.personalcollection.repository.PersonalCollectionRepository;
+import com.be.byeoldam.domain.tag.model.Tag;
+import com.be.byeoldam.domain.tag.util.JsoupUtil;
+import com.be.byeoldam.domain.tag.util.UrlPreview;
 import com.be.byeoldam.domain.user.model.User;
 import com.be.byeoldam.domain.user.repository.UserRepository;
 import com.be.byeoldam.exception.CustomException;
@@ -11,6 +19,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -20,6 +29,8 @@ public class PersonalCollectionService {
     private final UserRepository userRepository;
 
     private final PersonalCollectionRepository personalCollectionRepository;
+    private final BookmarkRepository bookmarkRepository;
+    private final BookmarkTagRepository bookmarkTagRepository;
 
     @Transactional
     public void createPersonalCollection(PersonalCollectionRequest request, Long userId) {
@@ -73,6 +84,50 @@ public class PersonalCollectionService {
         }
         personalCollectionRepository.delete(collection);
     }
+
+    // 컬렉션에서 전체 북마크 조회
+    @Transactional(readOnly = true)
+    public List<PersonalBookmarkResponse> getCollectionBookmark(Long userId, Long collectionId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new CustomException(""));
+        PersonalCollection collection = personalCollectionRepository.findById(collectionId)
+                .orElseThrow(() -> new CustomException(""));
+        List<Bookmark> bookmarks = bookmarkRepository.findByUserAndPersonalCollection(user, collection);
+        return makeBookmarkResponse(bookmarks);
+    }
+
+    // 개인 컬렉션 기능 - 30일 이상 보지 않은 컬렉션 조회
+    @Transactional(readOnly = true)
+    public List<PersonalBookmarkResponse> getLongUnreadBookmark(Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new CustomException(""));
+        LocalDateTime thirtyDaysAgo = LocalDateTime.now().minusDays(30);
+        List<Bookmark> bookmarks = bookmarkRepository.findOldBookmarksByUser(user, thirtyDaysAgo);
+        return makeBookmarkResponse(bookmarks);
+    }
+
+    // 개인 컬렉션 기능 - 중요 북마크 컬렉션 조회
+    @Transactional(readOnly = true)
+    public List<PersonalBookmarkResponse> getPriorityBookmark(Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new CustomException(""));
+        List<Bookmark> bookmarks = bookmarkRepository.findPriorityByUser(user);
+        return makeBookmarkResponse(bookmarks);
+    }
+
+    private List<PersonalBookmarkResponse> makeBookmarkResponse(List<Bookmark> bookmarks) {
+        return bookmarks.stream()
+                .map(bookmark -> {
+                    UrlPreview preview = JsoupUtil.fetchMetadata(bookmark.getBookmarkUrl().getUrl());
+                    List<TagDto> tagDtos = bookmarkTagRepository.findByBookmark(bookmark).stream()
+                            .map(bookmarkTag -> {
+                                Tag tag = bookmarkTag.getTag();
+                                return TagDto.of(tag);
+                            }).toList();
+                    return PersonalBookmarkResponse.of(bookmark, tagDtos, preview.getImageUrl(), preview.getTitle(), preview.getDescription());
+                }).toList();
+    }
+
 
     // 개인컬렉션 이름 검증(create, update)
     // TODO : 나중에 controller에서 @Valid로 입력 길이, null 처리

@@ -15,6 +15,11 @@ public class RabbitMQConfig {
     private static final String ROUTING_KEY = "notification.key";
 
     @Bean
+    public Jackson2JsonMessageConverter jsonMessageConverter() {
+        return new Jackson2JsonMessageConverter();
+    }
+
+    @Bean
     public Queue notificationQueue() {
         return new Queue(QUEUE_NAME, true);  // durable=true -> 서버 재시작해도 큐 유지
     }

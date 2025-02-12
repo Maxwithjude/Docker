@@ -57,6 +57,18 @@ public class PersonalCollectionController {
         return ResponseTemplate.ok(personalCollectionService.updatePersonalCollection(request, userId, personalCollectionId));
     }
 
+    @Operation(summary = "개인컬렉션 삭제", description = "개인컬렉션 삭제")
+    @ApiResponse(responseCode = "200", description = "개인컬렉션 멤버 조회 성공", useReturnTypeSchema = true)
+    @DeleteMapping("/{personalCollectionId}")
+    public ResponseTemplate<Void> deleteSharedCollection(
+            @UserId Long userId,
+            @PathVariable Long personalCollectionId
+    ) {
+
+        personalCollectionService.deletePersonalCollection(userId, personalCollectionId);
+        return ResponseTemplate.ok();
+    }
+
     @Operation(summary = "개인컬렉션 조회", description = "개인컬렉션의 북마크 목록 조회")
     @ApiResponse(responseCode = "200", description = "개인컬렉션 북마크 목록 조회 성공", useReturnTypeSchema = true)
     @GetMapping("/{personalCollectionId}")

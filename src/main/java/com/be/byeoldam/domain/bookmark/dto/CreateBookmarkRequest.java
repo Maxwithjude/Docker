@@ -13,6 +13,6 @@ import java.util.List;
 public class CreateBookmarkRequest {
     private String url;
     private Long collectionId;
-    private boolean isPersonal;
     private List<TagDto> tags;
+    private boolean personal;
 }

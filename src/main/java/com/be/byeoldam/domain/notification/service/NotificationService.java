@@ -9,6 +9,7 @@ import com.be.byeoldam.domain.user.model.User;
 import com.be.byeoldam.domain.user.repository.UserRepository;
 import com.be.byeoldam.exception.CustomException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.springframework.stereotype.Service;
@@ -19,6 +20,7 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class NotificationService {
 
     private final NotificationRepository notificationRepository;
@@ -35,7 +37,11 @@ public class NotificationService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new CustomException("사용자를 찾을 수 없습니다."));
 
+        log.info("user: {}", user);
+
         List<Notification> notifications = notificationRepository.findByUser(user);
+
+        log.info("notifications: {}", notifications);
 
         return notifications.stream()
                 .map(this::toResponse)

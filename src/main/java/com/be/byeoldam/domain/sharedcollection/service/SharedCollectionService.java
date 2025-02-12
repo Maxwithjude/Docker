@@ -1,14 +1,14 @@
 package com.be.byeoldam.domain.sharedcollection.service;
 
+import com.be.byeoldam.domain.bookmark.BookmarkService;
 import com.be.byeoldam.domain.bookmark.dto.TagDto;
 import com.be.byeoldam.domain.bookmark.model.Bookmark;
 import com.be.byeoldam.domain.bookmark.repository.BookmarkRepository;
 import com.be.byeoldam.domain.bookmark.repository.BookmarkTagRepository;
-import com.be.byeoldam.domain.personalcollection.dto.PersonalBookmarkResponse;
-import com.be.byeoldam.domain.sharedcollection.dto.CollectionMemberResponse;
-import com.be.byeoldam.domain.sharedcollection.dto.SharedBookmarkResponse;
-import com.be.byeoldam.domain.sharedcollection.dto.SharedCollectionRequest;
-import com.be.byeoldam.domain.sharedcollection.dto.SharedCollectionResponse;
+import com.be.byeoldam.domain.notification.NotificationRepository;
+import com.be.byeoldam.domain.notification.model.InviteNotification;
+import com.be.byeoldam.domain.notification.model.Notification;
+import com.be.byeoldam.domain.sharedcollection.dto.*;
 import com.be.byeoldam.domain.sharedcollection.model.Role;
 import com.be.byeoldam.domain.sharedcollection.model.SharedCollection;
 import com.be.byeoldam.domain.sharedcollection.model.SharedUser;
@@ -40,6 +40,9 @@ public class SharedCollectionService {
     private final BookmarkRepository bookmarkRepository;
 
     private final BookmarkTagRepository bookmarkTagRepository;
+    private final NotificationRepository notificationRepository;
+
+    private final BookmarkService bookmarkService;
 
     // 공유컬렉션 생성
     // 예외 1. user_id 확인
@@ -109,6 +112,14 @@ public class SharedCollectionService {
         if (!sharedUser.getRole().equals(Role.OWNER)) {
             throw new CustomException("해당 권한은 방장만 가능합니다.");
         }
+
+
+        List<Bookmark> bookmarkList = bookmarkRepository.findBySharedCollection(collection);
+
+        for (Bookmark bookmark : bookmarkList) {
+            bookmarkService.deleteBookmark(userId, bookmark.getId());
+        }
+
         sharedCollectionRepository.delete(collection);
         sharedUserRepository.deleteAllBySharedCollection(collection);
     }
@@ -128,13 +139,23 @@ public class SharedCollectionService {
     // 초대 알림에서 수락을 누르면 이쪽으로 넘어옴
     // 예외 1 : 이미 초대한 멤버를 또 초대하려고 할 때
     @Transactional
-    public void inviteNewMember(Long userId, Long collectionId) {
-        // 초대를 받은 유저 확인
-        User invitedUser = userRepository.findById(userId)
+    public void inviteNewMember(InviteAcceptRequest request, Long userId) {
+        Notification notification = notificationRepository.findById(request.getNotificationId())
+                .orElseThrow(() -> new CustomException("알림이 존재하지 않습니다."));
+        if(!(notification instanceof InviteNotification)) {
+            throw new CustomException("유효하지 않은 초대 알림입니다.");
+        }
+
+        InviteNotification inviteNotification = (InviteNotification) notification;
+
+        // 로그인해있는 유저
+        User user = userRepository.findById(userId)
                 .orElseThrow(() -> new CustomException("사용자를 찾을 수 없습니다."));
+        // 초대를 받은 유저 확인
+        User invitedUser = notification.getUser();
         // 초대한 공유컬렉션 확인
-        SharedCollection collection = sharedCollectionRepository.findById(collectionId)
-                .orElseThrow(() -> new CustomException("컬렉션을 찾을 수 없습니다."));
+        SharedCollection collection = inviteNotification.getCollection();
+
         // 컬렉션에 있는 멤버인지 확인
         if (sharedUserRepository.findByUserAndSharedCollection(invitedUser, collection).isPresent()) {
             throw new CustomException("이미 초대된 유저입니다.");
@@ -142,6 +163,8 @@ public class SharedCollectionService {
 
         SharedUser newSharedUser = SharedUser.create(invitedUser, collection, Role.MEMBER);
         sharedUserRepository.save(newSharedUser);
+
+        notificationRepository.delete(inviteNotification);
     }
 
     // 공유멀렉션 멤버 관리 - 강퇴

@@ -20,6 +20,7 @@ import com.be.byeoldam.domain.user.model.User;
 import com.be.byeoldam.domain.user.repository.UserRepository;
 import com.be.byeoldam.exception.CustomException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -29,6 +30,7 @@ import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class BookmarkService {
 
     private final BookmarkRepository bookmarkRepository;
@@ -253,9 +255,9 @@ public class BookmarkService {
         for (BookmarkTag bookmarkTag : bookmarkTags) {
             Tag tag = bookmarkTag.getTag();
             tag.decrement();
-            bookmarkTagRepository.deleteByBookmark(bookmark);
+            bookmarkTagRepository.delete(bookmarkTag);
             if (tag.getReferenceCount() == 0) {
-                // Tag 삭제, 북마크-태그 테이블에서 연관관계 삭제
+                tagBookmarkUrlRepository.deleteByTag(tag);
                 tagRepository.delete(tag);
             }
         }

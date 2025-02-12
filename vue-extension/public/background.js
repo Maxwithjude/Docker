@@ -1,5 +1,4 @@
-// <+> 컨텍스트 메뉴 생성 및 관리
-// - 우클릭시 나타나는 '별담에 저장' 메뉴 생성
+// <+> 컨텍스트 메뉴 - 우클릭시 나타나는 '별담에 저장' 메뉴 생성
 chrome.runtime.onInstalled.addListener(() => {
   chrome.contextMenus.create({
     id: "saveToByeoldam",
@@ -39,17 +38,6 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
       sendResponse({ status: "success" });
     }
   }
-
-  // getUserInfo 요청에 대한 응답
-  // if (message.action === "getUserInfo") {
-  //   chrome.storage.local.get(["userId", "access_token"], (result) => {
-  //     sendResponse({
-  //       userId: result.userId,
-  //       access_token: result.access_token,
-  //     });
-  //   });
-  //   return true; // 비동기 응답을 보내기 위해 true를 반환
-  // }
 });
 
 // 로그인 정보를 Extension local Storage에 저장하는 함수
@@ -73,19 +61,29 @@ function saveLoginData(userLoginInfo) {
 // [URL 정보 수신 및 응답 처리]
 // ===============================================================================================
 
+// 페이지 정보를 저장할 변수
 let currentUrl = null;
+let readingTimeInfo = {
+  readingTime: null,
+  stats: null
+};
 
-// <1> contentScript에서 URL 정보 수신
+// <1> contentScript.js로부터 페이지 정보 수신
 chrome.runtime.onMessage.addListener((message, sender) => {
-  if (message.action === "setUrl") {
+  if (message.action === "GET_PAGE_INFO") {
     currentUrl = message.url;
+    readingTimeInfo.readingTime = message.readingTime;
+    readingTimeInfo.stats = message.stats;
+    console.log("저장된 통계:", readingTimeInfo.stats);
   }
 });
 
-// <2> StorageView에서 URL 요청에 대한 응답
+// <2> StorageView로 페이지 정보 응답
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
-  if (message.action === "getCurrentUrl") {
-    sendResponse({ url: currentUrl });
+  if (message.action === "getPageInfo") {
+    sendResponse({ url: currentUrl, readingTime: readingTimeInfo.readingTime });
   }
   return true;
 });
+
+

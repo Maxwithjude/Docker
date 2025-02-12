@@ -197,10 +197,10 @@ const generatePastelColors = () => {
   return { tagColor, tagBorderColor };
 };
 
-const url = ref("");
+
 const accessToken = ref("");
 const gptTags = ref([ // GPT 생성 태그 배열
-{ tagName: "태그1", ...generatePastelColors()  },
+  { tagName: "태그1", ...generatePastelColors()  },
   { tagName: "태그2", ...generatePastelColors()  },
   { tagName: "태그3", ...generatePastelColors()  },
 ]); 
@@ -210,49 +210,80 @@ const finalTags = computed(() => {
   return [...gptTags.value, ...newTags.value];
 });
 
+const url = ref("");
+const readingTime = ref(null);
 onMounted(async () => {
-  // try {
-  //   // 초기 데이터 로드 API 요청
-  //   const response = await axios.get("API_URL");  
-  //   if (response.data) {
-  //     gptTags.value = response.data.tags; 
-  //   }
-  // } catch (error) {
-  //   console.error("데이터 로딩 실패:", error);
-  // }
-
-  chrome.runtime.sendMessage({ action: "getCurrentUrl" }, (response) => {
-    if (response && response.url) {
-      url.value = response.url;
-    }
-    chrome.storage.local.get(["access_token"], (response) => {
-      if (response && response.access_token) {
-        accessToken.value = response.access_token;
-      }
+  try {
+    // URL, 읽기 시간, 토큰을 비동기적으로 가져오기
+    const pageInfo = await new Promise((resolve, reject) => {
+      chrome.runtime.sendMessage({ action: "getPageInfo" }, (response) => {
+        if (response && response.url && response.readingTime) {
+          resolve({
+            url: response.url,
+            readingTime: response.readingTime
+          });
+        } else {
+          reject("페이지 정보를 가져오는 데 실패했습니다.");
+        }
+      });
     });
-  });
+
+    const fetchedAccessToken = await new Promise((resolve, reject) => {
+      chrome.storage.local.get(["access_token"], (response) => {
+        if (response && response.access_token) {
+          resolve(response.access_token);
+        } else {
+          reject("액세스 토큰을 가져오는 데 실패했습니다.");
+        }
+      });
+    });
+
+    url.value = pageInfo.url;
+    readingTime.value = pageInfo.readingTime;
+    accessToken.value = fetchedAccessToken;
+    console.log('StorageView.vue 가져오기 성공:', {
+      url: url.value,
+      readingTime: readingTime.value,
+      accessToken: accessToken.value
+    });
+
+
+    // 초기 데이터 로드 API 요청
+    // const response = await api.post("/popup/load", { siteUrl: url.value }, {
+    //   headers: {
+    //     "Content-Type": "application/json",
+    //     "Authorization": `Bearer ${accessToken.value}`, 
+    //   }
+    // });
+
+    // if (response.data.success) {
+    //   console.log("팝업 데이터 로드 성공:", response.data.data);
+    // } else {
+    //   console.error("에러 발생:", response.data.message);
+    // }
+
+  } catch (error) {
+    console.error("데이터 로딩 실패:", error);
+  }
 });
 
 // 북마크 저장 API 요청
 const saveBookmark = async () => {
-  if (accessToken.value && url.value) {
+  if (url.value) {
+   
     try {
       const response = await api.post(
         "/bookmarks/extension", 
         {
-          bookmark_url: url,
+          bookmark_url: url.value,
           collectionId: collectionId,         
           isPersonal: true,    
           tags: finalTags.value.map((finalTag) => ({
             tagName: finalTag.tagName,
-            tagColor: `${finalTag.tagColor} ${finalTag.tagBorderColor}`,
+            tagColor: finalTag.tagColor,
+            tagBorderColor: finalTag.tagBorderColor
           })),
-        },                
-        {
-          headers: {
-            Authorization: `Bearer ${accessToken}`,
-            "Content-Type": "application/json"
-          },
+          readingTime: readingTime.value
         }
       );
       if (response.status === 201) {

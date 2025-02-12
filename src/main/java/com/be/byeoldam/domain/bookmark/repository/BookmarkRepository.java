@@ -33,4 +33,6 @@ public interface BookmarkRepository extends JpaRepository<Bookmark, Long> {
 
     @Query("SELECT b FROM Bookmark b WHERE b.user = :user AND b.priority = true")
     List<Bookmark> findPriorityByUser(@Param("user") User user);
+
+    List<Bookmark> findBySharedCollection(SharedCollection collection);
 }

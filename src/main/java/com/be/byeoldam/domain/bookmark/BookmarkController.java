@@ -51,10 +51,11 @@ public class BookmarkController {
     @PutMapping("/{bookmarkId}/tags")
     public ResponseTemplate<Void> updateBookmark(
             @RequestBody UpdateBookmarkRequest request,
-            @PathVariable Long bookmarkId, @UserId Long userId
+            @UserId Long userId,
+            @PathVariable Long bookmarkId
     ) {
 
-        bookmarkService.updateBookmark(request, bookmarkId, userId);
+        bookmarkService.updateBookmark(request, userId, bookmarkId);
         return ResponseTemplate.ok();
     }
 
@@ -76,11 +77,12 @@ public class BookmarkController {
     @ApiResponse(responseCode = "200", description = "북마크 삭제 성공", useReturnTypeSchema = true)
     @DeleteMapping("{bookmarkId}")
     public ResponseTemplate<Void> deleteBookmark(
-            @PathVariable Long bookmarkId,
-            @UserId Long userId
+            @UserId Long userId,
+            @PathVariable Long bookmarkId
+
     ) {
 
-        bookmarkService.deleteBookmark(bookmarkId, userId);
+        bookmarkService.deleteBookmark(userId, bookmarkId);
         return ResponseTemplate.ok();
     }
 

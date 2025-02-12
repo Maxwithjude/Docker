@@ -68,10 +68,12 @@
   //로그인 핸들러
   const handleLogin = async () => {
     try {
-        await userstore.userLogin(email.value, password.value)
+      await userstore.userLogin(email.value, password.value)
+      router.push({ name: 'main' }) // 로그인 성공 시 main 페이지로 이동
     } catch (error) {
-        alert('로그인 실패: ' + error.message)
-    }}
+      alert('로그인 실패: ' + error.message)
+    }
+  }
 
   const handleGoogleLogin = () => {
     console.log("Google 로그인 시도");

@@ -23,19 +23,18 @@ export const useCollectionStore = defineStore("collection", () => {
         throw new Error("인증 정보가 없습니다. 로그인 후 다시 시도해주세요.");
       }
 
-      // baseURL은 이미 설정되어 있으므로 경로만 지정
       const [personalRes, sharedRes] = await Promise.all([
-        api.get('/collections/personal'),  // REST_API_URL 제거
-        api.get('/collections/shared'),    // REST_API_URL 제거
+        api.get('/collections/personal'),
+        api.get('/collections/shared'),
       ]);
 
-      if (personalRes.data.success && sharedRes.data.success) {
-        personalCollections.value = personalRes.data.results;
-        sharedCollections.value = sharedRes.data.results;
-        allCollections.value = [...personalRes.data.results, ...sharedRes.data.results]; // 합치기
-      } else {
-        console.error("컬렉션 로드 실패:", personalRes.data.message, sharedRes.data.message);
-      }
+      // success가 true인 경우에만 데이터를 설정
+      personalCollections.value = personalRes.data.results || [];
+      sharedCollections.value = sharedRes.data.results || [];
+      allCollections.value = [...personalCollections.value, ...sharedCollections.value];
+
+      return { personalCollections, sharedCollections, allCollections };
+      
     } catch (error) {
       console.error("컬렉션 로드 중 오류 발생:", error);
       throw error;

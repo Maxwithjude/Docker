@@ -1,5 +1,6 @@
 package com.be.byeoldam.domain.sharedcollection.service;
 
+import com.be.byeoldam.domain.bookmark.BookmarkService;
 import com.be.byeoldam.domain.bookmark.dto.TagDto;
 import com.be.byeoldam.domain.bookmark.model.Bookmark;
 import com.be.byeoldam.domain.bookmark.repository.BookmarkRepository;
@@ -7,7 +8,6 @@ import com.be.byeoldam.domain.bookmark.repository.BookmarkTagRepository;
 import com.be.byeoldam.domain.notification.NotificationRepository;
 import com.be.byeoldam.domain.notification.model.InviteNotification;
 import com.be.byeoldam.domain.notification.model.Notification;
-import com.be.byeoldam.domain.personalcollection.dto.PersonalBookmarkResponse;
 import com.be.byeoldam.domain.sharedcollection.dto.*;
 import com.be.byeoldam.domain.sharedcollection.model.Role;
 import com.be.byeoldam.domain.sharedcollection.model.SharedCollection;
@@ -41,6 +41,8 @@ public class SharedCollectionService {
 
     private final BookmarkTagRepository bookmarkTagRepository;
     private final NotificationRepository notificationRepository;
+
+    private final BookmarkService bookmarkService;
 
     // 공유컬렉션 생성
     // 예외 1. user_id 확인
@@ -110,6 +112,14 @@ public class SharedCollectionService {
         if (!sharedUser.getRole().equals(Role.OWNER)) {
             throw new CustomException("해당 권한은 방장만 가능합니다.");
         }
+
+
+        List<Bookmark> bookmarkList = bookmarkRepository.findBySharedCollection(collection);
+
+        for (Bookmark bookmark : bookmarkList) {
+            bookmarkService.deleteBookmark(userId, bookmark.getId());
+        }
+
         sharedCollectionRepository.delete(collection);
         sharedUserRepository.deleteAllBySharedCollection(collection);
     }

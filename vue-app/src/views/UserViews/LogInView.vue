@@ -69,7 +69,6 @@
   const handleLogin = async () => {
     try {
       await userstore.userLogin(email.value, password.value)
-      router.push({ name: 'main' }) // 로그인 성공 시 main 페이지로 이동
     } catch (error) {
       alert('로그인 실패: ' + error.message)
     }

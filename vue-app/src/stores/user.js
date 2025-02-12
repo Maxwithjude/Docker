@@ -64,22 +64,22 @@ const userLogin = async (email, password) => {
       }
       // api 인스턴스에 토큰 직접 설정
       api.defaults.headers.common['accessToken'] = accessToken;
-      //컬렉션 정보 가져오는 컨트롤러 아직 백엔드 준비 안됨
-      // try {
-      //   // 컬렉션 데이터 가져오기
-      //   await collectionStore.fetchAllCollection();
+      // 컬렉션 정보 가져오는 컨트롤러 아직 백엔드 준비 안됨
+      try {
+        // 컬렉션 데이터 가져오기
+        await collectionStore.fetchAllCollection();
         
-      //   // 라우팅 처리
-      //   if (collectionStore.allCollections.length === 0) {
-      //     router.push({ name: "collectionSelect" });
-      //   } else {
-      //     router.push({ name: "main" });
-      //   }
-      // } catch (collectionError) {
-      //   console.error("컬렉션 로드 중 오류:", collectionError);
-      //   // 컬렉션 로드 실패해도 로그인은 성공으로 처리
-      //   router.push({ name: "collectionSelect" });
-      // }
+        // 라우팅 처리
+        if (collectionStore.allCollections.length === 0) {
+          router.push({ name: "collectionSelect" });
+        } else {
+          router.push({ name: "main" });
+        }
+      } catch (collectionError) {
+        console.error("컬렉션 로드 중 오류:", collectionError);
+        // 컬렉션 로드 실패해도 로그인은 성공으로 처리
+        router.push({ name: "collectionSelect" });
+      }
     } else {
       throw new Error(res.data.message || "로그인 실패");
     }

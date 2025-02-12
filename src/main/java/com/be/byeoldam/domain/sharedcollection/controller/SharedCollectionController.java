@@ -2,10 +2,7 @@ package com.be.byeoldam.domain.sharedcollection.controller;
 
 import com.be.byeoldam.common.ResponseTemplate;
 import com.be.byeoldam.common.annotation.UserId;
-import com.be.byeoldam.domain.sharedcollection.dto.CollectionMemberResponse;
-import com.be.byeoldam.domain.sharedcollection.dto.SharedBookmarkResponse;
-import com.be.byeoldam.domain.sharedcollection.dto.SharedCollectionRequest;
-import com.be.byeoldam.domain.sharedcollection.dto.SharedCollectionResponse;
+import com.be.byeoldam.domain.sharedcollection.dto.*;
 import com.be.byeoldam.domain.sharedcollection.service.SharedCollectionService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -90,6 +87,17 @@ public class SharedCollectionController {
     ) {
 
         sharedCollectionService.deleteSharedCollection(userId, sharedCollectionId);
+        return ResponseTemplate.ok();
+    }
+
+    @Operation(summary = "공윰컬렉션 멤버 초대", description = "공유컬렉션세 멤버를 초대")
+    @ApiResponse(responseCode = "200", description = "공유컬렉션 멤버 초대 성공", useReturnTypeSchema = true)
+    @PostMapping("/invite")
+    public ResponseTemplate<Void> acceptSharedCollection(
+            @RequestBody InviteAcceptRequest request,
+            @UserId Long userId
+    ) {
+        sharedCollectionService.inviteNewMember(request, userId);
         return ResponseTemplate.ok();
     }
 

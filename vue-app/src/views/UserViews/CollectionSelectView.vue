@@ -34,8 +34,9 @@
             <button @click="removeCollection(collection)">x</button>
           </span>
         </div>
-        <RouterLink :to="{name: 'tagSelect'}"><button class="next-button">
-          다음</button></RouterLink>
+        <RouterLink :to="{name: 'tagSelect'}">
+          <button class="next-button" @click="createCollections">다음</button>
+        </RouterLink>
       </div>
     </div>  
   </template>
@@ -43,47 +44,64 @@
   <script setup>
   import { ref } from "vue";
 import { RouterLink } from "vue-router";
-  // 폴더 리스트
-  const folders = ref([
-    { name: "바로가기" },
-    { name: "쇼핑" },
-    { name: "영화" },
-    { name: "음악" },
-    { name: "콘텐츠" },
-    { name: "광고" },
-    { name: "스터디" },
-    { name: "맛집" },
-    { name: "IT" },
-    { name: "사진" },
-  ]);
-  
-  // 선택된 폴더들
-  const selectedFolders = ref([]);
-  
-  // 직접 입력한 컬렉션
-  const customCollection = ref("");
-  
-  // 폴더 선택 토글
-  const toggleFolder = (name) => {
-    if (selectedFolders.value.includes(name)) {
-      selectedFolders.value = selectedFolders.value.filter((item) => item !== name);
-    } else {
-      selectedFolders.value.push(name);
-    }
-  };
-  
-  // 직접 입력한 컬렉션 추가
-  const addCustomCollection = () => {
-    if (customCollection.value && !selectedFolders.value.includes(customCollection.value)) {
-      selectedFolders.value.push(customCollection.value);
-      customCollection.value = "";
-    }
-  };
-  
-  // 컬렉션 제거
-  const removeCollection = (name) => {
+import { useCollectionStore } from "@/stores/collection";
+
+const collectionStore = useCollectionStore();
+
+// 폴더 리스트
+const folders = ref([
+  { name: "즐겨찾기" },      // 가장 자주 방문하는 사이트
+  { name: "읽을거리" },      // 뉴스, 블로그, 아티클
+  { name: "학습" },         // 강의, 튜토리얼, 교육자료
+  { name: "업무" },         // 업무 관련 사이트, 도구
+  { name: "쇼핑" },         // 쇼핑몰, 상품 정보
+  { name: "엔터테인먼트" },  // 영화, 음악, 게임
+  { name: "여행" },         // 여행 정보, 맛집, 숙소
+  { name: "금융" },         // 은행, 투자, 금융 정보
+  { name: "건강" },         // 운동, 의료, 건강 정보
+  { name: "레시피" },       // 요리, 음식 관련
+]);
+
+// 선택된 폴더들
+const selectedFolders = ref([]);
+
+// 직접 입력한 컬렉션
+const customCollection = ref("");
+
+// 폴더 선택 토글
+const toggleFolder = (name) => {
+  if (selectedFolders.value.includes(name)) {
     selectedFolders.value = selectedFolders.value.filter((item) => item !== name);
-  };
+  } else {
+    selectedFolders.value.push(name);
+  }
+};
+
+// 직접 입력한 컬렉션 추가
+const addCustomCollection = () => {
+  if (customCollection.value && !selectedFolders.value.includes(customCollection.value)) {
+    selectedFolders.value.push(customCollection.value);
+    customCollection.value = "";
+  }
+};
+
+// 컬렉션 제거
+const removeCollection = (name) => {
+  selectedFolders.value = selectedFolders.value.filter((item) => item !== name);
+};
+
+// 선택된 컬렉션들 생성하는 함수
+const createCollections = async () => {
+  try {
+    // 선택된 모든 컬렉션에 대해 순차적으로 생성
+    for (const collectionName of selectedFolders.value) {
+      await collectionStore.createPersonalCollection(collectionName);
+    }
+    console.log("모든 컬렉션이 성공적으로 생성되었습니다.");
+  } catch (error) {
+    console.error("컬렉션 생성 중 오류 발생:", error);
+  }
+};
   </script>
   
   <style scoped>

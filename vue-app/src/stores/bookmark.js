@@ -231,8 +231,6 @@ export const useBookmarkStore = defineStore("bookmark", () => {
       //사용자 정의 태그 실제 response
       const userDefineTags = ref({});
 
-
-
       //사용자 정의 태그 조회
       const getUserDefineTags = async () => {
         try {
@@ -271,6 +269,21 @@ export const useBookmarkStore = defineStore("bookmark", () => {
             }
         })
       
+      //사용자 정의 태그 저장
+      const saveUserDefineTags = async (tagList) => {
+        const request = {
+          "tagList": [
+            {
+              "tagName": tagList.tagName,
+              "tagColor": tagList.tagColor,
+              "tagBolder": tagList.tagBolder
+            }
+          ]
+        }
+        const response = await api.post('/tags', request);
+        console.log(response.data);
+      };
+
       //추천 태그 기반 북마크 실제 response
       const recommendedBookmarks = ref({});
 
@@ -633,6 +646,7 @@ export const useBookmarkStore = defineStore("bookmark", () => {
         exampleOldBookmarks,
         oldBookmarks,
         // exampleBookmarkMemo,
-        bookmarkMemo
+        bookmarkMemo,
+        saveUserDefineTags
     };
 });

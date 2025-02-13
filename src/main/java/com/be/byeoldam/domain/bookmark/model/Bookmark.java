@@ -108,4 +108,8 @@ public class Bookmark extends BaseTimeEntity {
     public void updatePriority() {
         this.priority = !this.priority;
     }
+
+    public void updateRead() {
+        this.isRead = !this.isRead;
+    }
 }

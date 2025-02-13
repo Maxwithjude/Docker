@@ -3,8 +3,10 @@ package com.be.byeoldam.domain.bookmark.dto;
 import com.be.byeoldam.domain.tag.model.Tag;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Getter
+@NoArgsConstructor
 @AllArgsConstructor
 public class TagDto {
     private String tagName;

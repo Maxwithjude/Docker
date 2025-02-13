@@ -119,9 +119,9 @@ public class SharedCollectionService {
         for (Bookmark bookmark : bookmarkList) {
             bookmarkService.deleteBookmark(userId, bookmark.getId());
         }
+        sharedUserRepository.deleteAllBySharedCollection(collection);
 
         sharedCollectionRepository.delete(collection);
-        sharedUserRepository.deleteAllBySharedCollection(collection);
     }
 
     // 공유컬렉션 상세 조회 - 북마크 목록 조회

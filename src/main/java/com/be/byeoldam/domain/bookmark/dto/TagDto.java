@@ -9,7 +9,7 @@ import lombok.Getter;
 @AllArgsConstructor
 public class TagDto {
 
-    @NotBlank
+    @NotBlank(message = "태그 이름 입력은 필수입니다.")
     private String tagName;
 
     private String tagColor; // 태드 색상

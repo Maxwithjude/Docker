@@ -58,7 +58,6 @@ public class BookmarkService {
 
         // 1. url 저장 과정
         // 1-1. 먼저 request에 url이 잘 있는지 확인
-        // TODO : URL valid
         if (request.getUrl() == null) {
             throw new CustomException("URL 입력이 없습니다.");
         }
@@ -69,14 +68,12 @@ public class BookmarkService {
                         bookmarkUrlRepository.save(BookmarkUrl.create(request.getUrl(), 0L, request.getReadingTime())));
         bookmarkUrl.increment();
 
-        bookmarkRepository.findByBookmarkUrlAndUser(bookmarkUrl, user).stream()
-                .filter(bookmark -> bookmark.getPersonalCollection() != null)
-                .findFirst()
-                .ifPresent(bookmark -> {
-                    throw new CustomException("이미 저장한 url입니다.");
-                });
-
-
+//        bookmarkRepository.findByBookmarkUrlAndUser(bookmarkUrl, user).stream()
+//                .filter(bookmark -> bookmark.getPersonalCollection() != null)
+//                .findFirst()
+//                .ifPresent(bookmark -> {
+//                    throw new CustomException("이미 저장한 url입니다.");
+//                });
 
         // 2. Bookmark에 bookmark 추가해주기
         // 2-1. 컬렉션 타입 확인하기
@@ -89,11 +86,22 @@ public class BookmarkService {
             if (!collection.getUser().equals(user)) {
                 throw new CustomException("해당 컬렉션에 대한 권한이 없습니다.");
             }
+
+            bookmarkRepository.findByBookmarkUrlAndUser(bookmarkUrl, user).stream()
+                    .filter(bm -> bm.getPersonalCollection() != null)
+                    .findFirst()
+                    .ifPresent(bm -> {
+                        throw new CustomException("이미 저장한 url입니다.");
+                    });
+
             bookmark = Bookmark.createPersonalBookmark(bookmarkUrl, user, collection);
         } else {
             // 공유컬렉션이면 공유컬렉션 북마크로 만들기
             SharedCollection collection = sharedCollectionRepository.findById(request.getCollectionId())
                     .orElseThrow(() -> new CustomException("해당 공유컬렉션이 없습니다."));
+            if(bookmarkRepository.existsByBookmarkUrlAndSharedCollection(bookmarkUrl, collection)) {
+                throw new CustomException("공유컬렉션에 이미 저장한 url입니다.");
+            }
             bookmark = Bookmark.createSharedBookmark(bookmarkUrl, user, collection);
         }
 

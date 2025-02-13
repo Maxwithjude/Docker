@@ -38,7 +38,7 @@ public class BookmarkController {
     @ApiResponse(responseCode = "200", description = "북마크 저장 성공", useReturnTypeSchema = true)
     @PostMapping
     public ResponseTemplate<Void> createBookmark(
-            @RequestBody CreateBookmarkRequest request,
+            @Valid @RequestBody CreateBookmarkRequest request,
             @UserId Long userId
     ) {
 
@@ -92,7 +92,7 @@ public class BookmarkController {
     @ApiResponse(responseCode = "200", description = "북마크 이동/복사 성공", useReturnTypeSchema = true)
     @PostMapping("{bookmarkId}/move")
     public ResponseTemplate<Void> moveBookmark(
-            @RequestBody MoveBookmarkRequest request,
+            @Valid @RequestBody MoveBookmarkRequest request,
             @UserId Long userId, @PathVariable Long bookmarkId
     ) {
 

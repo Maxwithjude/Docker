@@ -1,6 +1,7 @@
 package com.be.byeoldam.domain.bookmark.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import jakarta.validation.Valid;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -14,6 +15,8 @@ import java.util.List;
 public class CreateBookmarkRequest {
     private String url;
     private Long collectionId;
+
+    @Valid
     private List<TagDto> tags;
 
     @JsonProperty("isPersonal")

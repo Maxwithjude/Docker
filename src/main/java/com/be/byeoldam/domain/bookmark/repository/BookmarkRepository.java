@@ -35,4 +35,6 @@ public interface BookmarkRepository extends JpaRepository<Bookmark, Long> {
     List<Bookmark> findPriorityByUser(@Param("user") User user);
 
     List<Bookmark> findBySharedCollection(SharedCollection collection);
+
+    boolean existsByBookmarkUrlAndSharedCollection(BookmarkUrl bookmarkUrl, SharedCollection collection);
 }

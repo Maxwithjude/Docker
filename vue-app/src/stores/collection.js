@@ -150,7 +150,7 @@ export const useCollectionStore = defineStore("collection", () => {
   const createSharedCollection = async (name) => {
     try {
       const request = {
-        "sharedCollectionName": name
+        "name": name
       } 
       const response = await api.post('/collections/shared', request)
       console.log('컬렉션 생성 성공:')

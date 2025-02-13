@@ -109,7 +109,9 @@ const handleNext = async () => {
   try {
     // 선택된 모든 컬렉션 생성
     for (const folderName of selectedFolders.value) {
-      if (!customCollection.value.includes(folderName)) {
+      // 이미 존재하는 기본 폴더인지 확인
+      const isDefaultFolder = folders.value.some(folder => folder.name === folderName);
+      if (!isDefaultFolder) {
         await collectionStore.createPersonalCollection(folderName);
       }
     }

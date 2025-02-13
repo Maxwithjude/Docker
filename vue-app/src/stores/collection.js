@@ -43,10 +43,11 @@ export const useCollectionStore = defineStore("collection", () => {
   const createPersonalCollection = async (name) => {
     try {
       const request = {
-        "name": name
-      } 
-      const response = await api.post('/collections/personal', request)
-      console.log('컬렉션 생성 성공:')
+        name: name.trim()
+      };
+      const response = await api.post('/collections/personal', request);
+      console.log('컬렉션 생성 성공:', response.data);
+      return response.data;
     } catch (error) {
       console.error('개인 컬렉션 생성 중 오류 발생:', error);
       throw error;

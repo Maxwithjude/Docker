@@ -8,6 +8,7 @@ import com.be.byeoldam.domain.personalcollection.dto.PersonalCollectionResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -25,7 +26,7 @@ public class PersonalCollectionController {
     @ApiResponse(responseCode = "200", description = "개인컬렉션 생성 성공", useReturnTypeSchema = true)
     @PostMapping
     public ResponseTemplate<Void> createPersonalCollection(
-            @RequestBody PersonalCollectionRequest request,
+            @Valid @RequestBody PersonalCollectionRequest request,
             @UserId Long userId
     ) {
 
@@ -49,7 +50,7 @@ public class PersonalCollectionController {
     @ApiResponse(responseCode = "200", description = "", useReturnTypeSchema = true)
     @PutMapping("/{personalCollectionId}")
     public ResponseTemplate<PersonalCollectionResponse> updatePeronalCollection(
-            @RequestBody PersonalCollectionRequest request,
+            @Valid @RequestBody PersonalCollectionRequest request,
             @UserId Long userId,
             @PathVariable Long personalCollectionId
     ) {

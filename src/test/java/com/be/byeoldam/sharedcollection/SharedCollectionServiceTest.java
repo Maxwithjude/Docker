@@ -119,7 +119,7 @@ class SharedCollectionServiceTest {
 
         // then
         assertThat(responses).hasSize(1);
-        assertThat(responses.get(0).getId()).isEqualTo(1L);
+        assertThat(responses.get(0).getCollectionId()).isEqualTo(1L);
         assertThat(responses.get(0).getName()).isEqualTo("sharedCollection");
     }
 
@@ -135,7 +135,7 @@ class SharedCollectionServiceTest {
                 sharedCollectionService.updateSharedCollection(new SharedCollectionRequest("Updated Name"), 1L, 1L);
 
         // then
-        assertThat(response.getId()).isEqualTo(1L);
+        assertThat(response.getCollectionId()).isEqualTo(1L);
         assertThat(response.getName()).isEqualTo("Updated Name");
     }
 

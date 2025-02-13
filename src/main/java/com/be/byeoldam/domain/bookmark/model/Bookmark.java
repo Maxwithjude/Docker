@@ -39,7 +39,7 @@ public class Bookmark extends BaseTimeEntity {
     @Column(name="priority", nullable=false)
     private boolean priority;
 
-    @Column(name="is_read")
+    @Column(name="is_read", nullable=false)
     private boolean isRead;
 
     @PrePersist

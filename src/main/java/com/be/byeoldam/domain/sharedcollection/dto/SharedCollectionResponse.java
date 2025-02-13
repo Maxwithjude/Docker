@@ -7,7 +7,7 @@ import lombok.*;
 @Builder
 public class SharedCollectionResponse {
 
-    private Long id;
+    private Long collectionId;
     private String name;
 
     @JsonProperty("isPersonal")
@@ -15,7 +15,7 @@ public class SharedCollectionResponse {
 
     public static SharedCollectionResponse of(Long id, String name) {
         return SharedCollectionResponse.builder()
-                .id(id)
+                .collectionId(id)
                 .name(name)
                 .isPersonal(false)
                 .build();

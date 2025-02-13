@@ -8,6 +8,7 @@ import com.be.byeoldam.domain.bookmark.dto.UpdateBookmarkRequest;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -37,7 +38,7 @@ public class BookmarkController {
     @ApiResponse(responseCode = "200", description = "북마크 저장 성공", useReturnTypeSchema = true)
     @PostMapping
     public ResponseTemplate<Void> createBookmark(
-            @RequestBody CreateBookmarkRequest request,
+            @Valid @RequestBody CreateBookmarkRequest request,
             @UserId Long userId
     ) {
 
@@ -50,7 +51,7 @@ public class BookmarkController {
     @ApiResponse(responseCode = "200", description = "북마크 수정 성공", useReturnTypeSchema = true)
     @PutMapping("/{bookmarkId}/tags")
     public ResponseTemplate<Void> updateBookmark(
-            @RequestBody UpdateBookmarkRequest request,
+            @Valid @RequestBody UpdateBookmarkRequest request,
             @UserId Long userId,
             @PathVariable Long bookmarkId
     ) {
@@ -64,11 +65,11 @@ public class BookmarkController {
     @ApiResponse(responseCode = "200", description = "북마크 수정 성공", useReturnTypeSchema = true)
     @PutMapping("/{bookmarkId}")
     public ResponseTemplate<Void> changeBookmarkPriority(
-            @PathVariable Long bookmarkId,
-            @UserId Long userId
+            @UserId Long userId,
+            @PathVariable Long bookmarkId
     ) {
 
-        bookmarkService.changePriority(bookmarkId);
+        bookmarkService.changePriority(userId, bookmarkId);
         return ResponseTemplate.ok();
     }
 
@@ -91,7 +92,7 @@ public class BookmarkController {
     @ApiResponse(responseCode = "200", description = "북마크 이동/복사 성공", useReturnTypeSchema = true)
     @PostMapping("{bookmarkId}/move")
     public ResponseTemplate<Void> moveBookmark(
-            @RequestBody MoveBookmarkRequest request,
+            @Valid @RequestBody MoveBookmarkRequest request,
             @UserId Long userId, @PathVariable Long bookmarkId
     ) {
 

@@ -89,7 +89,7 @@ const fetchMembers = async () => {
     await collectionStore.getMembersByCollectionId(props.collectionId);
     // results 배열의 각 사용자 정보를 members에 맞는 형식으로 변환
     members.value = collectionStore.membersByCollectionId.value.results.map(user => ({
-      id: user.user_id,
+      id: user.userId,
       name: user.nickname
     }));
   } catch (error) {

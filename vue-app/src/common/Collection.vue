@@ -19,14 +19,15 @@
     <SharedCollectionSettings 
       v-if="showSharedSettings && !collection.isPersonal" 
       :current-name="collection.name"
-      :collection-id="collection.collection_id"
+      :collection-id="collection.collectionId
+      "
       @close="showSharedSettings = false"
       @update="handleNameUpdate"
     />
     <PersonalCollectionSettings 
       v-if="showPersonalSettings && collection.isPersonal"
       :current-name="collection.name"
-      :collection-id="collection.collection_id"
+      :collection-id="collection.collectionId"
       @close="showPersonalSettings = false"
       @update="handleNameUpdate"
     />
@@ -63,23 +64,26 @@ const openSettings = () => {
 
 const handleNameUpdate = (newName) => {
   emit('update', {
-    collectionId: props.collection.collection_id,
+    collectionId: props.collection.collectionId,
     newName: newName
   });
 };
 
 const handleDelete = async () => {
   try {
+    console.log("삭제하려는 컬렉션:", props.collection);
+    console.log("컬렉션 ID:", props.collection.collectionId);
+    
     if (props.collection.isPersonal) {
-      await collectionStore.deletePersonalCollection(props.collection.collection_id);
+      await collectionStore.deletePersonalCollection(props.collection.collectionId);
     } else {
-      await collectionStore.deleteSharedCollection(props.collection.collection_id);
+      await collectionStore.deleteSharedCollection(props.collection.collectionId);
     }
-    // 삭제 후 필요한 처리 (예: 목록 새로고침)
-    emit('delete', props.collection.collection_id);
+    
+    await collectionStore.fetchAllCollection();
+    emit('delete', props.collection.collectionId);
   } catch (error) {
     console.error('컬렉션 삭제 중 오류 발생:', error);
-    // 에러 처리 로직 추가 가능
   }
 };
 </script>

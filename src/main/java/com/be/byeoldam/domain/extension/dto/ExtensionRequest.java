@@ -10,4 +10,5 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class ExtensionRequest {
     private String siteUrl;
+    private String title;
 }

@@ -24,14 +24,18 @@ public class ExtensionController {
             summary = "팝업창 초기 데이터 조회",
             description = "사용자의 컬렉션 목록, 페이지 키워드, RSS 구독 여부, 알림 개수, 새로운 피드 존재 여부를 조회합니다.")
     @PostMapping
-    public ResponseTemplate<ExtensionDataResponse> getExtensionData(@UserId long userId, @RequestBody ExtensionRequest request) {
-        String siteUrl = request.getSiteUrl();
-        System.out.println("userId: " + userId + " siteUrl: " + siteUrl);
-
-        if (siteUrl == null || siteUrl.trim().isEmpty()) {
+    public ResponseTemplate<ExtensionDataResponse> getExtensionData(
+            @UserId long userId,
+            @RequestBody ExtensionRequest request
+    ) {
+        if (request.getSiteUrl() == null) {
             return ResponseTemplate.fail("siteUrl 값이 비어있습니다.");
         }
-        return ResponseTemplate.ok(extensionService.getLoadList(userId, siteUrl));
-    }
 
+        if (request.getTitle() == null) {
+            return ResponseTemplate.fail("title 값이 비어있습니다.");
+        }
+
+        return ResponseTemplate.ok(extensionService.getLoadList(userId, request));
+    }
 }

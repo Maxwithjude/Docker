@@ -14,7 +14,7 @@ import java.util.List;
 public class ExtensionDataResponse {
     private List<PersonalCollectionResponse> personalCollections;
     private List<SharedCollectionResponse> sharedCollections;
-    private String keywords;
+    private List<String> keywords;
     private boolean canSubscribeRss;
     private int notificationCnt;
     private boolean hasNewFeed;

@@ -90,7 +90,10 @@ public class UserService {
     @Transactional
     UserRegisterResponse registerUser(UserRegisterRequest registerRequest) {
         User user = registerRequest.toEntity();
-        user.encodePassword(passwordEncoder.encode(user.getPassword()));
+        // 비밀번호 암호화 풀기
+        //user.encodePassword(passwordEncoder.encode(user.getPassword()));
+        user.encodePassword(user.getPassword());
+
         user.updateProfileImage(s3Util.getDefaultProfileImageUrl());
         user = userRepository.save(user);
 

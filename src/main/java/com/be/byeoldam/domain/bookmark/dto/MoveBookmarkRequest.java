@@ -13,5 +13,5 @@ public class MoveBookmarkRequest {
     private Long collectionId;
 
     @JsonProperty("isPersonal")
-    private boolean personal;
+    private boolean isPersonal;
 }

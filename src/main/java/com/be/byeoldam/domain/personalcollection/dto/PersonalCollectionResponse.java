@@ -11,6 +11,7 @@ public class PersonalCollectionResponse {
     private Long collectionId;
     private String name;
 
+
     @JsonProperty("isPersonal")
     private boolean isPersonal;
 

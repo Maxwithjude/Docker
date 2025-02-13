@@ -19,14 +19,10 @@
           <input 
               v-model="newTag" 
               type="text" 
-              placeholder="추천 받고 싶은 키워드를 입력하세요"
+              placeholder="추천 받고 싶은 키워드를 입력하고 엔터를 누르세요"
               class="flex-1 px-4 py-2.5 border rounded-lg text-base"
+              @keyup.enter="addTag(newTag)"
           >
-          <button 
-              @click="addTag(newTag)" 
-              class="px-5 py-2.5 bg-blue-500 text-white rounded-lg hover:bg-blue-600">
-            +
-          </button>
         </div>
   
         <!-- 선택된 태그 목록 -->
@@ -47,7 +43,7 @@
   
           <!-- 완료 버튼 -->
           <router-link :to="{ name: 'main' }">
-            <button class="px-6 py-2.5 bg-blue-500 text-white rounded-lg hover:bg-blue-600">완료</button>
+            <button @click="saveSelectedTags" class="px-6 py-2.5 bg-blue-500 text-white rounded-lg hover:bg-blue-600">완료</button>
           </router-link>
         </div>
       </div>
@@ -58,9 +54,13 @@
 
 <script setup>
 import { ref } from "vue";
-import { RouterLink} from "vue-router";
+import { RouterLink } from "vue-router";
 import { useErrorStore } from "@/stores/error";
+import { useBookmarkStore } from "@/stores/bookmark";
+
 const errorStore = useErrorStore();
+const bookmarkStore = useBookmarkStore();
+
 const recommendedTags = ref([
     "BackEnd", "오징어게임2", "연말정산", "설연휴", 
     "반려동물", "정보처리기사", "미국여행", "양식", "캐나다 워홀"
@@ -78,6 +78,23 @@ const addTag = (tag) => {
 
 const removeTag = (tag) => {
     selectedTags.value = selectedTags.value.filter(t => t !== tag);
+};
+
+const saveSelectedTags = async () => {
+  try {
+    for (const tag of selectedTags.value) {
+      const tagData = {
+        tagName: tag,
+        tagColor: "#0000FF",
+        tagBolder: false
+      };
+      await bookmarkStore.saveUserDefineTags(tagData);
+    }
+    console.log("모든 태그가 성공적으로 저장되었습니다.");
+  } catch (error) {
+    console.error("태그 저장 중 오류 발생:", error);
+    errorStore.setError("태그 저장에 실패했습니다.");
+  }
 };
 </script>
 

@@ -14,7 +14,6 @@ import org.springframework.web.bind.annotation.*;
 @Tag(name = "Extension", description = "Extension API")
 @RestController
 @RequiredArgsConstructor
-@CrossOrigin(origins = "chrome-extension://djiemmdlekojnbiclbgdepjapkoejddm")
 @RequestMapping("/api/popup/load")
 public class ExtensionController {
 

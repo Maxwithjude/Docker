@@ -71,10 +71,9 @@ const createNewCollection = () => {
 
 const deleteCollection = async (collectionId) => {
     try {
-        if (confirm('정말로 이 컬렉션을 삭제하시겠습니까?')) {
-            await collectionStore.deleteCollection(collectionId);
+        await collectionStore.deleteCollection(collectionId);
             // store의 allCollections가 자동으로 업데이트됨
-        }
+        
     } catch (error) {
         console.error('컬렉션 삭제 실패:', error);
     }

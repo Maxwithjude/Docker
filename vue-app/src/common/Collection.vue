@@ -31,6 +31,18 @@
       @close="showPersonalSettings = false"
       @update="handleNameUpdate"
     />
+
+    <!-- 삭제 확인 모달 추가 -->
+    <div v-if="showDeleteConfirm" class="modal-overlay" @click="showDeleteConfirm = false">
+      <div class="modal-content" @click.stop>
+        <h3>컬렉션 삭제</h3>
+        <p>정말로 이 컬렉션을 삭제하시겠습니까?</p>
+        <div class="modal-buttons">
+          <button class="cancel-btn" @click="showDeleteConfirm = false">취소</button>
+          <button class="delete-btn" @click="confirmDelete">삭제</button>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -42,6 +54,7 @@ import PersonalCollectionSettings from '../component/PersonalCollectionSettings.
 
 const showSharedSettings = ref(false);
 const showPersonalSettings = ref(false);
+const showDeleteConfirm = ref(false);
 
 const props = defineProps({
   collection: {
@@ -69,11 +82,12 @@ const handleNameUpdate = (newName) => {
   });
 };
 
-const handleDelete = async () => {
+const handleDelete = () => {
+  showDeleteConfirm.value = true;
+};
+
+const confirmDelete = async () => {
   try {
-    console.log("삭제하려는 컬렉션:", props.collection);
-    console.log("컬렉션 ID:", props.collection.collectionId);
-    
     if (props.collection.isPersonal) {
       await collectionStore.deletePersonalCollection(props.collection.collectionId);
     } else {
@@ -82,6 +96,7 @@ const handleDelete = async () => {
     
     await collectionStore.fetchAllCollection();
     emit('delete', props.collection.collectionId);
+    showDeleteConfirm.value = false;
   } catch (error) {
     console.error('컬렉션 삭제 중 오류 발생:', error);
   }
@@ -165,5 +180,49 @@ const handleDelete = async () => {
 
 .fa-users {
   color: #4CAF50;  /* 공유 컬렉션 아이콘 색상 */
+}
+
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modal-content {
+  background: white;
+  padding: 20px;
+  border-radius: 8px;
+  text-align: center;
+}
+
+.modal-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.cancel-btn {
+  padding: 8px 20px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  background: white;
+  cursor: pointer;
+}
+
+.delete-btn {
+  padding: 8px 20px;
+  border: none;
+  border-radius: 4px;
+  background: #dc3545;
+  color: white;
+  cursor: pointer;
 }
 </style>

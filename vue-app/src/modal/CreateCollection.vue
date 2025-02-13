@@ -64,6 +64,9 @@ const handleCreate = async () => {
         } else {
             await collectionStore.createSharedCollection(collectionName.value);
         }
+
+        // 컬렉션 생성 후 목록 새로고침
+        await collectionStore.fetchAllCollection();
         
         emit('close'); // 성공 시 모달 닫기
     } catch (error) {

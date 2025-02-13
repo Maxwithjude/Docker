@@ -11,11 +11,11 @@
         </div>
         
         <div class="auth-section">
-            <div>
-                <p>{{ usernickname }} 님 환영합니다</p>
+            <div v-if="userStore.user">
+                <p>{{ userStore.user.nickname }} 님 환영합니다</p>
             </div>
             <img 
-                :src="userProfile || defaultProfileImage" 
+                :src="userStore.user?.profile_img || defaultProfileImage" 
                 alt="프로필 사진" 
                 class="profile-image"
             />
@@ -24,14 +24,23 @@
 </template>
 
 <script setup>
-import { ref } from 'vue';
+import { ref, onMounted } from 'vue';
 import { useUserStore } from '@/stores/user';
 
-
 const userStore = useUserStore();
-const usernickname = ref(userStore.user?.nickname || '');
 const defaultProfileImage = 'https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png';
-const userProfile = ref(null);
+
+// 컴포넌트 마운트 시 사용자 정보 확인
+onMounted(async () => {
+    if (!userStore.user) {
+        try {
+            // 사용자 정보 새로고침
+            await userStore.refreshUserInfo();
+        } catch (error) {
+            console.error('사용자 정보 로드 실패:', error);
+        }
+    }
+});
 </script>
 
 <style scoped>

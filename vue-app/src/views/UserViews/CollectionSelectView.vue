@@ -24,7 +24,7 @@
           type="text"
           v-model="customCollection"
           class="collection-input"
-          placeholder="생성할 컬렉션명을 입력하고 엔터를 누르세요."
+          placeholder="위 예시에 없는 나만의 컬렉션명을 입력해보세요 (엔터로 추가)"
           @keyup.enter="addCustomCollection"
         />
     
@@ -34,56 +34,90 @@
             <button @click="removeCollection(collection)">x</button>
           </span>
         </div>
-        <RouterLink :to="{name: 'tagSelect'}"><button class="next-button">
-          다음</button></RouterLink>
+        <button @click="handleNext" class="next-button">다음</button>
       </div>
     </div>  
   </template>
   
   <script setup>
   import { ref } from "vue";
-import { RouterLink } from "vue-router";
-  // 폴더 리스트
-  const folders = ref([
-    { name: "바로가기" },
-    { name: "쇼핑" },
-    { name: "영화" },
-    { name: "음악" },
-    { name: "콘텐츠" },
-    { name: "광고" },
-    { name: "스터디" },
-    { name: "맛집" },
-    { name: "IT" },
-    { name: "사진" },
-  ]);
-  
-  // 선택된 폴더들
-  const selectedFolders = ref([]);
-  
-  // 직접 입력한 컬렉션
-  const customCollection = ref("");
-  
-  // 폴더 선택 토글
-  const toggleFolder = (name) => {
-    if (selectedFolders.value.includes(name)) {
-      selectedFolders.value = selectedFolders.value.filter((item) => item !== name);
-    } else {
-      selectedFolders.value.push(name);
-    }
-  };
-  
-  // 직접 입력한 컬렉션 추가
-  const addCustomCollection = () => {
-    if (customCollection.value && !selectedFolders.value.includes(customCollection.value)) {
+import { RouterLink, useRouter } from "vue-router";
+import { useCollectionStore } from "@/stores/collection";
+
+const router = useRouter();
+const collectionStore = useCollectionStore();
+
+// 폴더 리스트
+const folders = ref([
+  { name: "즐겨찾기" },      // 가장 자주 방문하는 사이트
+  { name: "읽을거리" },      // 뉴스, 블로그, 아티클
+  { name: "학습" },         // 강의, 튜토리얼, 교육자료
+  { name: "업무" },         // 업무 관련 사이트, 도구
+  { name: "쇼핑" },         // 쇼핑몰, 상품 정보
+  { name: "엔터테인먼트" },  // 영화, 음악, 게임
+  { name: "여행" },         // 여행 정보, 맛집, 숙소
+  { name: "금융" },         // 은행, 투자, 금융 정보
+  { name: "건강" },         // 운동, 의료, 건강 정보
+  { name: "레시피" },       // 요리, 음식 관련
+]);
+
+// 선택된 폴더들
+const selectedFolders = ref([]);
+
+// 직접 입력한 컬렉션
+const customCollection = ref("");
+
+// 폴더 선택 토글
+const toggleFolder = (name) => {
+  if (selectedFolders.value.includes(name)) {
+    selectedFolders.value = selectedFolders.value.filter((item) => item !== name);
+  } else {
+    selectedFolders.value.push(name);
+  }
+};
+
+// 직접 입력한 컬렉션 추가
+const addCustomCollection = async () => {
+  if (customCollection.value && !selectedFolders.value.includes(customCollection.value)) {
+    try {
+      await collectionStore.createPersonalCollection(customCollection.value);
       selectedFolders.value.push(customCollection.value);
       customCollection.value = "";
+    } catch (error) {
+      alert('컬렉션 생성에 실패했습니다: ' + error.message);
     }
-  };
-  
-  // 컬렉션 제거
-  const removeCollection = (name) => {
+  }
+};
+
+// 컬렉션 제거
+const removeCollection = async (name) => {
+  try {
+    // 실제 컬렉션 삭제는 아직 하지 않고, 선택 목록에서만 제거
     selectedFolders.value = selectedFolders.value.filter((item) => item !== name);
-  };
+  } catch (error) {
+    alert('컬렉션 제거에 실패했습니다: ' + error.message);
+  }
+};
+
+// 다음 버튼 클릭 시
+const handleNext = async () => {
+  if (selectedFolders.value.length === 0) {
+    alert('최소 한 개 이상의 컬렉션을 선택해주세요.');
+    return;
+  }
+  
+  try {
+    // 선택된 모든 컬렉션 생성
+    for (const folderName of selectedFolders.value) {
+      if (!customCollection.value.includes(folderName)) {
+        await collectionStore.createPersonalCollection(folderName);
+      }
+    }
+    router.push({ name: 'tagSelect' });
+  } catch (error) {
+    alert('컬렉션 생성에 실패했습니다: ' + error.message);
+  }
+};
   </script>
   
   <style scoped>

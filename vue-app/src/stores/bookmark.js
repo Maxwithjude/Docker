@@ -194,42 +194,42 @@ export const useBookmarkStore = defineStore("bookmark", () => {
     };
 
     //중요 북마크 예시 response
-    const exampleImportantBookmarks = ref(
-        {
-          "success":true,
-          "message":"some message",
-          "results": [
+    // const exampleImportantBookmarks = ref(
+    //     {
+    //       "success":true,
+    //       "message":"some message",
+    //       "results": [
 
-            {
-              "bookmark_id" : 1,
-              "url" : "https://naver.com",
-              "img" : "https://edu.ssafy.com/image.jpg",
-              "title" : "네이버 메인 페이지",
-              "description" : "네이버는 다양한 정보를 ...",
-              "priority" : true,
-              "created_at" : "2024-01-01",
-              "updated_at" : "2024-01-02",
-              "tag" : ["서핑", "웹"],
-              "isPersonal" : true
-            }, 
-            {
-              "bookmark_id" : 2,
-              "url" : "https://edu.ssafy.com",
-              "img" : "https://edu.ssafy.com/image.jpg",
-              "title" : "싸피 메인 페이지",
-              "description" : "대한민국 청년 삼성 ...",
-              "priority" : true,
-              "created_at" : "2024-01-01",
-              "updated_at" : "2024-01-02",
-              "tag" : ["싸피", "IT"],
-              "isPersonal" : false
-            }
-          ]
-        }
-      );
+    //         {
+    //           "bookmark_id" : 1,
+    //           "url" : "https://naver.com",
+    //           "img" : "https://edu.ssafy.com/image.jpg",
+    //           "title" : "네이버 메인 페이지",
+    //           "description" : "네이버는 다양한 정보를 ...",
+    //           "priority" : true,
+    //           "created_at" : "2024-01-01",
+    //           "updated_at" : "2024-01-02",
+    //           "tag" : ["서핑", "웹"],
+    //           "isPersonal" : true
+    //         }, 
+    //         {
+    //           "bookmark_id" : 2,
+    //           "url" : "https://edu.ssafy.com",
+    //           "img" : "https://edu.ssafy.com/image.jpg",
+    //           "title" : "싸피 메인 페이지",
+    //           "description" : "대한민국 청년 삼성 ...",
+    //           "priority" : true,
+    //           "created_at" : "2024-01-01",
+    //           "updated_at" : "2024-01-02",
+    //           "tag" : ["싸피", "IT"],
+    //           "isPersonal" : false
+    //         }
+    //       ]
+    //     }
+    //   );
       ///////////////////////////////////////////////////////////////////////////////////////////////
       //사용자 정의 태그 실제 response
-      const userDefineTags = ref({});
+      const userDefineTags = ref([]);
 
 
 
@@ -251,25 +251,25 @@ export const useBookmarkStore = defineStore("bookmark", () => {
       };
 
       //사용자 정의 태그 예시 response
-        const exampleUserDefineTags = ref({
-            "success":true,
-            "message":"some message",
-            "results": {
+        // const exampleUserDefineTags = ref({
+        //     "success":true,
+        //     "message":"some message",
+        //     "results": {
 
-                "tagList": [
-                    "서핑",
-                    "웹",
-                    "싸피",
-                    "IT",
-                    "프로그래밍",
-                    "교육",
-                    "Python",
-                    "FastAPI",
-                    "Spring",
-                    "Java"
-                ]
-            }
-        })
+        //         "tagList": [
+        //             "서핑",
+        //             "웹",
+        //             "싸피",
+        //             "IT",
+        //             "프로그래밍",
+        //             "교육",
+        //             "Python",
+        //             "FastAPI",
+        //             "Spring",
+        //             "Java"
+        //         ]
+        //     }
+        // })
       
       //추천 태그 기반 북마크 실제 response
       const recommendedBookmarks = ref({});
@@ -289,27 +289,27 @@ export const useBookmarkStore = defineStore("bookmark", () => {
 
 
       //추천 북마크 예시 response
-      const exampleRecommendedBookmarks = ref({
-        "success":true,
-        "message":"some message",
-        "result": {
+      // const exampleRecommendedBookmarks = ref({
+      //   "success":true,
+      //   "message":"some message",
+      //   "result": {
 
-          "recommendedUrlList": [
-            {
-              "url": "https://example.com/some-page-1",
-              "title": "추천 페이지 제목 1",
-              "description": "추천 페이지 설명 1",
-              "img": "https://example.com/image1.jpg"
-            },
-            {
-              "url": "https://example.com/some-page-2",
-              "title": "추천 페이지 제목 2",
-              "description": "추천 페이지 설명 2",
-              "img": "https://example.com/image2.jpg"
-            }
-          ]
-        }
-      })
+      //     "recommendedUrlList": [
+      //       {
+      //         "url": "https://example.com/some-page-1",
+      //         "title": "추천 페이지 제목 1",
+      //         "description": "추천 페이지 설명 1",
+      //         "img": "https://example.com/image1.jpg"
+      //       },
+      //       {
+      //         "url": "https://example.com/some-page-2",
+      //         "title": "추천 페이지 제목 2",
+      //         "description": "추천 페이지 설명 2",
+      //         "img": "https://example.com/image2.jpg"
+      //       }
+      //     ]
+      //   }
+      // })
       ///////////////////////////////////////////////////////////////////////////////////////////////
       //개인 컬렉션 별 북마크 실제 response
       const personalCollectionBookmarks = ref({});
@@ -323,42 +323,42 @@ export const useBookmarkStore = defineStore("bookmark", () => {
 
 
       //개인 컬렉션 별 북마크 예시 response
-      const examplePersonalCollectionBookmarks = ref(
-        {
-          "success":true,
-          "message":"some message",
-          "results": {
+      // const examplePersonalCollectionBookmarks = ref(
+      //   {
+      //     "success":true,
+      //     "message":"some message",
+      //     "results": {
 
-            "name" : "개발",
-            "bookmarks" : [
-              {
-                "bookmark_id" : 1,
-                "url" : "https://naver.com",
-                "img" : "https://naver.com/image.jpg",
-                "title" : "네이버 메인 - 검색, 뉴스, 쇼핑",
-                "description" : "네이버는 다양한 정보를 ...",
-                "priority" : true,
-                "created_at" : "2024-01-01",
-                "updated_at" : "2024-01-02",
-                "tag" : ["서핑", "웹"],
-                "isPersonal" : true
-              }, 
-              {
-                "bookmark_id" : 2,
-                "url" : "https://edu.ssafy.com",
-                "img" : "https://edu.ssafy.com/image.jpg",
-                "title" : "싸피 메인 페이지",
-                "description" : "대한민국 청년 삼성 ...",
-                "priority" : true,
-                "created_at" : "2024-01-01",
-                "updated_at" : "2024-01-02",
-                "tag" : ["싸피", "IT"],
-                "isPersonal" : true
-              },
-            ]
-          }
-        }
-      )
+      //       "name" : "개발",
+      //       "bookmarks" : [
+      //         {
+      //           "bookmark_id" : 1,
+      //           "url" : "https://naver.com",
+      //           "img" : "https://naver.com/image.jpg",
+      //           "title" : "네이버 메인 - 검색, 뉴스, 쇼핑",
+      //           "description" : "네이버는 다양한 정보를 ...",
+      //           "priority" : true,
+      //           "created_at" : "2024-01-01",
+      //           "updated_at" : "2024-01-02",
+      //           "tag" : ["서핑", "웹"],
+      //           "isPersonal" : true
+      //         }, 
+      //         {
+      //           "bookmark_id" : 2,
+      //           "url" : "https://edu.ssafy.com",
+      //           "img" : "https://edu.ssafy.com/image.jpg",
+      //           "title" : "싸피 메인 페이지",
+      //           "description" : "대한민국 청년 삼성 ...",
+      //           "priority" : true,
+      //           "created_at" : "2024-01-01",
+      //           "updated_at" : "2024-01-02",
+      //           "tag" : ["싸피", "IT"],
+      //           "isPersonal" : true
+      //         },
+      //       ]
+      //     }
+      //   }
+      // )
       ///////////////////////////////////////////////////////////////////////////////////////////////
       //공유 컬렉션 별 북마크 실제 response
       const sharedCollectionBookmarks = ref({});
@@ -371,58 +371,58 @@ export const useBookmarkStore = defineStore("bookmark", () => {
       };
 
       //공유 컬렉션 별 북마크 예시 response
-      const exampleSharedCollectionBookmarks = ref(
-        {
-          "success":true,
-          "message":"some message",
-          "results": {
-            "collection_id" : 1,
-            "name" : "일본여행",
-            "created_at" : "2024-01-01",
-            "updated_at" : "2024-01-02",
-            "users" : [
-              {
-                "user_id": 1,
-                "email": "example@naver.com",
-                "nickname": "사용자1",
-                "user_profile_url" : "www.example.com"
-              },
-              {
-                "user_id": 2,
-                "email": "example222@naver.com",
-                "nickname": "사용자2",
-                "user_profile_url" : "www.example.com"
-              },
-            ],
-            "bookmarks" : [
-              {   
-                "bookmark_id" : 1,
-                "url" : "https://naver.com",
-                "priority" : true,
-                "created_at" : "2024-01-01",
-                "updated_at" : "2024-01-02",
-                "tag" : ["서핑", "웹"],
-                "isPersonal" : false,
-                "img" : "https://naver.com/image.jpg",
-                "title" : "네이버 메인 - 검색, 뉴스, 쇼핑",
-                "description" : "네이버는 다양한 정보를 ...",
-              }, 
-              {
-                "bookmark_id" : 2,
-                "url" : "https://edu.ssafy.com",
-                "priority" : true,
-                "created_at" : "2024-01-01",
-                "updated_at" : "2024-01-02",
-                "tag" : ["웹", "IT"],
-                "isPersonal" : false,
-                "img" : "https://edu.ssafy.com/image.jpg",
-                "title" : "싸피 메인 페이지",
-                "description" : "대한민국 청년 삼성 ...",
-              },
-            ]
-          }
-        }
-      )
+      // const exampleSharedCollectionBookmarks = ref(
+      //   {
+      //     "success":true,
+      //     "message":"some message",
+      //     "results": {
+      //       "collection_id" : 1,
+      //       "name" : "일본여행",
+      //       "created_at" : "2024-01-01",
+      //       "updated_at" : "2024-01-02",
+      //       "users" : [
+      //         {
+      //           "user_id": 1,
+      //           "email": "example@naver.com",
+      //           "nickname": "사용자1",
+      //           "user_profile_url" : "www.example.com"
+      //         },
+      //         {
+      //           "user_id": 2,
+      //           "email": "example222@naver.com",
+      //           "nickname": "사용자2",
+      //           "user_profile_url" : "www.example.com"
+      //         },
+      //       ],
+      //       "bookmarks" : [
+      //         {   
+      //           "bookmark_id" : 1,
+      //           "url" : "https://naver.com",
+      //           "priority" : true,
+      //           "created_at" : "2024-01-01",
+      //           "updated_at" : "2024-01-02",
+      //           "tag" : ["서핑", "웹"],
+      //           "isPersonal" : false,
+      //           "img" : "https://naver.com/image.jpg",
+      //           "title" : "네이버 메인 - 검색, 뉴스, 쇼핑",
+      //           "description" : "네이버는 다양한 정보를 ...",
+      //         }, 
+      //         {
+      //           "bookmark_id" : 2,
+      //           "url" : "https://edu.ssafy.com",
+      //           "priority" : true,
+      //           "created_at" : "2024-01-01",
+      //           "updated_at" : "2024-01-02",
+      //           "tag" : ["웹", "IT"],
+      //           "isPersonal" : false,
+      //           "img" : "https://edu.ssafy.com/image.jpg",
+      //           "title" : "싸피 메인 페이지",
+      //           "description" : "대한민국 청년 삼성 ...",
+      //         },
+      //       ]
+      //     }
+      //   }
+      // )
       ///////////////////////////////////////////////////////////////////////////////////////////////
       //태그 기반 검색 실제 response
       const searchBookmarksByTag = ref({});
@@ -436,124 +436,124 @@ export const useBookmarkStore = defineStore("bookmark", () => {
 
 
       //태그 기반 검색 예시 response
-      const exampleSearchedBookmarksByTag = ref({
-        "success": true,
-        "message": "태그 기반 검색 성공",
-        "result": {
-            "userBookmarkList": [
-                {
-                    "bookmark_id": 1,
-                    "url": "https://naver.com",
-                    "img": "https://naver.com/image.jpg",
-                    "title": "네이버 메인 - 검색, 뉴스, 쇼핑",
-                    "description": "네이버는 다양한 정보를 ...",
-                    "priority": true,
-                    "created_at": "2024-01-01",
-                    "updated_at": "2024-01-02",
-                    "tag": ["서핑", "웹"],
-                    "isPersonal": true
-                },
-                {
-                    "bookmark_id": 2,
-                    "url": "https://edu.ssafy.com",
-                    "img": "https://edu.ssafy.com/image.jpg",
-                    "title": "싸피 메인 페이지",
-                    "description": "대한민국 청년 삼성 ...",
-                    "priority": true,
-                    "created_at": "2024-01-01",
-                    "updated_at": "2024-01-02",
-                    "tag": ["싸피", "IT"],
-                    "isPersonal": true
-                },
-                {
-                    "bookmark_id": 3,
-                    "url": "https://example.com/some-page-3",
-                    "img": "https://example.com/image3.jpg",
-                    "title": "제목 3",
-                    "description": "설명 3",
-                    "priority": true,
-                    "created_at": "2024-01-01",
-                    "updated_at": "2024-01-02",
-                    "tag": ["싸피", "IT"],
-                    "isPersonal": true
-                },
-                {
-                    "bookmark_id": 4,
-                    "url": "https://example.com/some-page-4",
-                    "img": "https://example.com/image4.jpg",
-                    "title": "제목 4",
-                    "description": "설명 4",
-                    "priority": true,
-                    "created_at": "2024-01-01",
-                    "updated_at": "2024-01-02",
-                    "tag": ["싸피", "IT"],
-                    "isPersonal": true
-                },
-                {
-                    "bookmark_id": 5,
-                    "url": "https://example.com/some-page-5",
-                    "img": "https://example.com/image5.jpg",
-                    "title": "제목 5",
-                    "description": "설명 5",
-                    "priority": true,
-                    "created_at": "2024-01-01",
-                    "updated_at": "2024-01-02",
-                    "tag": ["싸피", "IT"],
-                    "isPersonal": true
-                },
-                {
-                    "bookmark_id": 6,
-                    "url": "https://example.com/some-page-6",
-                    "img": "https://example.com/image6.jpg",
-                    "title": "제목 6",
-                    "description": "설명 6",
-                    "priority": true,
-                    "created_at": "2024-01-01",
-                    "updated_at": "2024-01-02",
-                    "tag": ["싸피", "IT"],
-                    "isPersonal": true
-                }
-            ],
-            "recommendedBookmarkList": [
-                {
-                    "url": "https://example.com/some-page-1",
-                    "title": "제목 1",
-                    "description": "설명 1",
-                    "img": "https://example.com/image1.jpg"
-                },
-                {
-                    "url": "https://example.com/some-page-2",
-                    "title": "제목 2",
-                    "description": "설명 2",
-                    "img": "https://example.com/image2.jpg"
-                },
-                {
-                    "url": "https://example.com/some-page-3",
-                    "title": "제목 3",
-                    "description": "설명 3",
-                    "img": "https://example.com/image3.jpg"
-                },
-                {
-                    "url": "https://example.com/some-page-4",
-                    "title": "제목 4",
-                    "description": "설명 4",
-                    "img": "https://example.com/image4.jpg"
-                },
-                {
-                    "url": "https://example.com/some-page-5",
-                    "title": "제목 5",
-                    "description": "설명 5",
-                    "img": "https://example.com/image5.jpg"
-                },
-                {
-                    "url": "https://example.com/some-page-6",
-                    "title": "제목 6",
-                    "description": "설명 6",
-                    "img": "https://example.com/image6.jpg"
-                }
-            ]
-        }
-    });
+    //   const exampleSearchedBookmarksByTag = ref({
+    //     "success": true,
+    //     "message": "태그 기반 검색 성공",
+    //     "result": {
+    //         "userBookmarkList": [
+    //             {
+    //                 "bookmark_id": 1,
+    //                 "url": "https://naver.com",
+    //                 "img": "https://naver.com/image.jpg",
+    //                 "title": "네이버 메인 - 검색, 뉴스, 쇼핑",
+    //                 "description": "네이버는 다양한 정보를 ...",
+    //                 "priority": true,
+    //                 "created_at": "2024-01-01",
+    //                 "updated_at": "2024-01-02",
+    //                 "tag": ["서핑", "웹"],
+    //                 "isPersonal": true
+    //             },
+    //             {
+    //                 "bookmark_id": 2,
+    //                 "url": "https://edu.ssafy.com",
+    //                 "img": "https://edu.ssafy.com/image.jpg",
+    //                 "title": "싸피 메인 페이지",
+    //                 "description": "대한민국 청년 삼성 ...",
+    //                 "priority": true,
+    //                 "created_at": "2024-01-01",
+    //                 "updated_at": "2024-01-02",
+    //                 "tag": ["싸피", "IT"],
+    //                 "isPersonal": true
+    //             },
+    //             {
+    //                 "bookmark_id": 3,
+    //                 "url": "https://example.com/some-page-3",
+    //                 "img": "https://example.com/image3.jpg",
+    //                 "title": "제목 3",
+    //                 "description": "설명 3",
+    //                 "priority": true,
+    //                 "created_at": "2024-01-01",
+    //                 "updated_at": "2024-01-02",
+    //                 "tag": ["싸피", "IT"],
+    //                 "isPersonal": true
+    //             },
+    //             {
+    //                 "bookmark_id": 4,
+    //                 "url": "https://example.com/some-page-4",
+    //                 "img": "https://example.com/image4.jpg",
+    //                 "title": "제목 4",
+    //                 "description": "설명 4",
+    //                 "priority": true,
+    //                 "created_at": "2024-01-01",
+    //                 "updated_at": "2024-01-02",
+    //                 "tag": ["싸피", "IT"],
+    //                 "isPersonal": true
+    //             },
+    //             {
+    //                 "bookmark_id": 5,
+    //                 "url": "https://example.com/some-page-5",
+    //                 "img": "https://example.com/image5.jpg",
+    //                 "title": "제목 5",
+    //                 "description": "설명 5",
+    //                 "priority": true,
+    //                 "created_at": "2024-01-01",
+    //                 "updated_at": "2024-01-02",
+    //                 "tag": ["싸피", "IT"],
+    //                 "isPersonal": true
+    //             },
+    //             {
+    //                 "bookmark_id": 6,
+    //                 "url": "https://example.com/some-page-6",
+    //                 "img": "https://example.com/image6.jpg",
+    //                 "title": "제목 6",
+    //                 "description": "설명 6",
+    //                 "priority": true,
+    //                 "created_at": "2024-01-01",
+    //                 "updated_at": "2024-01-02",
+    //                 "tag": ["싸피", "IT"],
+    //                 "isPersonal": true
+    //             }
+    //         ],
+    //         "recommendedBookmarkList": [
+    //             {
+    //                 "url": "https://example.com/some-page-1",
+    //                 "title": "제목 1",
+    //                 "description": "설명 1",
+    //                 "img": "https://example.com/image1.jpg"
+    //             },
+    //             {
+    //                 "url": "https://example.com/some-page-2",
+    //                 "title": "제목 2",
+    //                 "description": "설명 2",
+    //                 "img": "https://example.com/image2.jpg"
+    //             },
+    //             {
+    //                 "url": "https://example.com/some-page-3",
+    //                 "title": "제목 3",
+    //                 "description": "설명 3",
+    //                 "img": "https://example.com/image3.jpg"
+    //             },
+    //             {
+    //                 "url": "https://example.com/some-page-4",
+    //                 "title": "제목 4",
+    //                 "description": "설명 4",
+    //                 "img": "https://example.com/image4.jpg"
+    //             },
+    //             {
+    //                 "url": "https://example.com/some-page-5",
+    //                 "title": "제목 5",
+    //                 "description": "설명 5",
+    //                 "img": "https://example.com/image5.jpg"
+    //             },
+    //             {
+    //                 "url": "https://example.com/some-page-6",
+    //                 "title": "제목 6",
+    //                 "description": "설명 6",
+    //                 "img": "https://example.com/image6.jpg"
+    //             }
+    //         ]
+    //     }
+    // });
     ///////////////////////////////////////////////////////////////////////////////////////////////
     //오래된 북마크 실제 response
     const oldBookmarks = ref({});
@@ -566,38 +566,38 @@ export const useBookmarkStore = defineStore("bookmark", () => {
     };  
 
     //오래된 북마크 예시 response
-    const exampleOldBookmarks = ref(
-        {
-          "success":true,
-          "message":"some message",
-          "results": [
-            {
-              "bookmark_id" : 1,
-              "url" : "https://naver.com",
-              "img" : "https://edu.ssafy.com/image.jpg",
-              "title" : "네이버 메인 페이지",
-              "description" : "네이버는 다양한 정보를 ...",
-              "priority" : true,
-              "created_at" : "2024-01-01",
-              "updated_at" : "2024-01-02",
-              "tag" : ["서핑", "웹"],
-              "isPersonal" : true
-            }, 
-            {
-              "bookmark_id" : 2,
-              "url" : "https://edu.ssafy.com",
-              "img" : "https://edu.ssafy.com/image.jpg",
-              "title" : "싸피 메인 페이지",
-              "description" : "대한민국 청년 삼성 ...",
-              "priority" : true,
-              "created_at" : "2024-01-01",
-              "updated_at" : "2024-01-02",
-              "tag" : ["싸피", "IT"],
-              "isPersonal" : false
-            }
-          ]
-        }
-      );
+    // const exampleOldBookmarks = ref(
+    //     {
+    //       "success":true,
+    //       "message":"some message",
+    //       "results": [
+    //         {
+    //           "bookmark_id" : 1,
+    //           "url" : "https://naver.com",
+    //           "img" : "https://edu.ssafy.com/image.jpg",
+    //           "title" : "네이버 메인 페이지",
+    //           "description" : "네이버는 다양한 정보를 ...",
+    //           "priority" : true,
+    //           "created_at" : "2024-01-01",
+    //           "updated_at" : "2024-01-02",
+    //           "tag" : ["서핑", "웹"],
+    //           "isPersonal" : true
+    //         }, 
+    //         {
+    //           "bookmark_id" : 2,
+    //           "url" : "https://edu.ssafy.com",
+    //           "img" : "https://edu.ssafy.com/image.jpg",
+    //           "title" : "싸피 메인 페이지",
+    //           "description" : "대한민국 청년 삼성 ...",
+    //           "priority" : true,
+    //           "created_at" : "2024-01-01",
+    //           "updated_at" : "2024-01-02",
+    //           "tag" : ["싸피", "IT"],
+    //           "isPersonal" : false
+    //         }
+    //       ]
+    //     }
+    //   );
     ///////////////////////////////////////////////////////////////////////////////////////////////
     // 북마크 상세 페이지에서 메모 조회
 
@@ -618,21 +618,13 @@ export const useBookmarkStore = defineStore("bookmark", () => {
         getSearchBookmarksByTag,
         getOldBookmarks,
         saveBookmark,
-        exampleImportantBookmarks,
         importantBookmarks,
-        exampleUserDefineTags,
         userDefineTags,
-        exampleRecommendedBookmarks,
         recommendedBookmarks,
-        examplePersonalCollectionBookmarks,
         personalCollectionBookmarks,
-        exampleSharedCollectionBookmarks,
         sharedCollectionBookmarks,
-        exampleSearchedBookmarksByTag,
         searchBookmarksByTag,
-        exampleOldBookmarks,
         oldBookmarks,
-        // exampleBookmarkMemo,
         bookmarkMemo
     };
 });

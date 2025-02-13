@@ -10,7 +10,7 @@
           <span v-for="tag in recommendedTags" :key="tag"
                 class="px-3 py-1.5 text-sm rounded-lg bg-gray-200 cursor-pointer hover:bg-gray-300"
                 @click="addTag(tag)">
-            # {{ tag }}
+            # {{ tag.tagName }}
           </span>
         </div>
   
@@ -19,14 +19,15 @@
           <input 
               v-model="newTag" 
               type="text" 
-              placeholder="추천 받고 싶은 키워드를 입력하세요"
-              class="flex-1 px-4 py-2.5 border rounded-lg text-base"
+              placeholder="나만의 관심 태그를 입력하고 엔터를 눌러주세요"
+              class="flex-1 px-4 py-2.5 border rounded-lg text-base text-center"
+              @keyup.enter="addTag(newTag)"
           >
-          <button 
+          <!-- <button 
               @click="addTag(newTag)" 
               class="px-5 py-2.5 bg-blue-500 text-white rounded-lg hover:bg-blue-600">
-            +
-          </button>
+            추가
+          </button> -->
         </div>
   
         <!-- 선택된 태그 목록 -->
@@ -34,7 +35,7 @@
           <span v-for="(tag, index) in selectedTags" 
                 :key="index"
                 class="px-3 py-1.5 text-sm rounded-lg bg-blue-500 text-white flex items-center gap-2">
-            # {{ tag }}
+            # {{ tag.tagName }}
             <button @click="removeTag(tag)" class="text-white text-xs font-bold">✕</button>
           </span>
         </div>
@@ -47,7 +48,12 @@
   
           <!-- 완료 버튼 -->
           <router-link :to="{ name: 'main' }">
-            <button class="px-6 py-2.5 bg-blue-500 text-white rounded-lg hover:bg-blue-600">완료</button>
+            <button 
+              @click="saveSelectedTags"
+              class="px-6 py-2.5 bg-blue-500 text-white rounded-lg hover:bg-blue-600"
+            >
+              완료
+            </button>
           </router-link>
         </div>
       </div>
@@ -57,27 +63,69 @@
   
 
 <script setup>
-import { ref } from "vue";
-import { RouterLink} from "vue-router";
-import { useErrorStore } from "@/stores/error";
-const errorStore = useErrorStore();
-const recommendedTags = ref([
-    "BackEnd", "오징어게임2", "연말정산", "설연휴", 
-    "반려동물", "정보처리기사", "미국여행", "양식", "캐나다 워홀"
-]);
+import { ref, onMounted } from "vue";
+import { RouterLink, useRouter } from "vue-router";
+import { useCollectionStore } from "@/stores/collection";
+import { useBookmarkStore } from "@/stores/bookmark";
 
+const router = useRouter();
+const collectionStore = useCollectionStore();
+const bookmarkStore = useBookmarkStore();
+
+const recommendedTags = ref([]);
 const selectedTags = ref([]);
 const newTag = ref("");
 
-const addTag = (tag) => {
-    if (tag && !selectedTags.value.includes(tag)) {
-        selectedTags.value.push(tag);
-        newTag.value = "";
+// 컴포넌트 마운트 시 추천 태그 로드
+onMounted(async () => {
+    try {
+        await collectionStore.getTop10Tags();
+        const tagList = collectionStore.top10Tags.results.tagList;
+        recommendedTags.value = tagList.map(tagName => ({
+            tagName: tagName
+        }));
+    } catch (error) {
+        alert('추천 태그를 불러오는데 실패했습니다.');
     }
+});
+
+const addTag = (tag) => {
+    if (typeof tag === 'object' && tag.tagName) {
+        if (!selectedTags.value.some(t => t.tagName === tag.tagName)) {
+            selectedTags.value.push(tag);
+        }
+    } else if (typeof tag === 'string' && tag.trim()) {
+        const newTagObj = {
+            tagName: tag.trim()
+        };
+        if (!selectedTags.value.some(t => t.tagName === newTagObj.tagName)) {
+            selectedTags.value.push(newTagObj);
+        }
+    }
+    newTag.value = "";
 };
 
 const removeTag = (tag) => {
-    selectedTags.value = selectedTags.value.filter(t => t !== tag);
+    selectedTags.value = selectedTags.value.filter(t => t.tagName !== tag.tagName);
+};
+
+// 완료 버튼 클릭 시 선택된 태그 저장
+const saveSelectedTags = async () => {
+    try {
+        if (selectedTags.value.length === 0) {
+            alert('최소 한 개 이상의 태그를 선택해주세요.');
+            return;
+        }
+        
+        // 태그 목록만 추출하여 전송
+        const tagList = selectedTags.value.map(tag => tag.tagName);
+        await collectionStore.addTag(tagList);
+        
+        // 태그 저장 후 메인 페이지로 이동
+        router.push({ name: 'main' });
+    } catch (error) {
+        alert('태그 저장에 실패했습니다: ' + error.message);
+    }
 };
 </script>
 

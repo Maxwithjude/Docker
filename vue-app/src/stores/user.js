@@ -189,6 +189,22 @@ const getMyPage = async () => {
     }
   };
 
+  // 사용자 정보 새로고침 함수 추가
+  const refreshUserInfo = async () => {
+    try {
+        const response = await api.get('/users/me');
+        if (response.data.success) {
+            user.value = response.data.results;
+        }
+    } catch (error) {
+        console.error('사용자 정보 조회 실패:', error);
+        throw error;
+    }
+  };
+
+  ///////////////////////////////////////////////////////////////////////////////////
+
+
   return {
     user,
     // payload,
@@ -201,6 +217,7 @@ const getMyPage = async () => {
     signup,
     // userId,
     checkCode,
+    refreshUserInfo,  // 새로 추가한 함수 반환
 //     getMyPage,
 //     withdrawalOfMembership,
 //     putMyPage,

@@ -191,14 +191,20 @@ export const useCollectionStore = defineStore("collection", () => {
   //개인컬렉션 삭제
   const deletePersonalCollection = async (collectionId) => {
     try {
-      const response = await api.delete(`/collections/personal/${collectionId}`)
-      console.log('개인컬렉션 삭제 성공:')
+        console.log("삭제할 컬렉션 ID:", collectionId); // 디버깅용 로그 추가
+        if (!collectionId) {
+            throw new Error("컬렉션 ID가 유효하지 않습니다.");
+        }
+        const response = await api.delete(`/collections/personal/${collectionId}`);
+        console.log('개인컬렉션 삭제 성공:');
+        
+        // 삭제 후 컬렉션 목록 갱신
+        await fetchAllCollection();
     } catch (error) {
-      console.error('개인컬렉션 삭제 중 오류 발생:', error)
-      throw error
+        console.error('개인컬렉션 삭제 중 오류 발생:', error);
+        throw error;
     }
-
-  }
+  };
   //공유컬렉션 삭제
   const deleteSharedCollection = async (collectionId) => {
     try { 

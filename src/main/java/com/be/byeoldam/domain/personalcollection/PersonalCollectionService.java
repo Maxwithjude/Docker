@@ -28,7 +28,6 @@ import java.util.List;
 public class PersonalCollectionService {
 
     private final UserRepository userRepository;
-
     private final PersonalCollectionRepository personalCollectionRepository;
     private final BookmarkRepository bookmarkRepository;
     private final BookmarkTagRepository bookmarkTagRepository;

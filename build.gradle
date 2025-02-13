@@ -39,6 +39,9 @@ dependencies {
 
     // ChatGPT API
     implementation 'org.springframework.ai:spring-ai-openai-spring-boot-starter:0.8.1'
+    // valid
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
+
 
     // ⭐ Spring boot 3.x이상에서 QueryDsl 패키지를 정의하는 방법
     implementation 'com.querydsl:querydsl-jpa:5.0.0:jakarta'

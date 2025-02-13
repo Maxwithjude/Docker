@@ -1,5 +1,6 @@
 package com.be.byeoldam.domain.bookmark.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -14,6 +15,8 @@ public class CreateBookmarkRequest {
     private String url;
     private Long collectionId;
     private List<TagDto> tags;
+
+    @JsonProperty("isPersonal")
     private boolean personal;
     private int readingTime;
 }

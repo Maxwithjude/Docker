@@ -92,7 +92,7 @@ services:
       dockerfile: Dockerfile.prod
     container_name: frontend
     env_file:
-      - frontend/.env.prod
+      - frontend/vue-app/.env.prod
     depends_on:
       - backend
     ports:

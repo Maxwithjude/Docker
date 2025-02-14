@@ -1,0 +1,129 @@
+
+
+services:
+
+  nginx_proxy:
+    image: jc21/nginx-proxy-manager:latest
+    container_name:  nginx_proxy_manager
+    ports:
+    - "80:80"
+    - "443:443"
+    - "8090:81"
+    environment:
+      DB_SQLITE_FILE: "/data/database.sqlite"
+    volumes:
+      - npm_data:/data
+      - ./letsencrypt:/etc/letsencrypt
+      - ./nginx/nginx.dev.conf:/data/nginx/custom/http_top.conf
+    depends_on:
+      - frontend
+      - backend
+      - mysql
+      - adminer
+    networks:
+      - frontend-network
+      - backend-network
+  mysql:
+    image: mysql:8
+    container_name: mysql
+    # restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+    ports:
+      - "3307:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    networks:
+      - db-network
+
+  # redis:
+  #   image: redis:latest
+  #   container_name: redis
+  #   ports:
+  #     - "6379:6379"
+  #   networks:
+  #     - my-network
+  #   volumes:
+  #     - redis_data:/data
+
+  # rabbitmq:
+  #   image: rabbitmq:4.0.5-management
+  #   container_name: rabbitmq
+  #   ports:
+  #     - "5672:5672"  # AMQP 프로토콜
+  #     - "15672:15672"  # 관리 웹 UI
+  #   environment:
+  #     RABBITMQ_DEFAULT_USER: ssafy
+  #     RABBITMQ_DEFAULT_PASS: ssafy
+  #   networks:
+  #     - my-network
+
+  backend:
+    build: 
+      context: ./backend
+      dockerfile: Dockerfile.prod
+    container_name: backend
+    # restart: always
+    depends_on:
+      - mysql
+      # - redis
+      # - rabbitmq
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/ssafy_db
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      # SPRING_REDIS_HOST: redis
+      # SPRING_REDIS_PORT: 6379
+      # SPRING_RABBITMQ_HOST: rabbitmq
+      # SPRING_RABBITMQ_PORT: 5672
+      # SPRING_RABBITMQ_USERNAME: ssafy
+      # SPRING_RABBITMQ_PASSWORD: ssafy
+    ports:
+      - "8080:8080"
+    networks:
+      - backend-network
+      - db-network
+
+
+  frontend:
+    build: 
+      context: ./frontend
+      dockerfile: Dockerfile.prod
+    container_name: frontend
+    env_file:
+      - frontend/.env.prod
+    depends_on:
+      - backend
+    ports:
+      - "5173:5173"
+    networks:
+      - frontend-network
+      - backend-network
+    volumes:
+      - ./frontend/vue-app:/app
+      - /app/node_modules
+
+  adminer:
+    image: adminer
+    environment:
+      - ADMINER_DESIGN=pepa-linha
+      - ADMIER_DEFAULT_SERVER=mysql
+    ports:
+      - "8001:8081"  # 외부 8001 -> 내부 8081
+    command: php -S 0.0.0.0:8081 -t /var/www/html  # 강제로 8081에서 실행
+    networks:
+      - db-network  # 네트워크 설정 추가
+      - backend-network
+
+networks:
+  frontend-network:
+  backend-network:
+  db-network:
+
+volumes:
+  mysql_data:
+  data:
+  npm_data:
+  letsencrypt:
+  # redis_data:

@@ -1,6 +1,7 @@
 services:
   prometheus:
     image: prom/prometheus
+    container_name: prometheus
     ports:
       - "9090:9090"
     command:
@@ -15,12 +16,13 @@ services:
 
   grafana:
     image: grafana/grafana-oss
+    container_name: grafana
     expose:
       - "3002"
     ports:
       - "3002:3002"
     environment:
-      - GF_SERVER_ROOT_URL=http://localhost:3000/grafana
+      - GF_SERVER_ROOT_URL=http://localhost:3002/grafana
       - GF_SERVER_SERVE_FROM_SUB_PATH=true
     volumes:
       - grafana:/var/lib/grafana
@@ -31,6 +33,7 @@ services:
 
   cadvisor:
     image: gcr.io/cadvisor/cadvisor:v0.47.0
+    container_name: cadvisor
     ports:
       - "8082:8082"
     volumes:
@@ -49,6 +52,7 @@ services:
 
   loki:
     image: grafana/loki:latest
+    container_name: loki
     ports:
       - 3100:3100
     networks:
@@ -58,6 +62,7 @@ services:
 
   promtail:
     image: grafana/promtail:latest
+    container_name: promtail
     networks:
       - frontend-network
       - backend-network

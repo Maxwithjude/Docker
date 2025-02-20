@@ -35,7 +35,8 @@
 ![ERD](image/ERD.png)
 
 ### Architecture Diagram
-![설명 텍스트](image/Web App Reference Architecture (5).png)
+![설명 텍스트](image/Web%20App%20Reference%20Architecture%20%285%29.png)
+
 
 
 ### User Flow & Wire Frame

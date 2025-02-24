@@ -1,3 +1,4 @@
 .envletsencrypt/
 letsencrypt/
 .env
+.idea/

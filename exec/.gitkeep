@@ -1,0 +1,336 @@
+
+### I. 기술 스택 & 개발 환경
+---
+> [사용 도구]
+>* 이슈 관리: JIRA
+>* 형상 관리: GitLab
+>* 커뮤니케이션: Mattermost, Notion
+>* 디자인: Figma,
+>* UCC: Movavi
+>* CI/CD: EC2, Docker, Jenkins  
+
+> [개발 환경]
+> * **Front-end**
+> 	* Node.js: v22.13.0
+> 	* Vue.js: Vue 3
+> 	* ESLint: 7.1.1
+> 	* Prettier: 3.2.5
+
+>* **Back-end**
+>	* JDK: 17.0.10 LTS
+>	* Spring Boot: 3.3.1
+>	* SpringSecurity
+>	* Gradle: 8.5
+>	* QueryDSL: 5.0.0
+>	* jjwt-api:0.12.3
+>	* Swagger: 2.0.2
+> // 라이브러리 (RSS 파싱)
+    jsoup - version: '1.18.1'
+    rome - version: '2.1.0'
+>  * **DB**
+> 	 * MySQL 8.0.4
+>    * Redis 3.0.504
+
+>  * **Infra**
+> 	 * Server:
+> 		 * AWS EC2: Ubuntu 22.04.5 LTS
+> 	 * Containerization Platform:
+> 		 * Docker: 25.0.4
+> 	 * CI/CD:
+> 		 * Jenkins: 2.448
+> 	 * Web Server:
+> 		 * Nginx Proxy Manager: 5.4.8
+
+> * **Monitoring 및 관리자 페이지**
+>     * Adminer 4.8.1
+>     * Nginx Proxy Manager: 5.4.8
+>     * Prometheus 3.2.0
+>     * grafana/grafana-oss
+>     * Grafana/loki 3.4 
+>     * Grafana/Promtail 3.4
+>     * gcr.io/cadvisor/cadvisor:v0.47.0
+
+> [외부 서비스]
+> * ChatGPT API
+
+> [gitignore]
+```
+프로젝트를 클론 받고
+docker compose -f docker-compose.prod.yml up 실행
+
+git submodule을 이용하여 dev/be 브랜치를 backend 폴더로, dev/fe를 frontend 폴더로 통합 환경으로 되어있음.
+
+[프론트엔드 환경변수]
+파일명 .env.prod (경로 frontend/vue-app)
+VITE_API_BASE_URL={your_domain_back_route}
+
+[백엔드 환경변수]
+.env.prod (경로 backend)
+BACKEND_CORS_ORIGIN={your_domain_equal.SSL_name}
+DOMAIN={your_domain_equal.SSL_nname}
+
+### IntelliJ IDEA ###  
+.idea  
+*.iws  
+*.iml  
+*.ipr  
+out/  
+!**/src/main/**/out/  
+!**/src/test/**/out/  
+  
+### NetBeans ###  
+/nbproject/private/  
+/nbbuild/  
+/dist/  
+/nbdist/  
+/.nb-gradle/  
+  
+### VS Code ###  
+.vscode/  
+  
+# FCM 비공개 키  
+/src/main/resources/{FCM 비공개 키 파일 이름}.json
+```
+```
+[Front]
+
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+node_modules
+dist
+dist-ssr
+*.local
+
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+```
+
+> [환경변수 (root 프로젝트) ]
+MYSQL_ROOT_PASSWORD={your_db_password}
+MYSQL_DATABASE={your_db_table_name}
+SPRING_RABBITMQ_HOST={your_rabbitmqcontainer_name}
+SPRING_RABBITMQ_PORT={your_port}
+SPRING_RABBITMQ_USERNAME={default}
+SPRING_RABBITMQ_PASSWORD={default}
+
+> [환경변수 (Front) ]
+VITE_API_BASE_URL={your_domain_link/api}
+
+
+[Back]
+# S3 설정
+cloud.aws.credentials.access-key={YOUR_AWS_ACCESS_KEY}
+cloud.aws.credentials.secret-key={YOUR_AWS_SECRET_KEY}
+cloud.aws.region.static=ap-northeast-2
+cloud.aws.s3.mypage-bucket={YOUR_S3_BUCKET_NAME}
+default-profile-image-url=https://{YOUR_S3_BUCKET_NAME}.s3.ap-northeast-2.amazonaws.com/default-profile.jpg
+
+# JWT 설정
+jwt.secret.key={YOUR_JWT_SECRET_KEY}
+
+# 메일 서버 설정
+mail.host=smtp.gmail.com
+mail.port=587
+mail.username={YOUR_EMAIL}
+mail.password={YOUR_EMAIL_PASSWORD}
+mail.properties.mail.smtp.auth=true
+mail.properties.mail.smtp.ssl.enable=true
+mail.properties.mail.smtp.ssl.trust=smtp.gmail.com
+
+# ChatGPT API 설정
+spring.ai.openai.api-key={YOUR_OPENAI_API_KEY}
+spring.ai.openai.model=gpt-4
+spring.ai.openai.temperature=0.7
+spring.ai.openai.max-tokens=4000
+
+# OAuth2 Google 로그인 설정
+spring.security.oauth2.client.registration.google.client-name=Google
+spring.security.oauth2.client.registration.google.client-id={YOUR_GOOGLE_CLIENT_ID}
+spring.security.oauth2.client.registration.google.client-secret={YOUR_GOOGLE_CLIENT_SECRET}
+spring.security.oauth2.client.registration.google.redirect-uri={YOUR_BACKEND_URL}/login/oauth2/code/google
+spring.security.oauth2.client.registration.google.authorization-grant-type=authorization_code
+spring.security.oauth2.client.registration.google.scope=email,profile
+
+# 서버 설정
+SERVER_PORT={YOUR_BACKEND_PORT}
+
+# DB 서버 연결 설정
+# 기존 설정들...
+spring.application.name=byeoldam
+
+spring.config.import=secret.properties
+# master 브랜치의 docker-compose.yml에 env 설정한 요소가 없으면 아래 요소로 반영 dev/be에서 일관된 환경
+spring.datasource.url=${SPRING_DATASOURCE_URL:jdbc:mysql://localhost:3306/ssafy_db}
+spring.datasource.username=${SPRING_DATASOURCE_USERNAME:root}
+spring.datasource.password=${SPRING_DATASOURCE_PASSWORD:1234}
+spring.datasource.driver-class-name=com.mysql.cj.jdbc.Driver
+
+# Redis 설정
+spring.data.redis.host=redis
+spring.data.redis.port=6379
+
+# RabbitMQ 설정
+spring.rabbitmq.host=${SPRING_RABBITMQ_HOST}
+spring.rabbitmq.port=${SPRING_RABBITMQ_PORT}
+spring.rabbitmq.username=${SPRING_RABBITMQ_USERNAME}
+spring.rabbitmq.password=${SPRING_RABBITMQ_PASSWORD}
+
+# Hibernate (JPA)
+spring.jpa.hibernate.ddl-auto=update
+spring.jpa.show-sql=false
+spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.MySQL8Dialect
+spring.jpa.properties.hibernate.format_sql=true
+spring.jpa.properties.hibernate.id.new_generator_mappings=true
+
+# 도커 환경 테스트시
+server.address=0.0.0.0
+server.port=8080
+
+
+
+
+
+
+###  II. 빌드 및 배포
+---
+> [개발 환경에서 직접 빌드(로컬 빌드)]
+> [Front]
+> 1. 의존성 설치
+> `npm install`
+>
+>2. 프로젝트 빌드 (정적 파일 생성)
+> `npm run build`
+> 
+> 
+> [Back]
+> 1. 프로젝트 빌드
+>` ./gradlew build`
+> (Gradle - Tasks - build - bootJar 로도 jar 파일 생성 가능)
+>
+>2. 빌드된 JAR 파일 실행
+> `java -jar build/libs/{프로젝트명}.jar`
+> 
+> * 빌드/실행 동시에 하는 경우
+>   `./gradlew bootRun`
+>
+
+
+
+```
+
+> Frontend Dockerfile
+
+FROM node:22
+
+WORKDIR /app
+
+# package.json과 package-lock.json 복사
+COPY vue-app/package*.json ./
+
+# 종속성 설치
+RUN npm install --legacy-peer-deps
+
+# 전체 소스 코드 복사
+COPY vue-app/ .
+
+# Vite 글로벌 설치
+RUN npm install -g vite
+
+# 개발 서버 실행
+CMD ["npm", "run", "dev", "--", "--host", "0.0.0.0"]
+
+EXPOSE 5173
+
+
+> Backend Dockerfile
+```
+# Java 17 버전으로 변경
+FROM eclipse-temurin:17-jdk
+
+# 작업 디렉터리 설정
+WORKDIR /app
+
+# Gradle 래퍼와 빌드 스크립트 복사
+COPY ./gradlew . 
+COPY ./gradle gradle
+COPY ./build.gradle . 
+COPY ./settings.gradle .
+
+# Gradle 래퍼에 실행 권한 부여
+RUN chmod +x gradlew
+
+# 소스 코드 복사
+COPY ./src src
+
+# JAVA_HOME 환경변수 설정
+ENV JAVA_HOME=/opt/java/openjdk
+ENV PATH="${JAVA_HOME}/bin:${PATH}"
+
+# wait-for-it 설치 (MySQL 준비 확인용)
+RUN apt-get update && apt-get install -y wait-for-it
+
+# Gradle 빌드 실행
+RUN ./gradlew build -x test --no-daemon --warning-mode all
+
+# 컨테이너 시작 시 실행할 명령 설정
+CMD wait-for-it mysql:3306 -- java -jar /app/build/libs/byeoldam-0.0.1-SNAPSHOT.jar
+
+
+> [Nginx 설정파일]
+
+  server {
+      listen 80;
+      server_name localhost;
+			
+      location / {
+          proxy_pass http://frontend:5173;
+      }
+
+      location /api {
+          proxy_pass http://backend:8080/api;
+      }
+      
+      location /prometheus {
+          proxy_pass http://prometheus:9090;
+      }
+      
+      location /grafana {
+          proxy_pass http://grafana:3000;
+      }
+
+  }
+
+  server {
+      listen 80;
+      server_name db.localhost;
+
+      location / {
+          proxy_pass http://adminer:8081;
+      }
+  }
+
+  server {
+      listen 80;
+      server_name proxy.localhost;
+
+      location / {
+          proxy_pass http://nginx_proxy:81;
+      }
+  }
+  
+SSL 경로 등 나머지 설정은 nginx proxy manager 웹 ui로 직접 설정함
